@@ -31,6 +31,7 @@ public class NPCVehicleController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        rb.constraints = RigidbodyConstraints.FreezeRotationZ;
 
         // Randomize this car's driving speed once
         currentSpeed = Random.Range(minSpeed, maxSpeed);
