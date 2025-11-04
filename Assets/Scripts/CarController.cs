@@ -56,10 +56,10 @@ public class CarController : MonoBehaviour
         GetInputs();
         AnimateWheels();
         //WheelEffects();
-        speed = carRb.linearVelocity.magnitude * 3.6f; // Convert to km/h
+        speed = carRb.linearVelocity.magnitude * 3.6f;
     }
 
-    void LateUpdate()
+    void FixedUpdate()
     {
         Move();
         Steer();
