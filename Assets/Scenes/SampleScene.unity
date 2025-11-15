@@ -277,8 +277,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.0005, y: 0.4788711, z: 0.05108442}
-  m_Center: {x: 0, y: 0.2385401, z: 0.024457812}
+  m_Size: {x: 0.05, y: 0.4788711, z: 0.05108442}
+  m_Center: {x: 0.025, y: 0.2385401, z: 0.024457812}
 --- !u!1 &198805668
 GameObject:
   m_ObjectHideFlags: 0
@@ -1063,7 +1063,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &902612852
 Transform:
   m_ObjectHideFlags: 0
@@ -1073,8 +1073,8 @@ Transform:
   m_GameObject: {fileID: 902612851}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.45, y: 0.75, z: -0.94}
-  m_LocalScale: {x: 2.25, y: 1.06, z: 12.73}
+  m_LocalPosition: {x: -2.45, y: 0.75, z: -4.5100007}
+  m_LocalScale: {x: 2.25, y: 1.06, z: 9}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1630466463}
@@ -1116,7 +1116,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1008777556
 Transform:
   m_ObjectHideFlags: 0
@@ -1126,8 +1126,8 @@ Transform:
   m_GameObject: {fileID: 1008777555}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.45, y: 0.75, z: -0.94}
-  m_LocalScale: {x: 2.25, y: 1.06, z: 12.73}
+  m_LocalPosition: {x: 2.45, y: 0.75, z: -4.51}
+  m_LocalScale: {x: 2.25, y: 1.06, z: 9}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1630466463}
@@ -1204,8 +1204,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.0005, y: 0.4788711, z: 0.05108442}
-  m_Center: {x: 0, y: 0.2385401, z: 0.024457812}
+  m_Size: {x: 0.05, y: 0.4788711, z: 0.05108442}
+  m_Center: {x: 0.025, y: 0.2385401, z: 0.024457812}
 --- !u!1 &1184417369 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1990637836977232563, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
@@ -1288,8 +1288,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.0005, y: 0.4788711, z: 0.05108442}
-  m_Center: {x: 0, y: 0.2385401, z: 0.024457812}
+  m_Size: {x: 0.05, y: 0.4788711, z: 0.05108442}
+  m_Center: {x: -0.025, y: 0.2385401, z: 0.024457812}
 --- !u!1 &1322660477
 GameObject:
   m_ObjectHideFlags: 0
@@ -1341,8 +1341,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.0005, y: 0.4788711, z: 0.05108442}
-  m_Center: {x: 0, y: 0.2385401, z: 0.024457812}
+  m_Size: {x: 0.05, y: 0.4788711, z: 0.05108442}
+  m_Center: {x: -0.025, y: 0.2385401, z: 0.024457812}
 --- !u!1 &1384980573 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: e969ef76ad815ac4b94b62ced4c59f15, type: 3}
@@ -1493,7 +1493,7 @@ Transform:
   m_GameObject: {fileID: 1570094851}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.9, y: 0.1844521, z: -119.1}
+  m_LocalPosition: {x: 4.6, y: 0.1844521, z: -122.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2321,6 +2321,10 @@ PrefabInstance:
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2282600011012071076, guid: 8b2802472e56e054b92313fe260afe45, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2282600011012071076, guid: 8b2802472e56e054b92313fe260afe45, type: 3}
       propertyPath: brakeForce
       value: 10000
       objectReference: {fileID: 0}
@@ -2358,7 +2362,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4029899513338190374, guid: 8b2802472e56e054b92313fe260afe45, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -20.13
+      value: -45.879997
       objectReference: {fileID: 0}
     - target: {fileID: 4029899513338190374, guid: 8b2802472e56e054b92313fe260afe45, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2415,6 +2419,10 @@ PrefabInstance:
     - target: {fileID: 7236321387134924759, guid: 8b2802472e56e054b92313fe260afe45, type: 3}
       propertyPath: m_Mass
       value: 400
+      objectReference: {fileID: 0}
+    - target: {fileID: 7236321387134924759, guid: 8b2802472e56e054b92313fe260afe45, type: 3}
+      propertyPath: m_Constraints
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8666253602414703790, guid: 8b2802472e56e054b92313fe260afe45, type: 3}
       propertyPath: m_SuspensionSpring.damper
@@ -2665,7 +2673,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1711592240204503114, guid: 9b17be39194320a42b89287935b99200, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4.4
+      value: -0.87000036
       objectReference: {fileID: 0}
     - target: {fileID: 1711592240204503114, guid: 9b17be39194320a42b89287935b99200, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2673,7 +2681,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1711592240204503114, guid: 9b17be39194320a42b89287935b99200, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -27.89
+      value: -47.5
       objectReference: {fileID: 0}
     - target: {fileID: 1711592240204503114, guid: 9b17be39194320a42b89287935b99200, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2723,6 +2731,10 @@ PrefabInstance:
       propertyPath: m_SidewaysFriction.m_Stiffness
       value: 3.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3408542214279494584, guid: 9b17be39194320a42b89287935b99200, type: 3}
+      propertyPath: m_Constraints
+      value: 126
+      objectReference: {fileID: 0}
     - target: {fileID: 4412562776495352722, guid: 9b17be39194320a42b89287935b99200, type: 3}
       propertyPath: maxSpeed
       value: 16
@@ -2750,6 +2762,10 @@ PrefabInstance:
     - target: {fileID: 4412562776495352722, guid: 9b17be39194320a42b89287935b99200, type: 3}
       propertyPath: stopDistance
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4412562776495352722, guid: 9b17be39194320a42b89287935b99200, type: 3}
+      propertyPath: vehicleLayer.m_Bits
+      value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 4412562776495352722, guid: 9b17be39194320a42b89287935b99200, type: 3}
       propertyPath: accelerationSmoothness
@@ -3055,6 +3071,14 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 863325181817411895, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
+      propertyPath: m_SuspensionSpring.damper
+      value: 2000
+      objectReference: {fileID: 0}
+    - target: {fileID: 863325181817411895, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
+      propertyPath: m_SuspensionSpring.spring
+      value: 8000
+      objectReference: {fileID: 0}
+    - target: {fileID: 863325181817411895, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
       propertyPath: m_ForwardFriction.m_Stiffness
       value: 3
       objectReference: {fileID: 0}
@@ -3064,7 +3088,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3837339526210298114, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4.9
+      value: -1.37
       objectReference: {fileID: 0}
     - target: {fileID: 3837339526210298114, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3103,12 +3127,28 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4253105781423460251, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
+      propertyPath: m_SuspensionSpring.damper
+      value: 2000
+      objectReference: {fileID: 0}
+    - target: {fileID: 4253105781423460251, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
+      propertyPath: m_SuspensionSpring.spring
+      value: 8000
+      objectReference: {fileID: 0}
+    - target: {fileID: 4253105781423460251, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
       propertyPath: m_ForwardFriction.m_Stiffness
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4253105781423460251, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
       propertyPath: m_SidewaysFriction.m_Stiffness
       value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6268146195172965976, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
+      propertyPath: m_SuspensionSpring.damper
+      value: 2000
+      objectReference: {fileID: 0}
+    - target: {fileID: 6268146195172965976, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
+      propertyPath: m_SuspensionSpring.spring
+      value: 8000
       objectReference: {fileID: 0}
     - target: {fileID: 6268146195172965976, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
       propertyPath: m_ForwardFriction.m_Stiffness
@@ -3125,6 +3165,14 @@ PrefabInstance:
     - target: {fileID: 6931984949859570175, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7466189250562879933, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
+      propertyPath: m_SuspensionSpring.damper
+      value: 2000
+      objectReference: {fileID: 0}
+    - target: {fileID: 7466189250562879933, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
+      propertyPath: m_SuspensionSpring.spring
+      value: 8000
       objectReference: {fileID: 0}
     - target: {fileID: 7466189250562879933, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
       propertyPath: m_ForwardFriction.m_Stiffness
@@ -3307,13 +3355,16 @@ MonoBehaviour:
   minSpeed: 12
   maxSpeed: 18
   acceleration: 25
-  accelerationSmoothness: 0.6
+  accelerationSmoothness: 0.4
   steerAngle: 30
   turnSmoothness: 5
   brakeForce: 2000
-  stopDistanceMultiplier: 1.2
+  stopDistanceMultiplier: 1.5
   driveTarget: {fileID: 1570094852}
   reverseMechanics: 0
+  adjustedSpeedLimit: 15
+  speedLimit: 15
+  stopDistance: 3
   tryOvertake: 1
   overtakeTarget: {fileID: 843611306}
   rightChecker: {fileID: 1008777557}
@@ -3324,9 +3375,12 @@ MonoBehaviour:
   frontCheckerDistance: 20
   overTakeSideClearance: 2
   isOvertaking: 0
+  checkTime: 0.1
   vehicleLayer:
     serializedVersion: 2
     m_Bits: 64
+  obstacle: {fileID: 0}
+  obstacleDistance: Infinity
   wheels:
   - wheelModel: {fileID: 1958506289}
     wheelCollider: {fileID: 685661894}

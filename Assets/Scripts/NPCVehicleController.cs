@@ -2,6 +2,7 @@
 
 public class NPCVehicleController : MonoBehaviour
 {
+    public Transform temp;
     [System.Serializable]
     public enum Axel { Front, Rear }
 
@@ -25,30 +26,34 @@ public class NPCVehicleController : MonoBehaviour
     public float stopDistanceMultiplier = 1f;
     public Transform driveTarget;
     public bool reverseMechanics = false;
+    public float adjustedSpeedLimit = 15f;
+    private float currentAcceleration = 0f;
+    public float speedLimit = 15f;
+    public float stopDistance = 3f;
 
     [Header("Checker Settings")]
     public bool tryOvertake = true;
     public Transform overtakeTarget;
-    public BoxCollider rightChecker;
-    public BoxCollider leftChecker;
     public GameObject frontChecker;
     public GameObject frontRightchecker;
     public GameObject frontLeftChecker;
     public float frontCheckerDistance = 20f;
     public float overTakeSideClearance = 2f;
     public bool isOvertaking = false;
+    public float checkTime = 0.25f;
+    private float lastCheckTime = 0f;
     public LayerMask vehicleLayer;
     private BoxCollider vehicleBodyCollider;
+    public GameObject obstacle;
+    public float obstacleDistance = Mathf.Infinity;
+    private Vector3 checkSize = Vector3.zero;
 
     [Header("Wheels Setup")]
     public Wheel[] wheels;
 
     private Rigidbody rb;
-    private float currentAcceleration = 0f;
-    private float speedLimit = 15f;
     private Vector3 dirToTarget;
     private float absSteerAngle = 0f;
-    private float stopDistance = 3f;
     private Transform driveToTarget;
 
     void Start()
@@ -58,13 +63,44 @@ public class NPCVehicleController : MonoBehaviour
         vehicleBodyCollider = GetComponentInChildren<BoxCollider>();
         // Randomize this car's driving speed once
         speedLimit = Random.Range(minSpeed, maxSpeed);
-        if (reverseMechanics) { acceleration = -acceleration; }
+        if (reverseMechanics) 
+        { 
+            acceleration = -acceleration;
+            speedLimit = -speedLimit;
+            minSpeed = -minSpeed;
+            maxSpeed = -maxSpeed;
+        }
+        if(vehicleBodyCollider == null)
+        {
+            Debug.LogError(transform.name + ": Vehicle body collider not found!");
+        }
+        else
+        {
+            checkSize = new Vector3(vehicleBodyCollider.size.x + 0.5f, 1f, vehicleBodyCollider.size.z * 2f) * 0.5f;
+        }
     }
 
     void Update()
     {
         UpdateWheelModels();
-        ObstacleCheck();
+        lastCheckTime += Time.deltaTime;
+        if (lastCheckTime > checkTime)
+        {
+            Quaternion checkerRotation = Quaternion.Euler(-transform.rotation.eulerAngles.x, 0f, 0f);
+            frontChecker.transform.localRotation = checkerRotation; 
+            frontChecker.transform.localRotation = checkerRotation; 
+            frontLeftChecker.transform.localRotation = checkerRotation;
+            ObstacleCheck();
+            lastCheckTime = 0f;
+        }
+        /*
+        Vector3 tempPos = temp.position;
+        tempPos.x = vehicleBodyCollider.transform.position.x + vehicleBodyCollider.size.x + 0.5f;
+        tempPos.y = 1f;
+        tempPos.z = vehicleBodyCollider.transform.position.z;
+        temp.position = tempPos;
+        temp.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
+        temp.localScale = new Vector3(vehicleBodyCollider.size.x + 0.5f, 1f, vehicleBodyCollider.size.z*2);*/
     }
 
     void FixedUpdate()
@@ -79,24 +115,44 @@ public class NPCVehicleController : MonoBehaviour
 
     void DriveTowardsTarget()
     {
-        stopDistance = Mathf.Clamp(vehicleSpeed * 0.4f * stopDistanceMultiplier, 4f, 20f);
+        if(obstacle != null)
+        {
+            float distanceFactor = Mathf.Clamp(obstacleDistance, 1f, frontCheckerDistance);
+            float normalizedDistance = Mathf.InverseLerp(1f, frontCheckerDistance, distanceFactor);
+            adjustedSpeedLimit = Mathf.Lerp(1f, minSpeed, normalizedDistance);
+        }
+        else
+        {
+            adjustedSpeedLimit = speedLimit; // Default
+        }
+
+        stopDistance = Mathf.Clamp(vehicleSpeed * 0.4f * stopDistanceMultiplier, 1.5f, 20f);
 
         if (isOvertaking)
         {
             dirToTarget = overtakeTarget.position - transform.position;
-            driveToTarget = overtakeTarget;
+            if(driveToTarget != overtakeTarget)
+            {
+                driveToTarget = overtakeTarget;
+                Debug.LogWarning(transform.name + ": Overtaking Drive to overTake");
+            }
             float distance = dirToTarget.magnitude;
             float dotDirection = Vector3.Dot(transform.forward, dirToTarget.normalized);
-            if (dotDirection < 0 || distance <= 2f)
+            if (dotDirection < 0 || distance <= 0.5f)
             {
                 isOvertaking = false;
                 driveToTarget = driveTarget;
+                Debug.LogWarning(transform.name + ": change Drive to target");
             }
         }
         else
         {
             dirToTarget = driveTarget.position - transform.position;
-            driveToTarget = driveTarget;
+            if(driveToTarget != driveTarget)
+            {
+                Debug.LogWarning(transform.name + ": Drive to target");
+                driveToTarget = driveTarget;
+            }
             float distance = dirToTarget.magnitude;
             float dotDirection = Vector3.Dot(transform.forward, dirToTarget.normalized);
             // Stop near target
@@ -106,11 +162,10 @@ public class NPCVehicleController : MonoBehaviour
             {
                 currentAcceleration = 0f;
                 ApplyBrakes(true);
+                Debug.LogError(transform.name + ": Stopping for target");
                 return;
             }
         }
-
-        ApplyBrakes(false);
 
         //Steering
         Vector3 localTarget = transform.InverseTransformPoint(driveToTarget.position);
@@ -121,7 +176,6 @@ public class NPCVehicleController : MonoBehaviour
         vehicleSpeed = rb.linearVelocity.magnitude;
 
         // --- Adjust speed limit based on steer angle ---
-        float adjustedSpeedLimit = speedLimit; // Default
         float adjustedAcceleration = acceleration;
         if (absSteerAngle > 10f)
         {
@@ -133,11 +187,6 @@ public class NPCVehicleController : MonoBehaviour
         //Smooth acceleration
         currentAcceleration = Mathf.Lerp(currentAcceleration, adjustedAcceleration, accelerationSmoothness * Time.deltaTime);
 
-        // If under max speed, apply torque
-        if (reverseMechanics)
-        {
-            speedLimit = -speedLimit;
-        }
         foreach (var wheel in wheels)
         {
             if (wheel.axel == Axel.Front)
@@ -156,6 +205,13 @@ public class NPCVehicleController : MonoBehaviour
                 {
                     // Still below max speed — apply forward torque
                     wheel.wheelCollider.motorTorque = currentAcceleration * 50f;
+                    Debug.LogError(transform.name + ": Applying motor torque");
+                }
+                else if(vehicleSpeed > adjustedSpeedLimit + 5f)
+                {
+                    currentAcceleration = 0f;
+                    ApplyBrakes(true);
+                    Debug.LogError(transform.name + "Breaking For OverSpeed");
                 }
                 else
                 {
@@ -174,6 +230,7 @@ public class NPCVehicleController : MonoBehaviour
         {
             wheel.wheelCollider.brakeTorque = brake;
         }
+        //Debug.LogError(transform.name + ": Applying brakes - " + apply);
     }
 
     void UpdateWheelModels()
@@ -193,90 +250,139 @@ public class NPCVehicleController : MonoBehaviour
 
     void ObstacleCheck()
     {
-        RaycastHit hit;
-        if (Physics.Raycast(frontChecker.transform.position, frontChecker.transform.forward, out hit, frontCheckerDistance, vehicleLayer))
+        RaycastHit hit1, hit2, hit3;
+        bool foundHit = false;
+        RaycastHit closestHit = new RaycastHit();
+        if (Physics.Raycast(frontChecker.transform.position, frontChecker.transform.forward, out hit1, frontCheckerDistance, vehicleLayer))
         {
+            closestHit = hit1;
+            foundHit = true;
             // Obstacle detected in front
-            if (hit.distance > stopDistance && tryOvertake && !isOvertaking)
-            {
-                Vector3 hitVehicleSize = GetColliderWorldSize(hit.collider);
-                float sideOverTakePosition = hitVehicleSize.x/2 + rightChecker.size.x / 2 + overTakeSideClearance;
-                Vector3 rightOvertakePos = new Vector3(hit.point.x + sideOverTakePosition, vehicleBodyCollider.transform.position.y, hit.point.z);
-                Vector3 leftOvertakePos = new Vector3(hit.point.x - sideOverTakePosition, vehicleBodyCollider.transform.position.y, hit.point.z);
-                TryOvertake(rightOvertakePos, leftOvertakePos);
-                Debug.Log(hit.transform.name + " detected, attempting overtake. OverTakePosition:" + overtakeTarget.position);
-            }
-            else
+            if (hit1.distance <= stopDistance)
             {
                 ApplyBrakes(true);
+                Debug.LogError("1Braking for distance: " + hit1.distance);
+                return;
             }
-            return;
         }
-        if (Physics.Raycast(frontRightchecker.transform.position, frontRightchecker.transform.forward, out hit, frontCheckerDistance, vehicleLayer))
+        if (Physics.Raycast(frontRightchecker.transform.position, frontRightchecker.transform.forward, out hit2, frontCheckerDistance, vehicleLayer))
         {
+            if (!foundHit || hit2.distance < closestHit.distance)
+                closestHit = hit2;
+
+            foundHit = true;
             // Obstacle detected in front right
-            if (hit.distance > stopDistance && tryOvertake && !isOvertaking)
-            {
-                Vector3 hitVehicleSize = GetColliderWorldSize(hit.collider);
-                float sideOverTakePosition = hitVehicleSize.x / 2 + rightChecker.size.x / 2 + overTakeSideClearance;
-                Vector3 rightOvertakePos = new Vector3(hit.point.x + sideOverTakePosition, vehicleBodyCollider.transform.position.y, hit.point.z);
-                Vector3 leftOvertakePos = new Vector3(hit.point.x - sideOverTakePosition, vehicleBodyCollider.transform.position.y, hit.point.z);
-                TryOvertake(rightOvertakePos, leftOvertakePos);
-                Debug.Log(hit.transform.name + " detected, attempting overtake. OverTakePosition:" + overtakeTarget.position);
-            }
-            else
+            if (hit2.distance <= stopDistance)
             {
                 ApplyBrakes(true);
+                Debug.LogError("2Braking for distance: " + hit2.distance);
+                return;
             }
-            return;
         }
-        if (Physics.Raycast(frontLeftChecker.transform.position, frontLeftChecker.transform.forward, out hit, frontCheckerDistance, vehicleLayer))
+        if (Physics.Raycast(frontLeftChecker.transform.position, frontLeftChecker.transform.forward, out hit3, frontCheckerDistance, vehicleLayer))
         {
+            if (!foundHit || hit3.distance < closestHit.distance)
+                closestHit = hit3;
+
+            foundHit = true;
             // Obstacle detected in front left
-            if (hit.distance > stopDistance && tryOvertake && !isOvertaking)
-            {
-                Vector3 hitVehicleSize = GetColliderWorldSize(hit.collider);
-                float sideOverTakePosition = hitVehicleSize.x / 2 + rightChecker.size.x / 2 + overTakeSideClearance;
-                Vector3 rightOvertakePos = new Vector3(hit.point.x + sideOverTakePosition, vehicleBodyCollider.transform.position.y, hit.point.z);
-                Vector3 leftOvertakePos = new Vector3(hit.point.x - sideOverTakePosition, vehicleBodyCollider.transform.position.y, hit.point.z);
-                TryOvertake(rightOvertakePos, leftOvertakePos);
-                Debug.Log(hit.transform.name + " detected, attempting overtake. OverTakePosition:" + overtakeTarget.position);
-            }
-            else
+            if (hit3.distance <= stopDistance)
             {
                 ApplyBrakes(true);
+                Debug.LogError("3Braking for distance: " + hit3.distance);
+                return;
             }
-            return;
+        }
+
+        if (foundHit && obstacle != closestHit.collider?.gameObject)
+        {
+            obstacle = closestHit.collider.gameObject;
+            isOvertaking = false;
+            Debug.LogWarning("Closest Hit: " + obstacle.name);
+        }
+        obstacleDistance = closestHit.distance;
+        if(obstacleDistance > stopDistance)
+        {
+            ApplyBrakes(false);
+        }
+
+        if (!foundHit)
+        {
+            ApplyBrakes(false); // No obstacles detected
+            obstacle = null;
+            obstacleDistance = Mathf.Infinity;
+        }
+        else if (tryOvertake && !isOvertaking)
+        {
+            Vector3 vehicleColliderSize = GetColliderWorldSize(closestHit.collider);
+            float sideOverTakePosition = vehicleColliderSize.x / 2 + checkSize.x / 2 + overTakeSideClearance;
+            Vector3 rightOvertakePos = new Vector3(obstacle.transform.position.x - sideOverTakePosition, vehicleBodyCollider.transform.position.y, closestHit.point.z);
+            Vector3 leftOvertakePos = new Vector3(obstacle.transform.position.x + sideOverTakePosition, vehicleBodyCollider.transform.position.y, closestHit.point.z);
+            TryOvertakeRightSide(rightOvertakePos, leftOvertakePos);
         }
     }
 
-    void TryOvertake(Vector3 rightSideOverTakePosition, Vector3 leftSideOverTakePosition)
+    void TryOvertakeRightSide(Vector3 rightSideOverTakePosition, Vector3 leftSideOverTakePosition)
     {
         // Check right side first
-        rightChecker.enabled = true;
-        leftChecker.enabled = true;
-        if (!Physics.CheckBox(rightChecker.transform.position, rightChecker.size / 2, rightChecker.transform.rotation))
+        if (!Physics.CheckBox(rightSideOverTakePosition, vehicleBodyCollider.size / 2, Quaternion.identity))
         {
-            // Right side is clear
-            if (!Physics.CheckBox(rightSideOverTakePosition, vehicleBodyCollider.size / 2, Quaternion.identity))
+            Vector3 checkPos = new Vector3(
+                vehicleBodyCollider.transform.position.x - vehicleBodyCollider.size.x - 0.5f,
+                1f,
+                vehicleBodyCollider.transform.position.z + vehicleBodyCollider.size.z / 2
+            );
+
+            Quaternion checkRot = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
+
+            if (!Physics.CheckBox(checkPos, checkSize, checkRot))
             {
                 // Safe to overtake on the right
                 overtakeTarget.position = rightSideOverTakePosition;
+                overtakeTarget.SetParent(obstacle.transform);
                 isOvertaking = true;
             }
-        }
-        else if (!Physics.CheckBox(leftChecker.transform.position, leftChecker.size / 2, leftChecker.transform.rotation))
-        {
-            // Right side is clear
-            if (!Physics.CheckBox(leftSideOverTakePosition, vehicleBodyCollider.size / 2, Quaternion.identity))
+            else
             {
-                // Safe to overtake on the right
-                overtakeTarget.position = leftSideOverTakePosition;
-                isOvertaking = true;
+                TryOvertakeLeftSide(leftSideOverTakePosition);
+                Debug.LogWarning("Right side blocked by vehicle.");
             }
         }
-        rightChecker.enabled = false;
-        leftChecker.enabled = false;
+        else
+        {
+            TryOvertakeLeftSide(leftSideOverTakePosition);
+            Debug.LogWarning("Right side No Space.");
+        }
+    }
+
+    void TryOvertakeLeftSide(Vector3 leftSideOverTakePosition)
+    {
+        //leftChecker.enabled = true;
+        if (!Physics.CheckBox(leftSideOverTakePosition, vehicleBodyCollider.size / 2, Quaternion.identity))
+        {
+            Vector3 checkPos = new Vector3(
+                vehicleBodyCollider.transform.position.x + vehicleBodyCollider.size.x + 0.5f,
+                1f,
+                vehicleBodyCollider.transform.position.z + vehicleBodyCollider.size.z/2
+            );
+
+            Quaternion checkRot = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
+
+            if (!Physics.CheckBox(checkPos, checkSize, checkRot))
+            {
+                // Safe to overtake on the left
+                overtakeTarget.position = leftSideOverTakePosition;
+                overtakeTarget.SetParent(obstacle.transform);
+                isOvertaking = true;
+            }
+            else
+            {
+                Debug.LogWarning("Both side blocked by vehicle.");
+            }
+        }else
+        {
+            Debug.LogWarning("Both side No Space.");
+        }
     }
 
     // Helper: returns an approximate world-space size of the collider.
@@ -300,6 +406,11 @@ public class NPCVehicleController : MonoBehaviour
         // Only show when the game is running or in edit mode
         if (vehicleBodyCollider == null) return;
 
+        // Debug draw rays
+        Debug.DrawRay(frontChecker.transform.position, frontChecker.transform.forward * frontCheckerDistance, Color.red);
+        Debug.DrawRay(frontRightchecker.transform.position, frontRightchecker.transform.forward * frontCheckerDistance, Color.yellow);
+        Debug.DrawRay(frontLeftChecker.transform.position, frontLeftChecker.transform.forward * frontCheckerDistance, Color.cyan);
+
         // Set gizmo color (red if blocked, green if clear)
         Gizmos.color = Color.green;
 
@@ -316,5 +427,6 @@ public class NPCVehicleController : MonoBehaviour
         // Draw the wireframe box in Scene view
         Gizmos.matrix = Matrix4x4.TRS(overtakeTarget.position, Quaternion.identity, Vector3.one);
         Gizmos.DrawWireCube(Vector3.zero, vehicleBodyCollider.size);
+
     }
 }
