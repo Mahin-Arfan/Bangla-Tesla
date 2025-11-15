@@ -279,6 +279,59 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.05, y: 0.4788711, z: 0.05108442}
   m_Center: {x: 0.025, y: 0.2385401, z: 0.024457812}
+--- !u!1 &191452396
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 191452397}
+  - component: {fileID: 191452398}
+  m_Layer: 0
+  m_Name: Right (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &191452397
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191452396}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: -1.3613431, y: 0.7889779, z: -5.6867065}
+  m_LocalScale: {x: 1.93, y: 1, z: 4.656021}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &191452398
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191452396}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &198805668
 GameObject:
   m_ObjectHideFlags: 0
@@ -1063,7 +1116,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &902612852
 Transform:
   m_ObjectHideFlags: 0
@@ -1116,7 +1169,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1008777556
 Transform:
   m_ObjectHideFlags: 0
@@ -1493,7 +1546,7 @@ Transform:
   m_GameObject: {fileID: 1570094851}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.6, y: 0.1844521, z: -122.6}
+  m_LocalPosition: {x: 4.17, y: 0.1844521, z: -73.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2673,7 +2726,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1711592240204503114, guid: 9b17be39194320a42b89287935b99200, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.87000036
+      value: 4.5
       objectReference: {fileID: 0}
     - target: {fileID: 1711592240204503114, guid: 9b17be39194320a42b89287935b99200, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3086,9 +3139,13 @@ PrefabInstance:
       propertyPath: m_SidewaysFriction.m_Stiffness
       value: 3.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3801500631039455200, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
+      propertyPath: m_Constraints
+      value: 16
+      objectReference: {fileID: 0}
     - target: {fileID: 3837339526210298114, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.37
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3837339526210298114, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3351,7 +3408,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c480b353f2233f648a5c195e5c6a4658, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vehicleSpeed: 0
   minSpeed: 12
   maxSpeed: 18
   acceleration: 25
@@ -3360,27 +3416,21 @@ MonoBehaviour:
   turnSmoothness: 5
   brakeForce: 2000
   stopDistanceMultiplier: 1.5
-  driveTarget: {fileID: 1570094852}
-  reverseMechanics: 0
-  adjustedSpeedLimit: 15
-  speedLimit: 15
-  stopDistance: 3
-  tryOvertake: 1
-  overtakeTarget: {fileID: 843611306}
-  rightChecker: {fileID: 1008777557}
-  leftChecker: {fileID: 902612853}
-  frontChecker: {fileID: 86213429}
-  frontRightchecker: {fileID: 1492988403}
-  frontLeftChecker: {fileID: 198805668}
   frontCheckerDistance: 20
-  overTakeSideClearance: 2
-  isOvertaking: 0
-  checkTime: 0.1
+  overTakeSideClearance: 0.5
+  tryOvertake: 1
+  checkInterval: 0.2
+  reverseMechanics: 0
+  temp: {fileID: 191452397}
+  driveTarget: {fileID: 1570094852}
+  overtakeTarget: {fileID: 843611306}
+  frontChecker: {fileID: 86213430}
+  frontRightChecker: {fileID: 1492988404}
+  frontLeftChecker: {fileID: 198805669}
+  vehicleBodyCollider: {fileID: 0}
   vehicleLayer:
     serializedVersion: 2
     m_Bits: 64
-  obstacle: {fileID: 0}
-  obstacleDistance: Infinity
   wheels:
   - wheelModel: {fileID: 1958506289}
     wheelCollider: {fileID: 685661894}
@@ -3418,6 +3468,7 @@ SceneRoots:
   - {fileID: 406526564}
   - {fileID: 1570094852}
   - {fileID: 843611306}
+  - {fileID: 191452397}
   - {fileID: 8378566591267931724}
   - {fileID: 125798446996355073}
   - {fileID: 1202636007897860279}

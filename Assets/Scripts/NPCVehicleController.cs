@@ -2,7 +2,6 @@
 
 public class NPCVehicleController : MonoBehaviour
 {
-    public Transform temp;
     [System.Serializable]
     public enum Axel { Front, Rear }
 
@@ -15,53 +14,67 @@ public class NPCVehicleController : MonoBehaviour
     }
 
     [Header("Driving Settings")]
-    public float vehicleSpeed;            // Current speed of the vehicle
-    public float minSpeed = 5f;           // Minimum random driving speed
-    public float maxSpeed = 15f;          // Maximum random driving speed
-    public float acceleration = 25f;        // Acceleration rate
-    public float accelerationSmoothness = 1f; // Smoother acceleration
-    public float steerAngle = 30f;        // Max steering angle
-    public float turnSmoothness = 5f;     // Smoother steering rotation
-    public float brakeForce = 2000f;      // Brake power
-    public float stopDistanceMultiplier = 1f;
-    public Transform driveTarget;
-    public bool reverseMechanics = false;
-    public float adjustedSpeedLimit = 15f;
-    private float currentAcceleration = 0f;
-    public float speedLimit = 15f;
-    public float stopDistance = 3f;
+    public float minSpeed = 5f;                // min random speed (m/s)
+    public float maxSpeed = 15f;               // max random speed (m/s)
+    public float acceleration = 25f;           // base acceleration amount (units used as torque multiplier)
+    public float accelerationSmoothness = 5f;  // lerp speed for acceleration changes
+    public float steerAngle = 30f;             // maximum steering angle (deg)
+    public float turnSmoothness = 5f;          // lerp speed for steering
+    public float brakeForce = 2000f;           // brake torque
+    public float stopDistanceMultiplier = 1f;  // multiplier used to compute stopDistance from speed
 
-    [Header("Checker Settings")]
+    [Header("Obstacle & Overtake")]
+    public float frontCheckerDistance = 20f;   // how far the rays check
+    public float overTakeSideClearance = 2f;   // extra gap when calculating overtake pos
     public bool tryOvertake = true;
-    public Transform overtakeTarget;
-    public GameObject frontChecker;
-    public GameObject frontRightchecker;
-    public GameObject frontLeftChecker;
-    public float frontCheckerDistance = 20f;
-    public float overTakeSideClearance = 2f;
-    public bool isOvertaking = false;
-    public float checkTime = 0.25f;
+    public float checkInterval = 0.2f;         // how often to run obstacle checks (seconds)
+
+    [Header("Reverse Mechanics")]
+    public bool reverseMechanics = false;      // if true, the vehicle drives "backwards"
+
+    // runtime
+    private Rigidbody rb;
+    private float speedLimit;                  // randomly chosen top speed (m/s)
+    private float vehicleSpeed;                // current speed (m/s)
+    private float currentAcceleration;         // smoothed acceleration value
+    private bool isOvertaking = false;
+    private GameObject obstacle;               // current obstacle GameObject or null
+    private float obstacleDistance = Mathf.Infinity;
+    private Vector3 checkSize;          // checkSize for CheckBox (world-space)
     private float lastCheckTime = 0f;
-    public LayerMask vehicleLayer;
-    private BoxCollider vehicleBodyCollider;
-    public GameObject obstacle;
-    public float obstacleDistance = Mathf.Infinity;
-    private Vector3 checkSize = Vector3.zero;
+    private Transform currentDriveTarget;
+    private float stopDistance = 5f;
+    private Vector3 flatForward;
+
+    [Header("References")]
+    public Transform temp;                     // optional helper transform (can be null)
+    public Transform driveTarget;              // main drive target (set externally)
+    public Transform overtakeTarget;           // target used while overtaking
+    public Transform frontChecker;             // center ray origin
+    public Transform frontRightChecker;        // right ray origin
+    public Transform frontLeftChecker;         // left ray origin
+    public BoxCollider vehicleBodyCollider;    // used for sizing overtake checks
+    public LayerMask vehicleLayer;             // layer mask for raycasts/CheckBox
 
     [Header("Wheels Setup")]
     public Wheel[] wheels;
 
-    private Rigidbody rb;
-    private Vector3 dirToTarget;
-    private float absSteerAngle = 0f;
-    private Transform driveToTarget;
+
+    [Header("Temps")]
+    // Gizmo storage
+    private Vector3 rightOvertakeGizmoPos;
+    private Vector3 leftOvertakeGizmoPos;
+
+    private Vector3 rightSideCheckGizmoPos;
+    private Vector3 leftSideCheckGizmoPos;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.constraints = RigidbodyConstraints.FreezeRotationZ;
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
         vehicleBodyCollider = GetComponentInChildren<BoxCollider>();
-        // Randomize this car's driving speed once
+        // Randomize driving speed
         speedLimit = Random.Range(minSpeed, maxSpeed);
         if (reverseMechanics) 
         { 
@@ -76,31 +89,23 @@ public class NPCVehicleController : MonoBehaviour
         }
         else
         {
-            checkSize = new Vector3(vehicleBodyCollider.size.x + 0.5f, 1f, vehicleBodyCollider.size.z * 2f) * 0.5f;
+            Vector3 fullSize = Vector3.Scale(vehicleBodyCollider.size, vehicleBodyCollider.transform.lossyScale);
+            // requested size = (size.x + 0.5, 1, size.z*2)
+            Vector3 requested = new Vector3(fullSize.x + 0.5f, 1f, fullSize.z * 3f);
+            checkSize = requested * 0.5f;
         }
+        currentDriveTarget = driveTarget;
     }
 
     void Update()
     {
         UpdateWheelModels();
         lastCheckTime += Time.deltaTime;
-        if (lastCheckTime > checkTime)
+        if (lastCheckTime >= checkInterval)
         {
-            Quaternion checkerRotation = Quaternion.Euler(-transform.rotation.eulerAngles.x, 0f, 0f);
-            frontChecker.transform.localRotation = checkerRotation; 
-            frontChecker.transform.localRotation = checkerRotation; 
-            frontLeftChecker.transform.localRotation = checkerRotation;
             ObstacleCheck();
             lastCheckTime = 0f;
         }
-        /*
-        Vector3 tempPos = temp.position;
-        tempPos.x = vehicleBodyCollider.transform.position.x + vehicleBodyCollider.size.x + 0.5f;
-        tempPos.y = 1f;
-        tempPos.z = vehicleBodyCollider.transform.position.z;
-        temp.position = tempPos;
-        temp.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
-        temp.localScale = new Vector3(vehicleBodyCollider.size.x + 0.5f, 1f, vehicleBodyCollider.size.z*2);*/
     }
 
     void FixedUpdate()
@@ -115,108 +120,102 @@ public class NPCVehicleController : MonoBehaviour
 
     void DriveTowardsTarget()
     {
-        if(obstacle != null)
-        {
-            float distanceFactor = Mathf.Clamp(obstacleDistance, 1f, frontCheckerDistance);
-            float normalizedDistance = Mathf.InverseLerp(1f, frontCheckerDistance, distanceFactor);
-            adjustedSpeedLimit = Mathf.Lerp(1f, minSpeed, normalizedDistance);
-        }
-        else
-        {
-            adjustedSpeedLimit = speedLimit; // Default
-        }
+        Transform target = isOvertaking ? overtakeTarget : driveTarget;
+        if (currentDriveTarget != target)
+            currentDriveTarget = target;
 
-        stopDistance = Mathf.Clamp(vehicleSpeed * 0.4f * stopDistanceMultiplier, 1.5f, 20f);
+        // direction & distance
+        Vector3 dirToTarget = currentDriveTarget.position - transform.position;
+        float distance = dirToTarget.magnitude;
+        float dot = Vector3.Dot(transform.forward, dirToTarget.normalized);
 
-        if (isOvertaking)
+        if (isOvertaking && ((reverseMechanics ? dot > 0f : dot < 0f) || distance <= 0.5f))
         {
-            dirToTarget = overtakeTarget.position - transform.position;
-            if(driveToTarget != overtakeTarget)
-            {
-                driveToTarget = overtakeTarget;
-                Debug.LogWarning(transform.name + ": Overtaking Drive to overTake");
-            }
-            float distance = dirToTarget.magnitude;
-            float dotDirection = Vector3.Dot(transform.forward, dirToTarget.normalized);
-            if (dotDirection < 0 || distance <= 0.5f)
-            {
-                isOvertaking = false;
-                driveToTarget = driveTarget;
-                Debug.LogWarning(transform.name + ": change Drive to target");
-            }
-        }
-        else
-        {
-            dirToTarget = driveTarget.position - transform.position;
-            if(driveToTarget != driveTarget)
-            {
-                Debug.LogWarning(transform.name + ": Drive to target");
-                driveToTarget = driveTarget;
-            }
-            float distance = dirToTarget.magnitude;
-            float dotDirection = Vector3.Dot(transform.forward, dirToTarget.normalized);
-            // Stop near target
-            bool shouldBrake = distance <= stopDistance ||
-                       (reverseMechanics ? dotDirection > 0 : dotDirection < 0);
-            if (shouldBrake)
-            {
-                currentAcceleration = 0f;
-                ApplyBrakes(true);
-                Debug.LogError(transform.name + ": Stopping for target");
-                return;
-            }
+            isOvertaking = false;
+            currentDriveTarget = driveTarget;
+            Debug.LogWarning(transform.name + ": Change Drive to target");
         }
 
-        //Steering
-        Vector3 localTarget = transform.InverseTransformPoint(driveToTarget.position);
-        float steerInput = (localTarget.x / localTarget.magnitude);
-        float targetSteerAngle = steerInput * steerAngle;
-
-        // Get current actual speed (in m/s)
         vehicleSpeed = rb.linearVelocity.magnitude;
 
-        // --- Adjust speed limit based on steer angle ---
-        float adjustedAcceleration = acceleration;
-        if (absSteerAngle > 10f)
+        stopDistance = Mathf.Clamp(vehicleSpeed * 0.4f * stopDistanceMultiplier, 1.5f, 20f);
+        
+        // braking if close or target behind (respects reverseMechanics)
+        bool shouldBrake = distance <= stopDistance || (reverseMechanics ? dot > 0f : dot < 0f);
+        if (shouldBrake && !isOvertaking)
         {
-            // Smoothly reduce from minSpeed at 10° → minSpeed/2 at 30°
-            float t = Mathf.InverseLerp(10f, 30f, absSteerAngle);
-            adjustedSpeedLimit = Mathf.Lerp(minSpeed, minSpeed / 2f, t);
-            adjustedAcceleration = Mathf.Lerp(acceleration, acceleration/2f, t);
+            currentAcceleration = 0f;
+            ApplyBrakes(true);
+            Debug.LogWarning($"{name}: Braking - Close to target or target behind");
+            return;
         }
-        //Smooth acceleration
-        currentAcceleration = Mathf.Lerp(currentAcceleration, adjustedAcceleration, accelerationSmoothness * Time.deltaTime);
+        
 
-        foreach (var wheel in wheels)
+        // If we detected an obstacle, scale down allowed speed smoothly:
+        float desiredSpeedLimit = speedLimit;
+        if (obstacle != null && !float.IsInfinity(obstacleDistance))
         {
-            if (wheel.axel == Axel.Front)
+            // obstacleDistance in meters; map 1 -> minSpeed, frontCheckerDistance -> speedLimit
+            float clampedD = Mathf.Clamp(obstacleDistance, 1f, frontCheckerDistance);
+            float t = Mathf.InverseLerp(1f, frontCheckerDistance, clampedD);
+            desiredSpeedLimit = Mathf.Lerp(minSpeed, speedLimit, t);
+        }
+
+        // Steering: local target
+        Vector3 localTarget = transform.InverseTransformPoint(currentDriveTarget.position);
+        float steerInput = localTarget.magnitude > 0f ? (localTarget.x / localTarget.magnitude) : 0f;
+        float targetSteerAngle = steerInput * steerAngle;
+
+        // compute absolute steer from front wheels (we set steer per front wheel below)
+        float absSteer = Mathf.Abs(targetSteerAngle);
+
+        // adjust acceleration & speedLimit when steering hard
+        float adjustedAcceleration = acceleration;
+        float adjustedSpeedLimit = desiredSpeedLimit;
+
+        if (absSteer > 10f)
+        {
+            float tSteer = Mathf.InverseLerp(10f, 30f, absSteer);
+            adjustedSpeedLimit = Mathf.Lerp(minSpeed, desiredSpeedLimit, tSteer);   // closer = lower
+            adjustedAcceleration = Mathf.Lerp(acceleration, acceleration * 0.5f, tSteer);
+        }
+
+        // smooth acceleration (use fixedDeltaTime for physics)
+        currentAcceleration = Mathf.Lerp(currentAcceleration, adjustedAcceleration, accelerationSmoothness * Time.fixedDeltaTime);
+
+
+        // apply steering & torque to wheels
+        foreach (var w in wheels)
+        {
+            if (w.wheelCollider == null) continue;
+
+            if (w.axel == Axel.Front)
             {
-                wheel.wheelCollider.steerAngle = Mathf.Lerp(
-                    wheel.wheelCollider.steerAngle,
-                    targetSteerAngle,
-                    Time.deltaTime * turnSmoothness
-                );
-                absSteerAngle = Mathf.Abs(wheel.wheelCollider.steerAngle);
+                float lerpedSteer = Mathf.Lerp(w.wheelCollider.steerAngle, targetSteerAngle, Time.fixedDeltaTime * turnSmoothness);
+                w.wheelCollider.steerAngle = lerpedSteer;
             }
 
-            if (wheel.axel == Axel.Rear)
+            if (w.axel == Axel.Rear)
             {
+                // torque only applied if below adjusted speed limit
                 if (vehicleSpeed < adjustedSpeedLimit)
                 {
-                    // Still below max speed — apply forward torque
-                    wheel.wheelCollider.motorTorque = currentAcceleration * 50f;
-                    Debug.LogError(transform.name + ": Applying motor torque");
+                    w.wheelCollider.motorTorque = currentAcceleration * 50f;
+                    // ensure brakes not stuck
+                    w.wheelCollider.brakeTorque = 0f;
                 }
-                else if(vehicleSpeed > adjustedSpeedLimit + 5f)
+                else if (vehicleSpeed > adjustedSpeedLimit + 5f)
                 {
+                    // too fast -> brake
                     currentAcceleration = 0f;
-                    ApplyBrakes(true);
-                    Debug.LogError(transform.name + "Breaking For OverSpeed");
+                    w.wheelCollider.motorTorque = 0f;
+                    w.wheelCollider.brakeTorque = brakeForce;
                 }
                 else
                 {
-                    // At or above max speed — cut power
-                    wheel.wheelCollider.motorTorque = 0f;
+                    // at or slightly above allowed speed -> cut power, no heavy brake
+                    w.wheelCollider.motorTorque = 0f;
+                    w.wheelCollider.brakeTorque = 0f;
                 }
             }
         }
@@ -225,12 +224,11 @@ public class NPCVehicleController : MonoBehaviour
     void ApplyBrakes(bool apply)
     {
         float brake = apply ? brakeForce : 0f;
-
-        foreach (var wheel in wheels)
+        foreach (var w in wheels)
         {
-            wheel.wheelCollider.brakeTorque = brake;
+            w.wheelCollider.brakeTorque = brake;
+            if (apply) w.wheelCollider.motorTorque = 0f;
         }
-        //Debug.LogError(transform.name + ": Applying brakes - " + apply);
     }
 
     void UpdateWheelModels()
@@ -239,194 +237,239 @@ public class NPCVehicleController : MonoBehaviour
         {
             if (wheel.wheelCollider && wheel.wheelModel)
             {
-                Vector3 pos;
-                Quaternion rot;
-                wheel.wheelCollider.GetWorldPose(out pos, out rot);
-                wheel.wheelModel.transform.position = pos;
-                wheel.wheelModel.transform.rotation = rot;
+                wheel.wheelCollider.GetWorldPose(out Vector3 pos, out Quaternion rot);
+                wheel.wheelModel.transform.SetPositionAndRotation(pos, rot);
             }
         }
     }
 
     void ObstacleCheck()
     {
-        RaycastHit hit1, hit2, hit3;
-        bool foundHit = false;
-        RaycastHit closestHit = new RaycastHit();
-        if (Physics.Raycast(frontChecker.transform.position, frontChecker.transform.forward, out hit1, frontCheckerDistance, vehicleLayer))
-        {
-            closestHit = hit1;
-            foundHit = true;
-            // Obstacle detected in front
-            if (hit1.distance <= stopDistance)
-            {
-                ApplyBrakes(true);
-                Debug.LogError("1Braking for distance: " + hit1.distance);
-                return;
-            }
-        }
-        if (Physics.Raycast(frontRightchecker.transform.position, frontRightchecker.transform.forward, out hit2, frontCheckerDistance, vehicleLayer))
-        {
-            if (!foundHit || hit2.distance < closestHit.distance)
-                closestHit = hit2;
+        RaycastHit hitCenter, hitRight, hitLeft;
+        bool anyHit = false;
+        RaycastHit closest = new RaycastHit();
 
-            foundHit = true;
-            // Obstacle detected in front right
-            if (hit2.distance <= stopDistance)
-            {
-                ApplyBrakes(true);
-                Debug.LogError("2Braking for distance: " + hit2.distance);
-                return;
-            }
-        }
-        if (Physics.Raycast(frontLeftChecker.transform.position, frontLeftChecker.transform.forward, out hit3, frontCheckerDistance, vehicleLayer))
-        {
-            if (!foundHit || hit3.distance < closestHit.distance)
-                closestHit = hit3;
+        flatForward = Quaternion.Euler(0f, frontChecker.eulerAngles.y, 0f) * Vector3.forward;
 
-            foundHit = true;
-            // Obstacle detected in front left
-            if (hit3.distance <= stopDistance)
-            {
-                ApplyBrakes(true);
-                Debug.LogError("3Braking for distance: " + hit3.distance);
-                return;
-            }
+        // center
+        if (frontChecker != null && Physics.Raycast(frontChecker.position, flatForward, out hitCenter, frontCheckerDistance, vehicleLayer))
+        {
+            closest = hitCenter; anyHit = true;
+            if (hitCenter.distance <= stopDistance) { ApplyBrakes(true); return; } // immediate contact sanity
         }
 
-        if (foundHit && obstacle != closestHit.collider?.gameObject)
+        flatForward = Quaternion.Euler(0f, frontRightChecker.eulerAngles.y, 0f) * Vector3.forward;
+
+        // right
+        if (frontRightChecker != null && Physics.Raycast(frontRightChecker.position, frontRightChecker.forward, out hitRight, frontCheckerDistance, vehicleLayer))
         {
-            obstacle = closestHit.collider.gameObject;
-            isOvertaking = false;
-            Debug.LogWarning("Closest Hit: " + obstacle.name);
+            if (!anyHit || hitRight.distance < closest.distance) closest = hitRight;
+            anyHit = true;
+            if (hitRight.distance <= stopDistance) { ApplyBrakes(true); return; } // immediate contact sanity
         }
-        obstacleDistance = closestHit.distance;
-        if(obstacleDistance > stopDistance)
+
+        flatForward = Quaternion.Euler(0f, frontLeftChecker.eulerAngles.y, 0f) * Vector3.forward;
+
+        // left
+        if (frontLeftChecker != null && Physics.Raycast(frontLeftChecker.position, frontLeftChecker.forward, out hitLeft, frontCheckerDistance, vehicleLayer))
+        {
+            if (!anyHit || hitLeft.distance < closest.distance) closest = hitLeft;
+            anyHit = true;
+            if (hitLeft.distance <= stopDistance) { ApplyBrakes(true); return; } // immediate contact sanity
+        }
+
+        if (!anyHit)
+        {
+            // no obstacle
+            obstacle = null;
+            obstacleDistance = Mathf.Infinity;
+            ApplyBrakes(false);
+            return;
+        }
+
+        // assign obstacle & obstacle distance safely
+        if (closest.collider != null)
+        {
+            if (obstacle != closest.collider.gameObject)
+            {
+                obstacle = closest.collider.gameObject;
+                isOvertaking = false;
+                Debug.LogWarning($"{name}: Closest Hit -> {obstacle.name}");
+            }
+
+            obstacleDistance = closest.distance;
+        }
+        else
+        {
+            obstacle = null;
+            obstacleDistance = Mathf.Infinity;
+        }
+
+        // If close enough brake
+        if (obstacleDistance <= stopDistance)
+        {
+            ApplyBrakes(true);
+            Debug.LogError("obstacle close!");
+        }
+        else
         {
             ApplyBrakes(false);
         }
 
-        if (!foundHit)
+        // Try overtaking if enabled and not already overtaking
+        if (tryOvertake && !isOvertaking && obstacle != null)
         {
-            ApplyBrakes(false); // No obstacles detected
-            obstacle = null;
-            obstacleDistance = Mathf.Infinity;
-        }
-        else if (tryOvertake && !isOvertaking)
-        {
-            Vector3 vehicleColliderSize = GetColliderWorldSize(closestHit.collider);
-            float sideOverTakePosition = vehicleColliderSize.x / 2 + checkSize.x / 2 + overTakeSideClearance;
-            Vector3 rightOvertakePos = new Vector3(obstacle.transform.position.x - sideOverTakePosition, vehicleBodyCollider.transform.position.y, closestHit.point.z);
-            Vector3 leftOvertakePos = new Vector3(obstacle.transform.position.x + sideOverTakePosition, vehicleBodyCollider.transform.position.y, closestHit.point.z);
+            Vector3 obstacleWorldSize = GetColliderWorldSize(closest.collider);
+            float sideOffset = obstacleWorldSize.x * 0.5f + checkSize.x + overTakeSideClearance;
+
+            // right/left positions based on obstacle position and vehicle orientation
+            Vector3 rightOvertakePos = new Vector3(obstacle.transform.position.x - sideOffset, vehicleBodyCollider.transform.position.y, closest.point.z);
+            Vector3 leftOvertakePos = new Vector3(obstacle.transform.position.x + sideOffset, vehicleBodyCollider.transform.position.y, closest.point.z);
+
             TryOvertakeRightSide(rightOvertakePos, leftOvertakePos);
         }
     }
 
     void TryOvertakeRightSide(Vector3 rightSideOverTakePosition, Vector3 leftSideOverTakePosition)
     {
-        // Check right side first
-        if (!Physics.CheckBox(rightSideOverTakePosition, vehicleBodyCollider.size / 2, Quaternion.identity))
+        // check the overtake destination first (quick boolean test using layer)
+        if (!Physics.CheckBox(rightSideOverTakePosition, vehicleBodyCollider.size * 0.5f, Quaternion.identity))
         {
+            // compute a side-check box position for this vehicle's right side (world aligned Y=1)
             Vector3 checkPos = new Vector3(
-                vehicleBodyCollider.transform.position.x - vehicleBodyCollider.size.x - 0.5f,
+                transform.position.x - (vehicleBodyCollider.size.x * vehicleBodyCollider.transform.lossyScale.x) - overTakeSideClearance * 2,
                 1f,
-                vehicleBodyCollider.transform.position.z + vehicleBodyCollider.size.z / 2
+                vehicleBodyCollider.transform.position.z
             );
 
             Quaternion checkRot = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
 
             if (!Physics.CheckBox(checkPos, checkSize, checkRot))
             {
-                // Safe to overtake on the right
+                // safe to overtake on the right
                 overtakeTarget.position = rightSideOverTakePosition;
                 overtakeTarget.SetParent(obstacle.transform);
                 isOvertaking = true;
             }
             else
             {
+                Debug.LogWarning($"{name}: Right side blocked!");
                 TryOvertakeLeftSide(leftSideOverTakePosition);
-                Debug.LogWarning("Right side blocked by vehicle.");
             }
+            //temp
+            rightOvertakeGizmoPos = rightSideOverTakePosition;
+            rightSideCheckGizmoPos = checkPos;
         }
         else
         {
+            Debug.LogWarning($"{name}: Right overtake destination blocked");
             TryOvertakeLeftSide(leftSideOverTakePosition);
-            Debug.LogWarning("Right side No Space.");
         }
     }
 
     void TryOvertakeLeftSide(Vector3 leftSideOverTakePosition)
     {
-        //leftChecker.enabled = true;
-        if (!Physics.CheckBox(leftSideOverTakePosition, vehicleBodyCollider.size / 2, Quaternion.identity))
+        if (!Physics.CheckBox(leftSideOverTakePosition, vehicleBodyCollider.size * 0.5f, Quaternion.identity, vehicleLayer))
         {
             Vector3 checkPos = new Vector3(
-                vehicleBodyCollider.transform.position.x + vehicleBodyCollider.size.x + 0.5f,
+                transform.position.x + (vehicleBodyCollider.size.x * vehicleBodyCollider.transform.lossyScale.x) + overTakeSideClearance * 2,
                 1f,
-                vehicleBodyCollider.transform.position.z + vehicleBodyCollider.size.z/2
+                vehicleBodyCollider.transform.position.z
             );
 
             Quaternion checkRot = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
 
             if (!Physics.CheckBox(checkPos, checkSize, checkRot))
             {
-                // Safe to overtake on the left
                 overtakeTarget.position = leftSideOverTakePosition;
                 overtakeTarget.SetParent(obstacle.transform);
                 isOvertaking = true;
             }
             else
             {
-                Debug.LogWarning("Both side blocked by vehicle.");
+                Debug.LogWarning($"{name}: Left side blocked!");
             }
-        }else
+            //temp
+            leftOvertakeGizmoPos = leftSideOverTakePosition;
+            leftSideCheckGizmoPos = checkPos;
+        }
+        else
         {
-            Debug.LogWarning("Both side No Space.");
+            Debug.LogWarning($"{name}: Left overtake destination blocked");
         }
     }
 
-    // Helper: returns an approximate world-space size of the collider.
     Vector3 GetColliderWorldSize(Collider col)
     {
         if (col == null) return Vector3.zero;
-        // Simple, general-case: axis-aligned world-space bounds
-        Vector3 worldBoundsSize = col.bounds.size;
-        // If you specifically want exact BoxCollider dimensions in world space:
-        if (col is BoxCollider box)
-        {
-            // box.size is local; scale by lossyScale to get world size
-            Vector3 worldBoxSize = Vector3.Scale(box.size, box.transform.lossyScale);
-            return worldBoxSize;
-        }
-        return worldBoundsSize;
+        if (col is BoxCollider b)
+            return Vector3.Scale(b.size, b.transform.lossyScale);
+        return col.bounds.size;
+    }
+
+    // Optional: draw debug rays / boxes in Scene view
+    void OnDrawGizmosSelected()
+    {
+        if (!Application.isPlaying) return;
+
+        Gizmos.color = Color.red;
+        if (frontChecker) Gizmos.DrawLine(frontChecker.position, frontChecker.position + flatForward * frontCheckerDistance);
+        if (frontRightChecker) Gizmos.DrawLine(frontRightChecker.position, frontRightChecker.position + flatForward * frontCheckerDistance);
+        if (frontLeftChecker) Gizmos.DrawLine(frontLeftChecker.position, frontLeftChecker.position + flatForward * frontCheckerDistance);
     }
 
     void OnDrawGizmos()
     {
-        // Only show when the game is running or in edit mode
         if (vehicleBodyCollider == null) return;
 
-        // Debug draw rays
-        Debug.DrawRay(frontChecker.transform.position, frontChecker.transform.forward * frontCheckerDistance, Color.red);
-        Debug.DrawRay(frontRightchecker.transform.position, frontRightchecker.transform.forward * frontCheckerDistance, Color.yellow);
-        Debug.DrawRay(frontLeftChecker.transform.position, frontLeftChecker.transform.forward * frontCheckerDistance, Color.cyan);
+        // ----------------------------------------
+        // 1. DRAW RIGHT DESTINATION CHECK BOX
+        // ----------------------------------------
+        if (Application.isPlaying)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.matrix = Matrix4x4.TRS(
+                rightOvertakeGizmoPos,
+                Quaternion.identity,
+                Vector3.one
+            );
+            Gizmos.DrawWireCube(Vector3.zero, vehicleBodyCollider.size);
+        }
 
-        // Set gizmo color (red if blocked, green if clear)
+        // ----------------------------------------
+        // 2. DRAW LEFT DESTINATION CHECK BOX
+        // ----------------------------------------
         Gizmos.color = Color.green;
-
-        // Optional: visualize blocked state if you’re checking it in Update
-#if UNITY_EDITOR
-        bool isBlocked = Physics.CheckBox(
-            overtakeTarget.position,
-            vehicleBodyCollider.size / 2,
-            Quaternion.identity
+        Gizmos.matrix = Matrix4x4.TRS(
+            leftOvertakeGizmoPos,
+            Quaternion.identity,
+            Vector3.one
         );
-        Gizmos.color = isBlocked ? Color.red : Color.green;
-#endif
-
-        // Draw the wireframe box in Scene view
-        Gizmos.matrix = Matrix4x4.TRS(overtakeTarget.position, Quaternion.identity, Vector3.one);
         Gizmos.DrawWireCube(Vector3.zero, vehicleBodyCollider.size);
 
+        // ----------------------------------------
+        // 3. DRAW RIGHT SIDE CHECK BOX (checkPos)
+        // ----------------------------------------
+        Gizmos.color = Color.yellow;
+        Gizmos.matrix = Matrix4x4.TRS(
+            rightSideCheckGizmoPos,
+            Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f),
+            Vector3.one
+        );
+        Gizmos.DrawWireCube(Vector3.zero, checkSize * 2f); // *2 because checkSize is half-extents
+
+
+        // ----------------------------------------
+        // 4. DRAW LEFT SIDE CHECK BOX (checkPos)
+        // ----------------------------------------
+        Gizmos.color = Color.yellow;
+        Gizmos.matrix = Matrix4x4.TRS(
+            leftSideCheckGizmoPos,
+            Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f),
+            Vector3.one
+        );
+        Gizmos.DrawWireCube(Vector3.zero, checkSize * 2f);
+
+        Gizmos.matrix = Matrix4x4.identity;
     }
 }
