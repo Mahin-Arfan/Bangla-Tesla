@@ -29,6 +29,9 @@ public class NPCVehicleController : MonoBehaviour
     public bool tryOvertake = true;
     public float checkInterval = 0.2f;         // how often to run obstacle checks (seconds)
 
+    [Header("Lane Change")]
+    public float favouritePositionInRoad = 0f; // [Range -4 to 4]
+
     [Header("Reverse Mechanics")]
     public bool reverseMechanics = false;      // if true, the vehicle drives "backwards"
 
@@ -41,6 +44,7 @@ public class NPCVehicleController : MonoBehaviour
     private GameObject obstacle;               // current obstacle GameObject or null
     private float obstacleDistance = Mathf.Infinity;
     private Vector3 checkSize;          // checkSize for CheckBox (world-space)
+    private float overTakeCheckTimer = 0f;
     private float lastCheckTime = 0f;
     private Transform currentDriveTarget;
     private float stopDistance = 5f;
@@ -91,7 +95,7 @@ public class NPCVehicleController : MonoBehaviour
         {
             Vector3 fullSize = Vector3.Scale(vehicleBodyCollider.size, vehicleBodyCollider.transform.lossyScale);
             // requested size = (size.x + 0.5, 1, size.z*2)
-            Vector3 requested = new Vector3(fullSize.x + 0.5f, 1f, fullSize.z * 3f);
+            Vector3 requested = new Vector3(fullSize.x, 1f, fullSize.z * 3f);
             checkSize = requested * 0.5f;
         }
         currentDriveTarget = driveTarget;
@@ -101,6 +105,7 @@ public class NPCVehicleController : MonoBehaviour
     {
         UpdateWheelModels();
         lastCheckTime += Time.deltaTime;
+        overTakeCheckTimer += Time.deltaTime;
         if (lastCheckTime >= checkInterval)
         {
             ObstacleCheck();
@@ -258,8 +263,6 @@ public class NPCVehicleController : MonoBehaviour
             if (hitCenter.distance <= stopDistance) { ApplyBrakes(true); return; } // immediate contact sanity
         }
 
-        flatForward = Quaternion.Euler(0f, frontRightChecker.eulerAngles.y, 0f) * Vector3.forward;
-
         // right
         if (frontRightChecker != null && Physics.Raycast(frontRightChecker.position, frontRightChecker.forward, out hitRight, frontCheckerDistance, vehicleLayer))
         {
@@ -267,8 +270,6 @@ public class NPCVehicleController : MonoBehaviour
             anyHit = true;
             if (hitRight.distance <= stopDistance) { ApplyBrakes(true); return; } // immediate contact sanity
         }
-
-        flatForward = Quaternion.Euler(0f, frontLeftChecker.eulerAngles.y, 0f) * Vector3.forward;
 
         // left
         if (frontLeftChecker != null && Physics.Raycast(frontLeftChecker.position, frontLeftChecker.forward, out hitLeft, frontCheckerDistance, vehicleLayer))
@@ -283,6 +284,7 @@ public class NPCVehicleController : MonoBehaviour
             // no obstacle
             obstacle = null;
             obstacleDistance = Mathf.Infinity;
+            overTakeCheckTimer = 0f;
             ApplyBrakes(false);
             return;
         }
@@ -294,9 +296,7 @@ public class NPCVehicleController : MonoBehaviour
             {
                 obstacle = closest.collider.gameObject;
                 isOvertaking = false;
-                Debug.LogWarning($"{name}: Closest Hit -> {obstacle.name}");
             }
-
             obstacleDistance = closest.distance;
         }
         else
@@ -309,7 +309,6 @@ public class NPCVehicleController : MonoBehaviour
         if (obstacleDistance <= stopDistance)
         {
             ApplyBrakes(true);
-            Debug.LogError("obstacle close!");
         }
         else
         {
@@ -317,8 +316,10 @@ public class NPCVehicleController : MonoBehaviour
         }
 
         // Try overtaking if enabled and not already overtaking
-        if (tryOvertake && !isOvertaking && obstacle != null)
+        if (tryOvertake && overTakeCheckTimer > checkInterval && obstacle != null)
         {
+            Debug.LogError("checked");
+            overTakeCheckTimer = 0f;
             Vector3 obstacleWorldSize = GetColliderWorldSize(closest.collider);
             float sideOffset = obstacleWorldSize.x * 0.5f + checkSize.x + overTakeSideClearance;
 
@@ -333,11 +334,11 @@ public class NPCVehicleController : MonoBehaviour
     void TryOvertakeRightSide(Vector3 rightSideOverTakePosition, Vector3 leftSideOverTakePosition)
     {
         // check the overtake destination first (quick boolean test using layer)
-        if (!Physics.CheckBox(rightSideOverTakePosition, vehicleBodyCollider.size * 0.5f, Quaternion.identity))
+        if (!Physics.CheckBox(rightSideOverTakePosition, checkSize, Quaternion.identity))
         {
             // compute a side-check box position for this vehicle's right side (world aligned Y=1)
             Vector3 checkPos = new Vector3(
-                transform.position.x - (vehicleBodyCollider.size.x * vehicleBodyCollider.transform.lossyScale.x) - overTakeSideClearance * 2,
+                transform.position.x - checkSize.x * 2 - overTakeSideClearance,
                 1f,
                 vehicleBodyCollider.transform.position.z
             );
@@ -369,10 +370,10 @@ public class NPCVehicleController : MonoBehaviour
 
     void TryOvertakeLeftSide(Vector3 leftSideOverTakePosition)
     {
-        if (!Physics.CheckBox(leftSideOverTakePosition, vehicleBodyCollider.size * 0.5f, Quaternion.identity, vehicleLayer))
+        if (!Physics.CheckBox(leftSideOverTakePosition,checkSize, Quaternion.identity, vehicleLayer))
         {
             Vector3 checkPos = new Vector3(
-                transform.position.x + (vehicleBodyCollider.size.x * vehicleBodyCollider.transform.lossyScale.x) + overTakeSideClearance * 2,
+                transform.position.x + checkSize.x * 2 + overTakeSideClearance,
                 1f,
                 vehicleBodyCollider.transform.position.z
             );
@@ -433,7 +434,7 @@ public class NPCVehicleController : MonoBehaviour
                 Quaternion.identity,
                 Vector3.one
             );
-            Gizmos.DrawWireCube(Vector3.zero, vehicleBodyCollider.size);
+            Gizmos.DrawWireCube(Vector3.zero, checkSize * 2f);
         }
 
         // ----------------------------------------
@@ -445,7 +446,7 @@ public class NPCVehicleController : MonoBehaviour
             Quaternion.identity,
             Vector3.one
         );
-        Gizmos.DrawWireCube(Vector3.zero, vehicleBodyCollider.size);
+        Gizmos.DrawWireCube(Vector3.zero, checkSize * 2f);
 
         // ----------------------------------------
         // 3. DRAW RIGHT SIDE CHECK BOX (checkPos)
