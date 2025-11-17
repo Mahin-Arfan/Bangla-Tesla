@@ -26,11 +26,19 @@ public class NPCVehicleController : MonoBehaviour
     [Header("Obstacle & Overtake")]
     public float frontCheckerDistance = 20f;   // how far the rays check
     public float overTakeSideClearance = 2f;   // extra gap when calculating overtake pos
+    public float sideCheckDistance = 3f;
     public bool tryOvertake = true;
     public float checkInterval = 0.2f;         // how often to run obstacle checks (seconds)
 
-    [Header("Lane Change")]
-    public float favouritePositionInRoad = 0f; // [Range -4 to 4]
+    [Header("Random Stops")]
+    public bool randomStops = false;
+    public float stopPositionX = 0f; // [Range -4 to -3]
+    public bool stopping = false;
+    public float stopDuration = 5f;
+    private float stopTimer = 0f;
+    [Range(0f, 100f)]
+    public float stopChance = 0;
+    public bool shouldStop = false;
 
     [Header("Reverse Mechanics")]
     public bool reverseMechanics = false;      // if true, the vehicle drives "backwards"
@@ -49,6 +57,8 @@ public class NPCVehicleController : MonoBehaviour
     private Transform currentDriveTarget;
     private float stopDistance = 5f;
     private Vector3 flatForward;
+    private float driveToTargetDistance = 0f;
+    public float driveToTargetDot = 0f;
 
     [Header("References")]
     public Transform temp;                     // optional helper transform (can be null)
@@ -99,6 +109,22 @@ public class NPCVehicleController : MonoBehaviour
             checkSize = requested * 0.5f;
         }
         currentDriveTarget = driveTarget;
+        if (randomStops)
+        {
+            float randomValue = Random.Range(0f, 100f);
+            shouldStop = randomValue <= stopChance;
+            if(!shouldStop)
+            {
+                return;
+            }
+            float randomStopPosX = Random.Range(stopPositionX + 1, stopPositionX - 1);
+            if(randomStopPosX < -4f)
+            {
+                randomStopPosX = -4f;
+            }
+            driveTarget.position = new Vector3(randomStopPosX, driveTarget.position.y, transform.position.z - 30f);
+            stopping = true;
+        }
     }
 
     void Update()
@@ -110,6 +136,10 @@ public class NPCVehicleController : MonoBehaviour
         {
             ObstacleCheck();
             lastCheckTime = 0f;
+        }
+        if (stopping)
+        {
+            RandomStop();
         }
     }
 
@@ -131,10 +161,10 @@ public class NPCVehicleController : MonoBehaviour
 
         // direction & distance
         Vector3 dirToTarget = currentDriveTarget.position - transform.position;
-        float distance = dirToTarget.magnitude;
-        float dot = Vector3.Dot(transform.forward, dirToTarget.normalized);
+        driveToTargetDistance = dirToTarget.magnitude;
+        driveToTargetDot = Vector3.Dot(transform.forward, dirToTarget.normalized);
 
-        if (isOvertaking && ((reverseMechanics ? dot > 0f : dot < 0f) || distance <= 0.5f))
+        if (isOvertaking && ((reverseMechanics ? driveToTargetDot > 0f : driveToTargetDot < 0f) || driveToTargetDistance <= 0.5f))
         {
             isOvertaking = false;
             currentDriveTarget = driveTarget;
@@ -146,7 +176,7 @@ public class NPCVehicleController : MonoBehaviour
         stopDistance = Mathf.Clamp(vehicleSpeed * 0.4f * stopDistanceMultiplier, 1.5f, 20f);
         
         // braking if close or target behind (respects reverseMechanics)
-        bool shouldBrake = distance <= stopDistance || (reverseMechanics ? dot > 0f : dot < 0f);
+        bool shouldBrake = driveToTargetDistance <= stopDistance || (reverseMechanics ? driveToTargetDot > 0f : driveToTargetDot < 0f);
         if (shouldBrake && !isOvertaking)
         {
             currentAcceleration = 0f;
@@ -316,7 +346,7 @@ public class NPCVehicleController : MonoBehaviour
         }
 
         // Try overtaking if enabled and not already overtaking
-        if (tryOvertake && overTakeCheckTimer > checkInterval && obstacle != null)
+        if (tryOvertake && overTakeCheckTimer > checkInterval && obstacle != null && !shouldStop)
         {
             Debug.LogError("checked");
             overTakeCheckTimer = 0f;
@@ -324,8 +354,8 @@ public class NPCVehicleController : MonoBehaviour
             float sideOffset = obstacleWorldSize.x * 0.5f + checkSize.x + overTakeSideClearance;
 
             // right/left positions based on obstacle position and vehicle orientation
-            Vector3 rightOvertakePos = new Vector3(obstacle.transform.position.x - sideOffset, vehicleBodyCollider.transform.position.y, closest.point.z);
-            Vector3 leftOvertakePos = new Vector3(obstacle.transform.position.x + sideOffset, vehicleBodyCollider.transform.position.y, closest.point.z);
+            Vector3 rightOvertakePos = new Vector3(closest.point.x - sideOffset, vehicleBodyCollider.transform.position.y, closest.point.z);
+            Vector3 leftOvertakePos = new Vector3(closest.point.x + sideOffset, vehicleBodyCollider.transform.position.y, closest.point.z);
 
             TryOvertakeRightSide(rightOvertakePos, leftOvertakePos);
         }
@@ -338,7 +368,7 @@ public class NPCVehicleController : MonoBehaviour
         {
             // compute a side-check box position for this vehicle's right side (world aligned Y=1)
             Vector3 checkPos = new Vector3(
-                transform.position.x - checkSize.x * 2 - overTakeSideClearance,
+                transform.position.x - sideCheckDistance,
                 1f,
                 vehicleBodyCollider.transform.position.z
             );
@@ -373,7 +403,7 @@ public class NPCVehicleController : MonoBehaviour
         if (!Physics.CheckBox(leftSideOverTakePosition,checkSize, Quaternion.identity, vehicleLayer))
         {
             Vector3 checkPos = new Vector3(
-                transform.position.x + checkSize.x * 2 + overTakeSideClearance,
+                transform.position.x + sideCheckDistance,
                 1f,
                 vehicleBodyCollider.transform.position.z
             );
@@ -406,6 +436,25 @@ public class NPCVehicleController : MonoBehaviour
         if (col is BoxCollider b)
             return Vector3.Scale(b.size, b.transform.lossyScale);
         return col.bounds.size;
+    }
+
+    void RandomStop()
+    {
+        if(driveToTargetDot < 0f && transform.position.x > -3f)
+        {
+            driveTarget.position = new Vector3(stopPositionX, driveTarget.position.y, transform.position.z - 10f);
+        }
+        if(vehicleSpeed < 1f)
+        {
+            stopTimer += Time.deltaTime;
+        }
+        if(stopTimer >= stopDuration)
+        {
+            stopping = false;
+            shouldStop = false;
+            stopTimer = 0f;
+            driveTarget.position = new Vector3(transform.position.x + 2f, driveTarget.position.y, transform.position.z - 1000f);
+        }
     }
 
     // Optional: draw debug rays / boxes in Scene view
