@@ -268,11 +268,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minSpeed: 12
   maxSpeed: 25
+  acceleration: 25
+  accelerationSmoothness: 5
   steerAngle: 30
-  stopDistance: 3
   turnSmoothness: 5
   brakeForce: 15000
+  stopDistanceMultiplier: 1
+  frontCheckerDistance: 20
+  overTakeSideClearance: 2
+  sideCheckDistance: 3
+  tryOvertake: 1
+  checkInterval: 0.2
+  randomStops: 0
+  stopPositionX: 0
+  stopping: 0
+  stopDuration: 5
+  stopChance: 0
+  shouldStop: 0
+  reverseMechanics: 0
+  driveToTargetDot: 0
+  temp: {fileID: 0}
   driveTarget: {fileID: 0}
+  overtakeTarget: {fileID: 0}
+  frontChecker: {fileID: 0}
+  frontRightChecker: {fileID: 0}
+  frontLeftChecker: {fileID: 0}
+  vehicleBodyCollider: {fileID: 0}
+  vehicleLayer:
+    serializedVersion: 2
+    m_Bits: 0
   wheels:
   - wheelModel: {fileID: 2778995996100189630}
     wheelCollider: {fileID: 523907480290150147}
@@ -540,7 +564,6 @@ GameObject:
   - component: {fileID: 3715367975123283427}
   - component: {fileID: 8981790475087555140}
   - component: {fileID: 3805113013369103279}
-  - component: {fileID: 4987420506076456174}
   m_Layer: 0
   m_Name: Bus
   m_TagString: Untagged
@@ -616,27 +639,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &4987420506076456174
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4335274626548899873}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.844808, y: 3.009411, z: 11.982847}
-  m_Center: {x: 0.005378306, y: 0.07793701, z: -0.92778516}
 --- !u!1 &6771112501301824379
 GameObject:
   m_ObjectHideFlags: 0
