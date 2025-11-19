@@ -64,6 +64,7 @@ public class NPCVehicleController : MonoBehaviour
     private Vector3 flatForward;
     private float driveToTargetDistance = 0f;
     private float driveToTargetDot = 0f;
+    private float driveToTargetCheck = 5f;
 
     [Header("References")]
     private Vector3 driveTarget;              // main drive target
@@ -138,6 +139,7 @@ public class NPCVehicleController : MonoBehaviour
         UpdateWheelModels();
         lastCheckTime += Time.deltaTime;
         overTakeCheckTimer += Time.deltaTime;
+        driveToTargetCheck += Time.deltaTime;
         if (lastCheckTime >= checkInterval)
         {
             ObstacleCheck();
@@ -150,6 +152,10 @@ public class NPCVehicleController : MonoBehaviour
         if (stopping)
         {
             RandomStop();
+        }
+        if(!isOvertaking && !stopping && driveToTargetCheck > 10f)
+        {
+            driveTarget += new Vector3(0f, 0f, -300f);
         }
     }
 
@@ -346,10 +352,16 @@ public class NPCVehicleController : MonoBehaviour
         if (obstacleDistance <= stopDistance)
         {
             ApplyBrakes(true);
+            return;
         }
         else
         {
             ApplyBrakes(false);
+        }
+
+        if(obstacle.GetComponentInParent<NPCVehicleController>().vehicleSpeed > speedLimit)
+        {
+            return;
         }
 
         // Try overtaking if enabled and not already overtaking
@@ -362,12 +374,23 @@ public class NPCVehicleController : MonoBehaviour
             // right/left positions based on obstacle position and vehicle orientation
             Vector3 rightOvertakePos = new Vector3(obstacle.transform.position.x - sideOffset, vehicleBodyCollider.transform.position.y, closest.point.z);
             Vector3 leftOvertakePos = new Vector3(obstacle.transform.position.x + sideOffset, vehicleBodyCollider.transform.position.y, closest.point.z);
-
-            TryOvertakeRightSide(rightOvertakePos, leftOvertakePos);
+            Debug.LogWarning("Right : " + rightOvertakePos.x + " | Left : " + leftOvertakePos.x);
+            if (rightOvertakePos.x < -5f)
+            {
+                TryOvertakeLeftSide(leftOvertakePos);
+            }
+            else if(leftOvertakePos.x > 5f)
+            {
+                TryOvertakeRightSide(rightOvertakePos, leftOvertakePos, false);
+            }
+            else
+            {
+                TryOvertakeRightSide(rightOvertakePos, leftOvertakePos, true);
+            }
         }
     }
 
-    void TryOvertakeRightSide(Vector3 rightSideOverTakePosition, Vector3 leftSideOverTakePosition)
+    void TryOvertakeRightSide(Vector3 rightSideOverTakePosition, Vector3 leftSideOverTakePosition, bool leftSideCheck)
     {
         // check the overtake destination first (quick boolean test using layer)
         if (!Physics.CheckBox(rightSideOverTakePosition, checkSize, Quaternion.identity))
@@ -391,7 +414,7 @@ public class NPCVehicleController : MonoBehaviour
             else
             {
                 Debug.LogWarning($"{name}: Right side blocked!");
-                TryOvertakeLeftSide(leftSideOverTakePosition);
+                if (leftSideCheck) TryOvertakeLeftSide(leftSideOverTakePosition);
             }
             //temp
             rightOvertakeGizmoPos = rightSideOverTakePosition;
@@ -400,7 +423,7 @@ public class NPCVehicleController : MonoBehaviour
         else
         {
             Debug.LogWarning($"{name}: Right overtake destination blocked");
-            TryOvertakeLeftSide(leftSideOverTakePosition);
+            if (leftSideCheck) TryOvertakeLeftSide(leftSideOverTakePosition);
         }
     }
 
