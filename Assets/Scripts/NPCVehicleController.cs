@@ -28,6 +28,7 @@ public class NPCVehicleController : MonoBehaviour
     public bool tryOvertake = true;
     public float frontCheckerDistance = 20f;   // how far the rays check
     public float overTakeSideClearance = 2f;   // extra gap when calculating overtake pos
+    public float overTakeSideClearanceY = 0f;
     public float sideCheckDistance = 3f;
     public float checkInterval = 0.2f;         // how often to run obstacle checks (seconds)
     public float overTakingTendency = 3f;      // Lower = more likely to overtake
@@ -47,6 +48,8 @@ public class NPCVehicleController : MonoBehaviour
     [Header("Vehicle Mechanics")]
     public bool reverseMechanics = false;      // if true, the vehicle drives "backwards"
     public bool lockXRotation = false;         // if true, freezes X rotation on Rigidbody
+    public bool lockZRotation  = false;          // if true, freezes Z rotation on Rigidbody
+    public bool lockYPosition = true;         // if true, freezes Y position on Rigidbody
 
     // runtime
     private Rigidbody rb;
@@ -81,17 +84,19 @@ public class NPCVehicleController : MonoBehaviour
 
     [Header("Temps")]
     // Gizmo storage
-    private Vector3 rightOvertakeGizmoPos;
-    private Vector3 leftOvertakeGizmoPos;
+    public Vector3 rightOvertakeGizmoPos;
+    public Vector3 leftOvertakeGizmoPos;
 
     private Vector3 rightSideCheckGizmoPos;
     private Vector3 leftSideCheckGizmoPos;
 
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.constraints = RigidbodyConstraints.FreezeRotationZ;
         if(lockXRotation) rb.constraints |= RigidbodyConstraints.FreezeRotationX;
+        if(lockYPosition) rb.constraints |= RigidbodyConstraints.FreezePositionY;
+        if(lockZRotation) rb.constraints |= RigidbodyConstraints.FreezeRotationZ;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         vehicleBodyCollider = GetComponentInChildren<BoxCollider>();
         // Randomize driving speed
@@ -208,7 +213,7 @@ public class NPCVehicleController : MonoBehaviour
         Vector3 localTarget = transform.InverseTransformPoint(currentDriveTarget);
         float steerInput = localTarget.magnitude > 0f ? (localTarget.x / localTarget.magnitude) : 0f;
         float targetSteerAngle = steerInput * steerAngle;
-        if(reverseMechanics) targetSteerAngle = -targetSteerAngle;
+        if (reverseMechanics) targetSteerAngle = -targetSteerAngle;
 
         float absSteer = Mathf.Abs(targetSteerAngle);
 
@@ -372,9 +377,15 @@ public class NPCVehicleController : MonoBehaviour
             float sideOffset = obstacleWorldSize.x * 0.5f + checkSize.x + overTakeSideClearance;
 
             // right/left positions based on obstacle position and vehicle orientation
-            Vector3 rightOvertakePos = new Vector3(obstacle.transform.position.x - sideOffset, vehicleBodyCollider.transform.position.y, closest.point.z);
-            Vector3 leftOvertakePos = new Vector3(obstacle.transform.position.x + sideOffset, vehicleBodyCollider.transform.position.y, closest.point.z);
+            Vector3 rightOvertakePos = new Vector3(obstacle.transform.position.x - sideOffset, vehicleBodyCollider.transform.position.y + overTakeSideClearanceY, closest.point.z);
+            Vector3 leftOvertakePos = new Vector3(obstacle.transform.position.x + sideOffset, vehicleBodyCollider.transform.position.y + overTakeSideClearanceY, closest.point.z);
+            //temp
             Debug.LogWarning("Right : " + rightOvertakePos.x + " | Left : " + leftOvertakePos.x);
+
+            rightOvertakeGizmoPos = rightOvertakePos;
+
+            leftOvertakeGizmoPos = leftOvertakePos;
+            //temp End
             if (rightOvertakePos.x < -5f)
             {
                 TryOvertakeLeftSide(leftOvertakePos);
@@ -417,7 +428,6 @@ public class NPCVehicleController : MonoBehaviour
                 if (leftSideCheck) TryOvertakeLeftSide(leftSideOverTakePosition);
             }
             //temp
-            rightOvertakeGizmoPos = rightSideOverTakePosition;
             rightSideCheckGizmoPos = checkPos;
         }
         else
@@ -450,7 +460,6 @@ public class NPCVehicleController : MonoBehaviour
                 Debug.LogWarning($"{name}: Left side blocked!");
             }
             //temp
-            leftOvertakeGizmoPos = leftSideOverTakePosition;
             leftSideCheckGizmoPos = checkPos;
         }
         else
@@ -499,7 +508,6 @@ public class NPCVehicleController : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        if (vehicleBodyCollider == null) return;
 
         // ----------------------------------------
         // 1. DRAW RIGHT DESTINATION CHECK BOX
@@ -520,7 +528,14 @@ public class NPCVehicleController : MonoBehaviour
         // ----------------------------------------
         Gizmos.color = Color.green;
         Gizmos.matrix = Matrix4x4.TRS(
-            overtakeTarget,
+            leftOvertakeGizmoPos,
+            Quaternion.identity,
+            Vector3.one
+        );
+        Gizmos.DrawWireCube(Vector3.zero, checkSize * 2f);
+        Gizmos.color = Color.green;
+        Gizmos.matrix = Matrix4x4.TRS(
+            rightOvertakeGizmoPos,
             Quaternion.identity,
             Vector3.one
         );

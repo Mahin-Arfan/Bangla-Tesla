@@ -9,7 +9,7 @@ public class GameManagerScript : MonoBehaviour
     public GameObject firstRoad;
     public GameObject secondRoad;
     public GameObject thirdRoad;
-    public float firstRoadDistance;
+    private float firstRoadDistance;
     private Transform[] spawnLocations = new Transform[3];
     private int currentRoadIndex = 2;
 
