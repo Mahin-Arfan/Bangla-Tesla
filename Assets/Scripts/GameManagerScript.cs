@@ -3,30 +3,54 @@ using UnityEngine;
 
 public class GameManagerScript : MonoBehaviour
 {
-    public Transform spawnRoadPoint;
+    [System.Serializable]
+    public enum Type { Truck, Bus, Car, Cng, Bike, Rickshaw, Barrier }
+    [System.Serializable]
+    public struct Road
+    {
+        public GameObject roadSegment;
+        public Transform endPoint;
+    }
+    [System.Serializable]
+    public struct Vehicle
+    {
+        public GameObject vehicle;
+        public Vector2 spawnLocationX;
+        [Range(0f, 100f)]
+        public int spawnChance;
+        public Type vehicleType;
+
+    }
+
+    public float roadSpawnDistance = 110f;
+
     public GameObject player;
 
-    public GameObject firstRoad;
-    public GameObject secondRoad;
-    public GameObject thirdRoad;
+    private Transform firstRoad;
+    private Transform secondRoad;
+    private Transform thirdRoad;
+    private Transform spawnRoadPoint;
     private float firstRoadDistance;
     private Transform[] spawnLocations = new Transform[3];
     private int currentRoadIndex = 2;
 
+    public Vehicle[] vehicles;
+    public Road[] roads;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        if (firstRoad == null || secondRoad == null || thirdRoad == null)
+        if (roads.Length < 3)
         {
-            Debug.LogError("One or more road segments are not assigned in the GameManagerScript.");
-
-            firstRoad = GameObject.Find("Road 1");
-            secondRoad = GameObject.Find("Road 2");
-            thirdRoad = GameObject.Find("Road 3");
+            Debug.LogError("All road segments are not assigned in the GameManagerScript.");
+            return;
         }
-        spawnLocations[0] = firstRoad.transform.Find("Road_End");
-        spawnLocations[1] = secondRoad.transform.Find("Road_End");  
-        spawnLocations[2] = thirdRoad.transform.Find("Road_End");
+        firstRoad = roads[0].roadSegment.transform;
+        secondRoad = roads[1].roadSegment.transform;
+        thirdRoad = roads[2].roadSegment.transform;
+        spawnLocations[0] = roads[0].endPoint;
+        spawnLocations[1] = roads[1].endPoint;
+        spawnLocations[2] = roads[2].endPoint;
         spawnRoadPoint = spawnLocations[2];
     }
 
@@ -37,7 +61,7 @@ public class GameManagerScript : MonoBehaviour
         {
             firstRoadDistance = Vector3.Distance(player.transform.position, firstRoad.transform.position);
         }
-        if(firstRoadDistance > 55f)
+        if(firstRoadDistance > roadSpawnDistance)
         {
             SpawnRoad();
         }
@@ -47,7 +71,7 @@ public class GameManagerScript : MonoBehaviour
     {
         firstRoad.transform.position = spawnRoadPoint.position;
         // Update references
-        GameObject temp = firstRoad;
+        Transform temp = firstRoad;
         firstRoad = secondRoad;
         secondRoad = thirdRoad;
         thirdRoad = temp;
