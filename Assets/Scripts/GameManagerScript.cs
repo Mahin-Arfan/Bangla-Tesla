@@ -1,13 +1,12 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class GameManagerScript : MonoBehaviour
 {
     [System.Serializable]
     public enum Type { Truck, Bus, Car, Cng, Bike, Rickshaw, Barrier }
 
-    // ──────────────────────────────────────────────────────────────
-    // ROAD SYSTEM
-    // ──────────────────────────────────────────────────────────────
+    // ───────────────────────── ROAD SYSTEM ─────────────────────────
     [System.Serializable]
     public struct Road
     {
@@ -29,9 +28,7 @@ public class GameManagerScript : MonoBehaviour
     private int currentRoadIndex = 2;
     private float firstRoadDistance;
 
-    // ──────────────────────────────────────────────────────────────
-    // VEHICLE SPAWNING SYSTEM
-    // ──────────────────────────────────────────────────────────────
+    // ───────────────────────── VEHICLE SPAWNING ─────────────────────────
     [System.Serializable]
     public struct VehicleChance
     {
@@ -50,19 +47,32 @@ public class GameManagerScript : MonoBehaviour
     public class SpawnPoint
     {
         public Vector2 xRange = new Vector2(-3f, 3f); // random X range per spawn
-        public float spawnDistance = 40f;             // Z offset from player
+        public float spawnDistance = 40f;             // Z offset from player // distance IN FRONT (toward -Z)
         public float baseCooldown = 3f;               // spawn delay
-        public VehicleChance[] chances;               // Taxi 60%, Car 40%, etc.
-        public VehicleGroup[] groups;                 // Prefab pools
+        public VehicleChance[] vehicleSpawnChances;               // Taxi 60%, Car 40%, etc.
 
         [HideInInspector] public float timer;
     }
+
+    [Header("Vehicles")]
+    public VehicleGroup[] vehicleGroups;                 // Prefab pools
 
     [Header("Spawn Points (Follow Player)")]
     public SpawnPoint[] spawnPoints;
 
     [Header("Collision Check")]
     public Vector3 checkSize = new Vector3(1.2f, 1f, 3f);
+
+    [Header("Pooling")]
+    [Header("Pooling")]
+    public float recycleDistance = 80f;
+    public int maxActiveVehicles = 35;
+
+    private Dictionary<GameObject, Queue<GameObject>> prefabPool =
+        new Dictionary<GameObject, Queue<GameObject>>();
+    private Dictionary<GameObject, Type> activeVehicles =
+            new Dictionary<GameObject, Type>();
+
 
     void Start()
     {
@@ -74,12 +84,16 @@ public class GameManagerScript : MonoBehaviour
         spawnLocations[0] = roads[0].endPoint;
         spawnLocations[1] = roads[1].endPoint;
         spawnLocations[2] = roads[2].endPoint;
+
+        foreach (var sp in spawnPoints)
+            sp.timer = sp.baseCooldown;
     }
 
     void Update()
     {
         HandleRoadSpawning();
         HandleVehicleSpawning();
+        RecycleOldVehicles();
     }
 
     void HandleRoadSpawning()
@@ -104,14 +118,14 @@ public class GameManagerScript : MonoBehaviour
             currentRoadIndex = 0;
     }
 
+    // ───────────────────────── VEHICLE SPAWN ─────────────────────────
     void HandleVehicleSpawning()
     {
+        float speedFactor = Mathf.Clamp01(Mathf.Abs(player.transform.position.z) / 400f);
+
         foreach (var sp in spawnPoints)
         {
             sp.timer += Time.deltaTime;
-
-            // spawn faster the longer the player drives
-            float speedFactor = Mathf.Clamp01(player.transform.position.z / 400f);
             float cooldown = Mathf.Lerp(sp.baseCooldown, 0.5f, speedFactor);
 
             if (sp.timer >= cooldown)
@@ -124,37 +138,109 @@ public class GameManagerScript : MonoBehaviour
 
     void TrySpawnVehicle(SpawnPoint sp)
     {
-        // choose type by weighted chance
-        Type chosenType = ChooseWeightedType(sp.chances);
+        if (activeVehicles.Count >= maxActiveVehicles)
+            return;
 
-        // get prefab from that type
-        GameObject prefab = GetPrefabFromType(chosenType, sp.groups);
+        Type chosenType = ChooseWeightedType(sp.vehicleSpawnChances);
+        GameObject prefab = GetPrefabFromType(chosenType, vehicleGroups);
         if (prefab == null) return;
 
-        // determine spawn position
         float x = Random.Range(sp.xRange.x, sp.xRange.y);
-        Vector3 spawnPos = new Vector3(x, 1f, player.transform.position.z + sp.spawnDistance);
 
-        // block if other vehicle present
+        // ✅ SPAWN IN FRONT (PLAYER MOVES -Z)
+        Vector3 spawnPos = new Vector3(
+            x,
+            1f,
+            player.transform.position.z - sp.spawnDistance
+        );
+
         if (Physics.CheckBox(spawnPos, checkSize))
             return;
 
-        Instantiate(prefab, spawnPos, Quaternion.identity);
+        GameObject vehicle = GetFromPool(prefab);
+        vehicle.transform.position = spawnPos;
+        vehicle.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+        vehicle.SetActive(true);
+
+        activeVehicles[vehicle] = chosenType;
+        /*
+        GameObject vehicle = GetFromPool(prefab);
+        BoxCollider col = vehicle.transform.GetComponent<NPCVehicleController>().vehicleBodyCollider;
+        Debug.LogError(col);
+        if (col == null) return;
+        checkSize = col.size * 0.5f;
+        checkSize.z += 10f; // extra buffer
+
+        if (Physics.CheckBox(spawnPos, checkSize))
+            return;
+
+        vehicle.transform.position = spawnPos;
+        vehicle.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+        vehicle.SetActive(true);
+
+        activeVehicles[vehicle] = chosenType;
+        */
     }
 
+    // ───────────────────────── OBJECT POOL ─────────────────────────
+    GameObject GetFromPool(GameObject prefab)
+    {
+        if (!prefabPool.ContainsKey(prefab))
+            prefabPool[prefab] = new Queue<GameObject>();
+
+        if (prefabPool[prefab].Count > 0)
+            return prefabPool[prefab].Dequeue();
+
+        return Instantiate(prefab);
+    }
+
+    void RecycleOldVehicles()
+    {
+        List<GameObject> toRecycle = new List<GameObject>();
+
+        foreach (var v in activeVehicles.Keys)
+        {
+            if (!v.activeSelf) continue;
+
+            // ✅ Vehicle moved far BEHIND the player
+            if (v.transform.position.z > player.transform.position.z + recycleDistance)
+            {
+                toRecycle.Add(v);
+            }
+            // ✅ Safety clean-up
+            else if (Mathf.Abs(v.transform.position.z - player.transform.position.z) > 150f)
+            {
+                toRecycle.Add(v);
+            }
+        }
+
+        foreach (var vehicle in toRecycle)
+        {
+            Type type = activeVehicles[vehicle];
+            activeVehicles.Remove(vehicle);
+
+            GameObject prefab = GetPrefabFromType(type, vehicleGroups);
+            prefabPool[prefab].Enqueue(vehicle);
+
+            vehicle.SetActive(false);
+        }
+    }
+
+    // ───────────────────────── UTILS ─────────────────────────
     Type ChooseWeightedType(VehicleChance[] list)
     {
         float total = 0f;
         foreach (var c in list) total += c.weight;
 
         float r = Random.Range(0, total);
-        float running = 0;
+        float running = 0f;
 
         foreach (var c in list)
         {
             running += c.weight;
             if (r <= running) return c.type;
         }
+
         return list[0].type;
     }
 
@@ -162,7 +248,7 @@ public class GameManagerScript : MonoBehaviour
     {
         foreach (var g in groups)
         {
-            if (g.type == type)
+            if (g.type == type && g.prefabs.Length > 0)
                 return g.prefabs[Random.Range(0, g.prefabs.Length)];
         }
         return null;

@@ -26,13 +26,13 @@ public class PlayerRickshawController : MonoBehaviour
 
     void Update()
     {
-        
+        horizontalInput = Input.GetAxis("Horizontal");
+        MoveAndSteer();
     }
 
     void FixedUpdate()
     {
-        horizontalInput = Input.GetAxis("Horizontal");
-        MoveAndSteer();
+        
     }
 
     void MoveAndSteer()

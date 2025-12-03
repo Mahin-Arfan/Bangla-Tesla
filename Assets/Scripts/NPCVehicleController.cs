@@ -19,14 +19,14 @@ public class NPCVehicleController : MonoBehaviour
     public float vehicleSpeed;                // current speed (m/s)
     public float minSpeed = 5f;                // min random speed (m/s)
     public float maxSpeed = 15f;               // max random speed (m/s)
-    public float speedLimit;
+    private float speedLimit;
     public float acceleration = 25f;           // base acceleration amount (units used as torque multiplier)
     public float accelerationSmoothness = 5f;  // lerp speed for acceleration changes
     private float steerAngle = 30f;             // maximum steering angle (deg)
     public float turnSmoothness = 5f;          // lerp speed for steering
     public float brakeForce = 2000f;           // brake torque
     public float stopDistanceMultiplier = 1f;  // multiplier used to compute stopDistance from speed
-    public bool isBraking = false;
+    private bool isBraking = false;
 
     [Header("Obstacle & Overtake")]
     public bool tryOvertake = true;
@@ -65,11 +65,11 @@ public class NPCVehicleController : MonoBehaviour
     // runtime
     private Rigidbody rb;              // randomly chosen top speed (m/s)
     private float currentAcceleration;         // smoothed acceleration value
-    public bool isOvertaking = false;
-    public GameObject obstacle;               // current obstacle GameObject or null
-    public float obstacleDistance = Mathf.Infinity;
-    public Collider obstacleCollider = null;
-    public Transform obstacleTransform = null;
+    private bool isOvertaking = false;
+    private GameObject obstacle;               // current obstacle GameObject or null
+    private float obstacleDistance = Mathf.Infinity;
+    private Collider obstacleCollider = null;
+    private Transform obstacleTransform = null;
     private Vector3 checkSize;          // checkSize for CheckBox (world-space)
     private float overTakeCheckTimer = 0f;
     private float lastCheckTime = 0f;
@@ -83,12 +83,12 @@ public class NPCVehicleController : MonoBehaviour
 
     [Header("References")]
     private Vector3 driveTarget;              // main drive target
-    public Vector3 overtakeTarget;           // target used while overtaking
+    private Vector3 overtakeTarget;           // target used while overtaking
     public Transform frontChecker;             // center ray origin
     public Transform frontRightChecker;        // right ray origin
     public Transform frontLeftChecker;         // left ray origin
     public Transform groundChecker;           // ground check origin
-    private BoxCollider vehicleBodyCollider;    // used for sizing overtake checks
+    public BoxCollider vehicleBodyCollider;    // used for sizing overtake checks
     public LayerMask vehicleLayer;             // layer mask for raycasts/CheckBox
 
     [Header("Wheels Setup")]
@@ -97,9 +97,9 @@ public class NPCVehicleController : MonoBehaviour
 
     [Header("Temps")]
     // Gizmo storage
-    public Vector3 rightOvertakeGizmoPos;
-    public Vector3 leftOvertakeGizmoPos;
-    public Vector3 hitPos;
+    private Vector3 rightOvertakeGizmoPos;
+    private Vector3 leftOvertakeGizmoPos;
+    private Vector3 hitPos;
     private Vector3 rightSideCheckGizmoPos;
     private Vector3 leftSideCheckGizmoPos;
 
@@ -111,7 +111,6 @@ public class NPCVehicleController : MonoBehaviour
         if(lockYPosition) rb.constraints |= RigidbodyConstraints.FreezePositionY;
         if(lockZRotation) rb.constraints |= RigidbodyConstraints.FreezeRotationZ;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
-        vehicleBodyCollider = GetComponentInChildren<BoxCollider>();
         initialYPosition = transform.position.y;
         // Randomize driving speed
         speedLimit = Random.Range(minSpeed, maxSpeed);

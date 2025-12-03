@@ -75,7 +75,7 @@ WheelCollider:
   m_Radius: 0.53
   m_SuspensionSpring:
     spring: 8000
-    damper: 4000
+    damper: 6000
     targetPosition: 0.5
   m_SuspensionDistance: 0.3
   m_ForceAppPointDistance: 0
@@ -374,13 +374,11 @@ MonoBehaviour:
   vehicleSpeed: 0
   minSpeed: 8
   maxSpeed: 12
-  speedLimit: 0
   acceleration: 25
   accelerationSmoothness: 2
   turnSmoothness: 5
   brakeForce: 20000
   stopDistanceMultiplier: 3
-  isBraking: 0
   tryOvertake: 1
   frontCheckerDistance: 20
   overTakeSideClearance: 1.5
@@ -389,24 +387,21 @@ MonoBehaviour:
   checkInterval: 0.2
   overTakingTendency: 1
   overTakeCompleteDisctance: 4
-  randomStops: 0
+  randomStops: 1
   stopPositionX: 2.75
   stopDuration: 5
-  stopChance: 50
+  minimumStopDistance: 3
+  stopChance: 25
+  nextStopCheckTime: 5
   reverseMechanics: 0
   lockXRotation: 0
   lockZRotation: 1
-  lockYPosition: 1
-  isOvertaking: 0
-  obstacle: {fileID: 0}
-  obstacleDistance: Infinity
-  obstacleCollider: {fileID: 0}
-  obstacleTransform: {fileID: 0}
-  overtakeTarget: {x: 0, y: 0, z: 0}
+  lockYPosition: 0
   frontChecker: {fileID: 836747461992676279}
   frontRightChecker: {fileID: 5757461658901861867}
   frontLeftChecker: {fileID: 3109924176718023308}
   groundChecker: {fileID: 882209507978548761}
+  vehicleBodyCollider: {fileID: 3602538749406662550}
   vehicleLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -423,9 +418,6 @@ MonoBehaviour:
   - wheelModel: {fileID: 8528797575587096894}
     wheelCollider: {fileID: 6379068379861255477}
     axel: 1
-  rightOvertakeGizmoPos: {x: 0, y: 0, z: 0}
-  leftOvertakeGizmoPos: {x: 0, y: 0, z: 0}
-  hitPos: {x: 0, y: 0, z: 0}
 --- !u!1 &2283449886554238021
 GameObject:
   m_ObjectHideFlags: 0
@@ -470,7 +462,7 @@ WheelCollider:
   m_Radius: 0.53
   m_SuspensionSpring:
     spring: 8000
-    damper: 4000
+    damper: 6000
     targetPosition: 0.5
   m_SuspensionDistance: 0.3
   m_ForceAppPointDistance: 0
@@ -772,7 +764,7 @@ WheelCollider:
   m_Radius: 0.53
   m_SuspensionSpring:
     spring: 8000
-    damper: 4000
+    damper: 6000
     targetPosition: 0.5
   m_SuspensionDistance: 0.3
   m_ForceAppPointDistance: 0
@@ -1015,7 +1007,7 @@ WheelCollider:
   m_Radius: 0.53
   m_SuspensionSpring:
     spring: 8000
-    damper: 4000
+    damper: 6000
     targetPosition: 0.5
   m_SuspensionDistance: 0.3
   m_ForceAppPointDistance: 0

@@ -426,13 +426,11 @@ MonoBehaviour:
   vehicleSpeed: 0
   minSpeed: 10
   maxSpeed: 14
-  speedLimit: 0
   acceleration: 15
-  accelerationSmoothness: 1
+  accelerationSmoothness: 0.5
   turnSmoothness: 5
   brakeForce: 10000
   stopDistanceMultiplier: 1.75
-  isBraking: 0
   tryOvertake: 1
   frontCheckerDistance: 20
   overTakeSideClearance: 1
@@ -444,21 +442,18 @@ MonoBehaviour:
   randomStops: 1
   stopPositionX: -5
   stopDuration: 5
+  minimumStopDistance: 3
   stopChance: 3.5
+  nextStopCheckTime: 5
   reverseMechanics: 0
   lockXRotation: 0
   lockZRotation: 1
-  lockYPosition: 1
-  isOvertaking: 0
-  obstacle: {fileID: 0}
-  obstacleDistance: Infinity
-  obstacleCollider: {fileID: 0}
-  obstacleTransform: {fileID: 0}
-  overtakeTarget: {x: 0, y: 0, z: 0}
+  lockYPosition: 0
   frontChecker: {fileID: 8556918644705869853}
   frontRightChecker: {fileID: 2391033376587411942}
   frontLeftChecker: {fileID: 8798099197822527871}
   groundChecker: {fileID: 4887943535180935105}
+  vehicleBodyCollider: {fileID: 5792985824895341438}
   vehicleLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -475,9 +470,6 @@ MonoBehaviour:
   - wheelModel: {fileID: 3324028635668555504}
     wheelCollider: {fileID: 7156693975606224608}
     axel: 1
-  rightOvertakeGizmoPos: {x: 0, y: 0, z: 0}
-  leftOvertakeGizmoPos: {x: 0, y: 0, z: 0}
-  hitPos: {x: 0, y: 0, z: 0}
 --- !u!1 &3324028635668555504
 GameObject:
   m_ObjectHideFlags: 0
