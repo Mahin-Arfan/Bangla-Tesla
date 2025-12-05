@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameManagerScript : MonoBehaviour
@@ -41,29 +42,26 @@ public class GameManagerScript : MonoBehaviour
     {
         public Type type;
         public GameObject[] prefabs;
-    }
-
-    [System.Serializable]
-    public class SpawnPoint
-    {
-        public Vector2 xRange = new Vector2(-3f, 3f); // random X range per spawn
-        public float spawnDistance = 40f;             // Z offset from player // distance IN FRONT (toward -Z)
-        public float baseCooldown = 3f;               // spawn delay
-        public VehicleChance[] vehicleSpawnChances;               // Taxi 60%, Car 40%, etc.
-
-        [HideInInspector] public float timer;
+        public Vector2 xRange; // random X range per spawn
+        public float weight;
+        public float bonusWeight;
+        [HideInInspector]
+        public int chosenVehicleIndex;
     }
 
     [Header("Vehicles")]
-    public VehicleGroup[] vehicleGroups;                 // Prefab pools
+    public VehicleGroup[] vehicleGroups;
 
-    [Header("Spawn Points (Follow Player)")]
-    public SpawnPoint[] spawnPoints;
+    [Header("Spawn Settings")]
+    public float spawnRate = 2f; // base spawn rate
+    public Vector3 spawnLocation;
+    public float baseSpawnTime = 3f;
+    public float spawnDistance = 80f; // distance in front of player to spawn
+    public float spawnTimer;
 
     [Header("Collision Check")]
-    public Vector3 checkSize = new Vector3(1.2f, 1f, 3f);
+    private Vector3 checkSize = new Vector3(1.2f, 1f, 3f);
 
-    [Header("Pooling")]
     [Header("Pooling")]
     public float recycleDistance = 80f;
     public int maxActiveVehicles = 35;
@@ -84,9 +82,6 @@ public class GameManagerScript : MonoBehaviour
         spawnLocations[0] = roads[0].endPoint;
         spawnLocations[1] = roads[1].endPoint;
         spawnLocations[2] = roads[2].endPoint;
-
-        foreach (var sp in spawnPoints)
-            sp.timer = sp.baseCooldown;
     }
 
     void Update()
@@ -121,65 +116,52 @@ public class GameManagerScript : MonoBehaviour
     // ───────────────────────── VEHICLE SPAWN ─────────────────────────
     void HandleVehicleSpawning()
     {
-        float speedFactor = Mathf.Clamp01(Mathf.Abs(player.transform.position.z) / 400f);
-
-        foreach (var sp in spawnPoints)
+        spawnTimer += spawnRate * Time.deltaTime;
+        if (spawnTimer >= baseSpawnTime)
         {
-            sp.timer += Time.deltaTime;
-            float cooldown = Mathf.Lerp(sp.baseCooldown, 0.5f, speedFactor);
-
-            if (sp.timer >= cooldown)
-            {
-                TrySpawnVehicle(sp);
-                sp.timer = 0f;
-            }
+            TrySpawnVehicle();
         }
     }
 
-    void TrySpawnVehicle(SpawnPoint sp)
+    void TrySpawnVehicle()
     {
         if (activeVehicles.Count >= maxActiveVehicles)
             return;
 
-        Type chosenType = ChooseWeightedType(sp.vehicleSpawnChances);
-        GameObject prefab = GetPrefabFromType(chosenType, vehicleGroups);
-        if (prefab == null) return;
+        VehicleGroup chosenGroup = ChooseWeightedType();
+        GameObject chosenVehicle = GetVehiclePrefab(chosenGroup);
+        if(chosenVehicle == null)   return;
 
-        float x = Random.Range(sp.xRange.x, sp.xRange.y);
+        float spawnPositionX = Random.Range(chosenGroup.xRange.x, chosenGroup.xRange.y);
 
         // ✅ SPAWN IN FRONT (PLAYER MOVES -Z)
         Vector3 spawnPos = new Vector3(
-            x,
+            spawnPositionX,
             1f,
-            player.transform.position.z - sp.spawnDistance
+            player.transform.position.z - spawnDistance
         );
 
-        if (Physics.CheckBox(spawnPos, checkSize))
-            return;
+        GameObject vehicle = GetFromPool(chosenVehicle);
 
-        GameObject vehicle = GetFromPool(prefab);
-        vehicle.transform.position = spawnPos;
-        vehicle.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
-        vehicle.SetActive(true);
-
-        activeVehicles[vehicle] = chosenType;
-        /*
-        GameObject vehicle = GetFromPool(prefab);
         BoxCollider col = vehicle.transform.GetComponent<NPCVehicleController>().vehicleBodyCollider;
         Debug.LogError(col);
         if (col == null) return;
-        checkSize = col.size * 0.5f;
-        checkSize.z += 10f; // extra buffer
+
+        checkSize = col.size;
+        checkSize.z += 10f;
 
         if (Physics.CheckBox(spawnPos, checkSize))
+        {
+            spawnTimer = 0f;   // ✅ reset even if blocked
             return;
+        }
 
         vehicle.transform.position = spawnPos;
         vehicle.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
         vehicle.SetActive(true);
-
-        activeVehicles[vehicle] = chosenType;
-        */
+        Debug.LogError("Spawned Vehicle: " + chosenGroup.type.ToString());
+        activeVehicles[vehicle] = chosenGroup.type;
+        spawnTimer = 0f;
     }
 
     // ───────────────────────── OBJECT POOL ─────────────────────────
@@ -191,65 +173,81 @@ public class GameManagerScript : MonoBehaviour
         if (prefabPool[prefab].Count > 0)
             return prefabPool[prefab].Dequeue();
 
-        return Instantiate(prefab);
+        GameObject obj = Instantiate(prefab);
+
+        PooledVehicle pv = obj.AddComponent<PooledVehicle>();
+        pv.prefabSource = prefab;
+
+        return obj;
     }
 
     void RecycleOldVehicles()
     {
         List<GameObject> toRecycle = new List<GameObject>();
 
-        foreach (var v in activeVehicles.Keys)
+        foreach (var pair in activeVehicles)
         {
+            GameObject v = pair.Key;
+
             if (!v.activeSelf) continue;
 
-            // ✅ Vehicle moved far BEHIND the player
+            // ✅ Recycle if far BEHIND player
             if (v.transform.position.z > player.transform.position.z + recycleDistance)
             {
                 toRecycle.Add(v);
             }
-            // ✅ Safety clean-up
-            else if (Mathf.Abs(v.transform.position.z - player.transform.position.z) > 150f)
-            {
-                toRecycle.Add(v);
-            }
         }
 
-        foreach (var vehicle in toRecycle)
+        foreach (GameObject vehicle in toRecycle)
         {
-            Type type = activeVehicles[vehicle];
-            activeVehicles.Remove(vehicle);
+            PooledVehicle pv = vehicle.GetComponent<PooledVehicle>();
 
-            GameObject prefab = GetPrefabFromType(type, vehicleGroups);
-            prefabPool[prefab].Enqueue(vehicle);
+            if (pv == null || pv.prefabSource == null)
+            {
+                vehicle.SetActive(false);
+                activeVehicles.Remove(vehicle);
+                continue;
+            }
+
+            if (!prefabPool.ContainsKey(pv.prefabSource))
+                prefabPool[pv.prefabSource] = new Queue<GameObject>();
 
             vehicle.SetActive(false);
+            prefabPool[pv.prefabSource].Enqueue(vehicle);
+            activeVehicles.Remove(vehicle);
         }
     }
 
     // ───────────────────────── UTILS ─────────────────────────
-    Type ChooseWeightedType(VehicleChance[] list)
+    VehicleGroup ChooseWeightedType()
     {
-        float total = 0f;
-        foreach (var c in list) total += c.weight;
+        float totalWeight = 0f;
+        foreach (var vehicle in vehicleGroups) totalWeight += vehicle.weight + vehicle.bonusWeight;
 
-        float r = Random.Range(0, total);
+        float selectedWeight = Random.Range(0, totalWeight);
         float running = 0f;
+        int index = 0;
 
-        foreach (var c in list)
+        foreach (var vehicle in vehicleGroups)
         {
-            running += c.weight;
-            if (r <= running) return c.type;
+            running += vehicle.weight + vehicle.bonusWeight;
+            if (selectedWeight <= running) return vehicleGroups[index];
+            index++;
         }
 
-        return list[0].type;
+        return vehicleGroups[0];
     }
 
-    GameObject GetPrefabFromType(Type type, VehicleGroup[] groups)
+    GameObject GetVehiclePrefab(VehicleGroup chosenGroup)
     {
-        foreach (var g in groups)
+        if (chosenGroup.prefabs.Length > 0)
         {
-            if (g.type == type && g.prefabs.Length > 0)
-                return g.prefabs[Random.Range(0, g.prefabs.Length)];
+            GameObject vehiclePrefeb = chosenGroup.prefabs[chosenGroup.chosenVehicleIndex];
+            if(chosenGroup.chosenVehicleIndex < chosenGroup.prefabs.Length - 1)
+                chosenGroup.chosenVehicleIndex++;
+            else
+                chosenGroup.chosenVehicleIndex = 0;
+            return vehiclePrefeb;
         }
         return null;
     }
