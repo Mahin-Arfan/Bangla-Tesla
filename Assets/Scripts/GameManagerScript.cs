@@ -31,26 +31,21 @@ public class GameManagerScript : MonoBehaviour
 
     // ───────────────────────── VEHICLE SPAWNING ─────────────────────────
     [System.Serializable]
-    public struct VehicleChance
-    {
-        public Type type;
-        public float weight;
-    }
-
-    [System.Serializable]
     public struct VehicleGroup
     {
         public Type type;
         public GameObject[] prefabs;
         public Vector2 xRange; // random X range per spawn
         public float weight;
-        public float bonusWeight;
-        [HideInInspector]
-        public int chosenVehicleIndex;
+        [HideInInspector] public float bonusWeight;
+        public float weightIncrement;
+        public float maxBonusWeight;
+        public Vector3 spawnCheckSize;
     }
 
     [Header("Vehicles")]
     public VehicleGroup[] vehicleGroups;
+    private int[] vehicleGroupIndex;
 
     [Header("Spawn Settings")]
     public float spawnRate = 2f; // base spawn rate
@@ -58,9 +53,6 @@ public class GameManagerScript : MonoBehaviour
     public float baseSpawnTime = 3f;
     public float spawnDistance = 80f; // distance in front of player to spawn
     public float spawnTimer;
-
-    [Header("Collision Check")]
-    private Vector3 checkSize = new Vector3(1.2f, 1f, 3f);
 
     [Header("Pooling")]
     public float recycleDistance = 80f;
@@ -82,6 +74,10 @@ public class GameManagerScript : MonoBehaviour
         spawnLocations[0] = roads[0].endPoint;
         spawnLocations[1] = roads[1].endPoint;
         spawnLocations[2] = roads[2].endPoint;
+
+        vehicleGroupIndex = new int[vehicleGroups.Length];
+        for (int i = 0; i < vehicleGroupIndex.Length; i++)
+            vehicleGroupIndex[i] = 0;
     }
 
     void Update()
@@ -128,40 +124,50 @@ public class GameManagerScript : MonoBehaviour
         if (activeVehicles.Count >= maxActiveVehicles)
             return;
 
-        VehicleGroup chosenGroup = ChooseWeightedType();
-        GameObject chosenVehicle = GetVehiclePrefab(chosenGroup);
+        int chosenGroupIndex = ChooseWeightedTypeIndex();
+        GameObject chosenVehicle = GetVehiclePrefab(chosenGroupIndex);
         if(chosenVehicle == null)   return;
 
-        float spawnPositionX = Random.Range(chosenGroup.xRange.x, chosenGroup.xRange.y);
-
-        // ✅ SPAWN IN FRONT (PLAYER MOVES -Z)
-        Vector3 spawnPos = new Vector3(
-            spawnPositionX,
-            1f,
-            player.transform.position.z - spawnDistance
-        );
-
         GameObject vehicle = GetFromPool(chosenVehicle);
+        VehicleGroup chosenGroup = vehicleGroups[chosenGroupIndex];
+        bool foundFreeSpot = false;
+        Vector3 spawnPos = Vector3.zero;
 
-        BoxCollider col = vehicle.transform.GetComponent<NPCVehicleController>().vehicleBodyCollider;
-        Debug.LogError(col);
-        if (col == null) return;
-
-        checkSize = col.size;
-        checkSize.z += 10f;
-
-        if (Physics.CheckBox(spawnPos, checkSize))
+        for (int i = 0; i < 6; i++)   // try 6 times max
         {
-            spawnTimer = 0f;   // ✅ reset even if blocked
+            float spawnX = Random.Range(chosenGroup.xRange.x, chosenGroup.xRange.y);
+
+            spawnPos = new Vector3(
+                spawnX,
+                1f,
+                player.transform.position.z - spawnDistance
+            );
+
+            if (!Physics.CheckBox(spawnPos, chosenGroup.spawnCheckSize, Quaternion.identity))
+            {
+                foundFreeSpot = true;
+                Debug.LogError("Spawned " + i + "th try.");
+                break;
+            }
+        }
+
+        // ❌ If all attempts failed → skip this spawn safely
+        if (!foundFreeSpot)
+        {
+            Debug.LogError("Failed to spawn " + chosenGroup.type + " after max attempts.");
             return;
         }
 
         vehicle.transform.position = spawnPos;
-        vehicle.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+        NPCVehicleController npcController = vehicle.transform.GetComponent<NPCVehicleController>();
+        if(npcController != null)
+        {
+            vehicle.transform.rotation = npcController.reverseMechanics ? Quaternion.Euler(0f, 0f, 0f) : Quaternion.Euler(0f, 180f, 0f);
+        }
         vehicle.SetActive(true);
-        Debug.LogError("Spawned Vehicle: " + chosenGroup.type.ToString());
         activeVehicles[vehicle] = chosenGroup.type;
         spawnTimer = 0f;
+        IncreaseBonusForUnselected(chosenGroup);
     }
 
     // ───────────────────────── OBJECT POOL ─────────────────────────
@@ -219,36 +225,61 @@ public class GameManagerScript : MonoBehaviour
     }
 
     // ───────────────────────── UTILS ─────────────────────────
-    VehicleGroup ChooseWeightedType()
+    int ChooseWeightedTypeIndex()
     {
         float totalWeight = 0f;
         foreach (var vehicle in vehicleGroups) totalWeight += vehicle.weight + vehicle.bonusWeight;
 
         float selectedWeight = Random.Range(0, totalWeight);
         float running = 0f;
-        int index = 0;
 
-        foreach (var vehicle in vehicleGroups)
+        for (int i = 0; i < vehicleGroups.Length; i++)
         {
-            running += vehicle.weight + vehicle.bonusWeight;
-            if (selectedWeight <= running) return vehicleGroups[index];
-            index++;
+            running += vehicleGroups[i].weight + vehicleGroups[i].bonusWeight;
+
+            if (selectedWeight <= running)
+            {
+                // ✅ RESET bonus for selected type
+                Debug.LogError("Chosen Vehicle Type: " + vehicleGroups[i].type + "Weight: " + (vehicleGroups[i].weight + vehicleGroups[i].bonusWeight));
+                vehicleGroups[i].bonusWeight = 0f;
+                return i;
+            }
         }
 
-        return vehicleGroups[0];
+        return 0;
     }
 
-    GameObject GetVehiclePrefab(VehicleGroup chosenGroup)
+    void IncreaseBonusForUnselected(VehicleGroup selected)
     {
-        if (chosenGroup.prefabs.Length > 0)
+        for (int i = 0; i < vehicleGroups.Length; i++)
         {
-            GameObject vehiclePrefeb = chosenGroup.prefabs[chosenGroup.chosenVehicleIndex];
-            if(chosenGroup.chosenVehicleIndex < chosenGroup.prefabs.Length - 1)
-                chosenGroup.chosenVehicleIndex++;
-            else
-                chosenGroup.chosenVehicleIndex = 0;
-            return vehiclePrefeb;
+            if (vehicleGroups[i].type == selected.type)
+                continue;
+
+            vehicleGroups[i].bonusWeight += vehicleGroups[i].weightIncrement;
+            vehicleGroups[i].bonusWeight = Mathf.Clamp(
+                vehicleGroups[i].bonusWeight,
+                0f,
+                vehicleGroups[i].maxBonusWeight
+            );
         }
-        return null;
+    }
+
+    GameObject GetVehiclePrefab(int chosenGroupIndex)
+    {
+        if (vehicleGroups[chosenGroupIndex].prefabs.Length == 0)
+            return null;
+
+        GameObject vehiclePrefeb = vehicleGroups[chosenGroupIndex].prefabs[vehicleGroupIndex[chosenGroupIndex]];
+
+        if (vehicleGroups[chosenGroupIndex].prefabs.Length - 1 > vehicleGroupIndex[chosenGroupIndex])
+        {
+            vehicleGroupIndex[chosenGroupIndex]++;
+        }
+        else
+        {
+            vehicleGroupIndex[chosenGroupIndex] = 0;
+        } 
+        return vehiclePrefeb;
     }
 }

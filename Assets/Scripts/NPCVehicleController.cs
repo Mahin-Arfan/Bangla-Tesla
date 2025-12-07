@@ -208,7 +208,6 @@ public class NPCVehicleController : MonoBehaviour
         {
             currentAcceleration = 0f;
             if(!isBraking)  ApplyBrakes(true);
-            Debug.LogWarning($"{name}: Braking - Close to target or target behind");
             return;
         }
 
@@ -223,7 +222,6 @@ public class NPCVehicleController : MonoBehaviour
             obstacleTransform = null;
             overTakeCheckTimer = 0f;
             currentDriveTarget = driveTarget;
-            Debug.LogWarning(transform.name + ": Change Drive to target");
         }
 
         float desiredSpeedLimit = speedLimit;
@@ -455,7 +453,6 @@ public class NPCVehicleController : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning($"{name}: Right side blocked!");
                 if (leftSideCheck) TryOvertakeLeftSide(leftSideOverTakePosition);
             }
             //temp
@@ -463,7 +460,6 @@ public class NPCVehicleController : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"{name}: Right overtake destination blocked");
             if (leftSideCheck) TryOvertakeLeftSide(leftSideOverTakePosition);
         }
     }
@@ -485,16 +481,8 @@ public class NPCVehicleController : MonoBehaviour
                 overTakeLocalOffset = leftSideOverTakePosition - obstacleTransform.position;
                 isOvertaking = true;
             }
-            else
-            {
-                Debug.LogWarning($"{name}: Left side blocked!");
-            }
             //temp
             leftSideCheckGizmoPos = checkPos;
-        }
-        else
-        {
-            Debug.LogWarning($"{name}: Left overtake destination blocked");
         }
     }
 
@@ -575,7 +563,6 @@ public class NPCVehicleController : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Left side not clear for stopping");
             leftSideClearForStop = false;
         }
         //temp

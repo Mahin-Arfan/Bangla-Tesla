@@ -558,7 +558,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vehicleSpeed: 0
-  minSpeed: 18
+  minSpeed: 10
   maxSpeed: 18
   acceleration: 25
   accelerationSmoothness: 0.35
@@ -583,6 +583,7 @@ MonoBehaviour:
   lockXRotation: 0
   lockZRotation: 1
   lockYPosition: 0
+  vehicleSize: {x: 0, y: 0, z: 0}
   frontChecker: {fileID: 4004249463670927986}
   frontRightChecker: {fileID: 4569156283574617839}
   frontLeftChecker: {fileID: 9080988606022894807}
