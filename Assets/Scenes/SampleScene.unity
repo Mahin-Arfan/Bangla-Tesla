@@ -134,6 +134,7 @@ GameObject:
   m_Component:
   - component: {fileID: 81262820}
   - component: {fileID: 81262819}
+  - component: {fileID: 81262821}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -172,7 +173,7 @@ MonoBehaviour:
     bonusWeight: 0
     weightIncrement: 1
     maxBonusWeight: 10
-    spawnCheckSize: {x: 0, y: 0, z: 0}
+    spawnCheckSize: {x: 0.35, y: 0.5, z: 11}
   - type: 3
     prefabs:
     - {fileID: 3837573111360809350, guid: 1a990a8638b6b714fa7a0a81bc48f40b, type: 3}
@@ -181,7 +182,7 @@ MonoBehaviour:
     bonusWeight: 0
     weightIncrement: 1
     maxBonusWeight: 10
-    spawnCheckSize: {x: 0, y: 0, z: 0}
+    spawnCheckSize: {x: 0.675, y: 0.5, z: 11}
   - type: 2
     prefabs:
     - {fileID: 3247104159443246242, guid: 8b2802472e56e054b92313fe260afe45, type: 3}
@@ -194,7 +195,7 @@ MonoBehaviour:
     bonusWeight: 0
     weightIncrement: 1
     maxBonusWeight: 10
-    spawnCheckSize: {x: 0, y: 0, z: 0}
+    spawnCheckSize: {x: 1.1, y: 0.5, z: 12.5}
   - type: 1
     prefabs:
     - {fileID: 2278272101244545825, guid: d24893936d9c9c14abf8c373c88508c7, type: 3}
@@ -203,7 +204,7 @@ MonoBehaviour:
     bonusWeight: 0
     weightIncrement: 2
     maxBonusWeight: 25
-    spawnCheckSize: {x: 0, y: 0, z: 0}
+    spawnCheckSize: {x: 1.5, y: 0.5, z: 15}
   - type: 0
     prefabs:
     - {fileID: 8463349050262562609, guid: 752bb075a2b959b4baa3d10fe939c59d, type: 3}
@@ -214,7 +215,7 @@ MonoBehaviour:
     bonusWeight: 0
     weightIncrement: 2
     maxBonusWeight: 10
-    spawnCheckSize: {x: 0, y: 0, z: 0}
+    spawnCheckSize: {x: 1.25, y: 0.5, z: 13}
   - type: 6
     prefabs:
     - {fileID: 4768512161167820869, guid: d7d71b78f728d834fae1c7b76998427b, type: 3}
@@ -223,14 +224,16 @@ MonoBehaviour:
     bonusWeight: 0
     weightIncrement: 1
     maxBonusWeight: 2
-    spawnCheckSize: {x: 0, y: 0, z: 0}
-  spawnRate: 2
+    spawnCheckSize: {x: 2.05, y: 0.5, z: 12}
+  spawnRate: 10
   spawnLocation: {x: 0, y: 0, z: 0}
   baseSpawnTime: 3
   spawnDistance: 70
   spawnTimer: 0
   recycleDistance: 80
   maxActiveVehicles: 35
+  gizmosSpawnPos: {x: 0, y: 0, z: 0}
+  gizmosSpawnSize: {x: 0, y: 0, z: 0}
 --- !u!4 &81262820
 Transform:
   m_ObjectHideFlags: 0
@@ -246,6 +249,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &81262821
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 81262818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fffbdb9479b2914f9c05e2a7b13b86c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &182873346 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5143749296609761991, guid: a52abc9d05beb0c44bb2bf93810250ff, type: 3}
@@ -310,7 +325,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3569592824683992161, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -2.6
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 3569592824683992161, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_LocalRotation.w

@@ -63,6 +63,10 @@ public class GameManagerScript : MonoBehaviour
     private Dictionary<GameObject, Type> activeVehicles =
             new Dictionary<GameObject, Type>();
 
+    //temp
+    public Vector3 gizmosSpawnPos;
+    public Vector3 gizmosSpawnSize;
+
 
     void Start()
     {
@@ -125,14 +129,10 @@ public class GameManagerScript : MonoBehaviour
             return;
 
         int chosenGroupIndex = ChooseWeightedTypeIndex();
-        GameObject chosenVehicle = GetVehiclePrefab(chosenGroupIndex);
-        if(chosenVehicle == null)   return;
-
-        GameObject vehicle = GetFromPool(chosenVehicle);
         VehicleGroup chosenGroup = vehicleGroups[chosenGroupIndex];
+
         bool foundFreeSpot = false;
         Vector3 spawnPos = Vector3.zero;
-
         for (int i = 0; i < 6; i++)   // try 6 times max
         {
             float spawnX = Random.Range(chosenGroup.xRange.x, chosenGroup.xRange.y);
@@ -150,13 +150,25 @@ public class GameManagerScript : MonoBehaviour
                 break;
             }
         }
-
         // ❌ If all attempts failed → skip this spawn safely
         if (!foundFreeSpot)
         {
             Debug.LogError("Failed to spawn " + chosenGroup.type + " after max attempts.");
             return;
         }
+
+        GameObject chosenVehicle = GetVehiclePrefab(chosenGroupIndex);
+        if(chosenVehicle == null)   return;
+
+        GameObject vehicle = GetFromPool(chosenVehicle);
+
+        //temp gizmos
+        CheckBoxGizmoDrawer.boxes.Add(
+    new CheckBoxGizmoDrawer.CheckBoxData(
+        spawnPos,
+        chosenGroup.spawnCheckSize,
+        Quaternion.identity
+    ));
 
         vehicle.transform.position = spawnPos;
         NPCVehicleController npcController = vehicle.transform.GetComponent<NPCVehicleController>();
@@ -240,7 +252,6 @@ public class GameManagerScript : MonoBehaviour
             if (selectedWeight <= running)
             {
                 // ✅ RESET bonus for selected type
-                Debug.LogError("Chosen Vehicle Type: " + vehicleGroups[i].type + "Weight: " + (vehicleGroups[i].weight + vehicleGroups[i].bonusWeight));
                 vehicleGroups[i].bonusWeight = 0f;
                 return i;
             }
@@ -281,5 +292,25 @@ public class GameManagerScript : MonoBehaviour
             vehicleGroupIndex[chosenGroupIndex] = 0;
         } 
         return vehiclePrefeb;
+    }
+
+    //temp gizmos
+    void OnDrawGizmosSelected()
+    {
+        if (!Application.isPlaying) return;
+
+
+        // ----------------------------------------
+        // 4. DRAW LEFT SIDE CHECK BOX (checkPos)
+        // ----------------------------------------
+        Gizmos.color = Color.yellow;
+        Gizmos.matrix = Matrix4x4.TRS(
+            gizmosSpawnPos,
+            Quaternion.identity,
+            Vector3.one
+        );
+        Gizmos.DrawWireCube(Vector3.zero, gizmosSpawnSize * 2f);
+
+        Gizmos.matrix = Matrix4x4.identity;
     }
 }
