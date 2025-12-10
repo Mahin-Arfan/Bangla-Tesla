@@ -569,6 +569,60 @@ public class NPCVehicleController : MonoBehaviour
         leftSideCheckGizmoPos = checkPos;
     }
 
+    public void ResetNPC()
+    {
+        // Reset Rigidbody
+        if (rb == null) rb = GetComponent<Rigidbody>();
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        // Reset constraints
+        rb.constraints = RigidbodyConstraints.None;
+        if (lockXRotation) rb.constraints |= RigidbodyConstraints.FreezeRotationX;
+        if (lockZRotation) rb.constraints |= RigidbodyConstraints.FreezeRotationZ;
+        if (lockYPosition) rb.constraints |= RigidbodyConstraints.FreezePositionY;
+
+        // Re-randomize speed
+        speedLimit = Random.Range(minSpeed, maxSpeed);
+        if (reverseMechanics)
+        {
+            speedLimit = -speedLimit;
+        }
+
+        // Reset drive target far ahead
+        driveTarget = new Vector3(transform.position.x, transform.position.y, transform.position.z - 1000f);
+        currentDriveTarget = driveTarget;
+
+        // Reset stop system
+        stopping = false;
+        shouldStop = false;
+        stopTimer = 0f;
+        stopCheckTimer = Random.Range(0f, nextStopCheckTime);
+        leftSideClearForStop = true;
+
+        // Reset obstacle system
+        obstacle = null;
+        obstacleCollider = null;
+        obstacleTransform = null;
+        frontCheckHit = false;
+        obstacleDistance = Mathf.Infinity;
+        isOvertaking = false;
+        overTakeCheckTimer = 0f;
+
+        // Reset acceleration
+        currentAcceleration = 0f;
+        isBraking = false;
+        ApplyBrakes(false);
+
+        // Recompute vehicle body size & CheckBox sizes
+        if (vehicleBodyCollider != null)
+        {
+            Vector3 fullSize = Vector3.Scale(vehicleBodyCollider.size, vehicleBodyCollider.transform.lossyScale);
+            Vector3 requested = new Vector3(fullSize.x, 1f, fullSize.z * overTakingTendency);
+            checkSize = requested * 0.5f;
+        }
+    }
+
     // Optional: draw debug rays / boxes in Scene view
     void OnDrawGizmosSelected()
     {

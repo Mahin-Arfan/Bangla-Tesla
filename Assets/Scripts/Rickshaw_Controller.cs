@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody), typeof(BoxCollider))]
 public class PlayerRickshawController : MonoBehaviour
@@ -51,7 +51,7 @@ public class PlayerRickshawController : MonoBehaviour
         if ((steer < 0 && !canTurnLeft) || (steer > 0 && !canTurnRight))
             steer = 0;
 
-        // Rotate: 180 � maxTurnAngle
+        // Rotate: 180 ± maxTurnAngle
         float targetY = 180f + steer * maxTurnAngle;
         Quaternion targetRot = Quaternion.Euler(0f, targetY, 0f);
         rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRot, steerSpeed * Time.fixedDeltaTime));

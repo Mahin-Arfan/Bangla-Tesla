@@ -82,6 +82,8 @@ public class GameManagerScript : MonoBehaviour
         vehicleGroupIndex = new int[vehicleGroups.Length];
         for (int i = 0; i < vehicleGroupIndex.Length; i++)
             vehicleGroupIndex[i] = 0;
+
+        PrewarmPool(5);
     }
 
     void Update()
@@ -175,6 +177,7 @@ public class GameManagerScript : MonoBehaviour
         if(npcController != null)
         {
             vehicle.transform.rotation = npcController.reverseMechanics ? Quaternion.Euler(0f, 0f, 0f) : Quaternion.Euler(0f, 180f, 0f);
+            npcController.ResetNPC();
         }
         vehicle.SetActive(true);
         activeVehicles[vehicle] = chosenGroup.type;
@@ -198,6 +201,35 @@ public class GameManagerScript : MonoBehaviour
 
         return obj;
     }
+
+    void PrewarmPool(int maxInstantiate)
+    {
+        foreach (var group in vehicleGroups)
+        {
+            int prefabCount = group.prefabs.Length;
+
+            // Number to instantiate = MIN(prefabs, maxInstantiate)
+            int countToInstantiate = Mathf.Min(prefabCount, maxInstantiate);
+
+            for (int i = 0; i < countToInstantiate; i++)
+            {
+                GameObject prefab = group.prefabs[i];
+
+                if (!prefabPool.ContainsKey(prefab))
+                    prefabPool[prefab] = new Queue<GameObject>();
+
+                GameObject obj = Instantiate(prefab);
+                obj.SetActive(false);
+
+                PooledVehicle pv = obj.AddComponent<PooledVehicle>();
+                pv.prefabSource = prefab;
+
+                prefabPool[prefab].Enqueue(obj);
+                Debug.Log("Prewarmed " + prefab.name);
+            }
+        }
+    }
+
 
     void RecycleOldVehicles()
     {
