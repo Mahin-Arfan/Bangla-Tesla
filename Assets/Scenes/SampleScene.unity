@@ -141,7 +141,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &81262819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -284,12 +284,24 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1800530967710970952, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+      propertyPath: boostSpeed
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1800530967710970952, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: acceleration
       value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 1800530967710970952, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: forwardSpeed
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1800530967710970952, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+      propertyPath: maxTurnAngle
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 1800530967710970952, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+      propertyPath: maxSteerAngle
+      value: -45
       objectReference: {fileID: 0}
     - target: {fileID: 2520620960185127018, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -321,11 +333,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3569592824683992161, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.72
       objectReference: {fileID: 0}
     - target: {fileID: 3569592824683992161, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1
+      value: -5
       objectReference: {fileID: 0}
     - target: {fileID: 3569592824683992161, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -355,6 +367,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4258686004044048272, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+      propertyPath: m_Constraints
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4258686004044048272, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5372999492772644695, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_Name
       value: Player
@@ -366,6 +386,10 @@ PrefabInstance:
     - target: {fileID: 5372999492772644695, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5372999492772644695, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+      propertyPath: m_TagString
+      value: Player
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
