@@ -148,14 +148,12 @@ public class GameManagerScript : MonoBehaviour
             if (!Physics.CheckBox(spawnPos, chosenGroup.spawnCheckSize, Quaternion.identity))
             {
                 foundFreeSpot = true;
-                Debug.LogError("Spawned " + i + "th try.");
                 break;
             }
         }
         // ❌ If all attempts failed → skip this spawn safely
         if (!foundFreeSpot)
         {
-            Debug.LogError("Failed to spawn " + chosenGroup.type + " after max attempts.");
             return;
         }
 

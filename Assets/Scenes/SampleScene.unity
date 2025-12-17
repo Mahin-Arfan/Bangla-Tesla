@@ -345,6 +345,14 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1800530967710970952, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+      propertyPath: baseSpeed
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1800530967710970952, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1800530967710970952, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: boostSpeed
       value: 10
       objectReference: {fileID: 0}
@@ -364,6 +372,14 @@ PrefabInstance:
       propertyPath: maxSteerAngle
       value: -45
       objectReference: {fileID: 0}
+    - target: {fileID: 1800530967710970952, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+      propertyPath: rickshawManAnimator
+      value: 
+      objectReference: {fileID: 1733885649}
+    - target: {fileID: 1800530967710970952, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+      propertyPath: rickshawSteerHandle
+      value: 
+      objectReference: {fileID: 465336467}
     - target: {fileID: 2520620960185127018, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.9828389
@@ -390,7 +406,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3569592824683992161, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -1.29
       objectReference: {fileID: 0}
     - target: {fileID: 3569592824683992161, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -398,7 +414,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3569592824683992161, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5
+      value: -27.4
       objectReference: {fileID: 0}
     - target: {fileID: 3569592824683992161, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -591,6 +607,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6375780798345254646, guid: c71ae82f75b86554f8c64b87a7f82b94, type: 3}
   m_PrefabInstance: {fileID: 1717748737073985405}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &465336467 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2481538918853866823, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+  m_PrefabInstance: {fileID: 406526564}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -665,7 +686,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &931243697
 Transform:
   m_ObjectHideFlags: 0
@@ -737,6 +758,11 @@ Transform:
 Transform:
   m_CorrespondingSourceObject: {fileID: 1139249550342396799, guid: a52abc9d05beb0c44bb2bf93810250ff, type: 3}
   m_PrefabInstance: {fileID: 100702822581337153}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1733885649 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: b3d0cf38e2f79e24d830a7b1a4686439, type: 3}
+  m_PrefabInstance: {fileID: 265140904}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1905133919 stripped
 Transform:
@@ -1134,7 +1160,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2885689461017025927, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3767484349822436447, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
       propertyPath: m_Name
@@ -1146,7 +1172,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5697021793349952753, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5971783127587311803, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1389,9 +1415,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2722503110420873251, guid: b88964d0ad793cd4389d9b69f5d88d96, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4123599542360829966, guid: b88964d0ad793cd4389d9b69f5d88d96, type: 3}
       propertyPath: m_Name
       value: Road Segment 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7437474931663979396, guid: b88964d0ad793cd4389d9b69f5d88d96, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7561144685292000562, guid: b88964d0ad793cd4389d9b69f5d88d96, type: 3}
       propertyPath: m_LocalPosition.x

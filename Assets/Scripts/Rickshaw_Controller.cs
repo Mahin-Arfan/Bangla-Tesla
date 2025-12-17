@@ -22,6 +22,9 @@ public class PlayerRickshawController : MonoBehaviour
     private Vector3 steerHandleLeft = new Vector3(-42f, -20f, 28f);
     private Vector3 steerHandleNeutral = new Vector3(0.733f, 0.137f, 21.114f);
     private Vector3 steerHandleRight = new Vector3(42f, 20f, 28f);
+    float fullSteerX = 3.5f;
+    float zeroSteerX = 5.3f;
+    float steerMultiplier;
 
     [Header("References")]
     public Animator rickshawManAnimator;
@@ -45,7 +48,7 @@ public class PlayerRickshawController : MonoBehaviour
     void Update()
     {
         horizontalInput = Input.GetAxis("Horizontal");
-        MoveAndSteer();
+        Steer();
         HandleBraking();
     }
 
@@ -54,43 +57,58 @@ public class PlayerRickshawController : MonoBehaviour
         ApplyForwardMovement();
     }
 
-    void MoveAndSteer()
+    void Steer()
     {
 
-        // Side collision checks
-        bool canTurnLeft = !Physics.Raycast(rb.position, -transform.right, sideCheckDistance);
-        bool canTurnRight = !Physics.Raycast(rb.position, transform.right, sideCheckDistance);
-        bool canGoForward = !Physics.Raycast(rb.position, transform.forward, sideCheckDistance);
+        float posX = transform.position.x;
 
         float steer = Mathf.Clamp(horizontalInput, -1f, 1f);
 
-        // Block rotation if collider on that side
-        if ((steer < 0 && !canTurnLeft) || (steer > 0 && !canTurnRight))
-            steer = 0;
-
         float currentY = transform.rotation.eulerAngles.y;
+
+        if (steer < 0 && posX > fullSteerX)
+        {
+            steerMultiplier = Mathf.InverseLerp(
+                zeroSteerX,
+                fullSteerX,
+                posX
+            );
+        }
+        else if (steer > 0 && posX < -fullSteerX)
+        {
+            steerMultiplier = Mathf.InverseLerp(
+                -zeroSteerX,
+                -fullSteerX,
+                posX
+            );
+        }
+        else
+        {
+            steerMultiplier = 1f;
+        }
+
+        float finalSteer = steer * steerMultiplier;
+        float animationSteer = finalSteer;
         // how far we are rotated from straight (180°)
         float deltaFromForward = Mathf.DeltaAngle(180f, currentY);
         // true when near max turn
         bool atMaxSteer =
             Mathf.Abs(deltaFromForward) >= (maxTurnAngle - 10f);
-        float finalSteer = steer;
         if (atMaxSteer)
         {
             // Smoothly return visuals + animation to neutral
-            finalSteer = Mathf.Lerp(
+            animationSteer = Mathf.Lerp(
                 rickshawManAnimator.GetFloat("Steer"),
                 0f,
                 steerSpeed * Time.deltaTime
             );
         }
         // Animator
-        rickshawManAnimator.SetFloat("Steer", finalSteer);
+        rickshawManAnimator.SetFloat("Steer", animationSteer);
         // Visual handle
-        UpdateSteerHandle(finalSteer);
-
+        UpdateSteerHandle(animationSteer);
         // Rotate: 180 ± maxTurnAngle
-        float targetY = 180f + steer * maxTurnAngle;
+        float targetY = 180f + finalSteer * maxTurnAngle;
         Quaternion targetRot = Quaternion.Euler(0f, targetY, 0f);
         rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRot, steerSpeed * Time.fixedDeltaTime));
     }

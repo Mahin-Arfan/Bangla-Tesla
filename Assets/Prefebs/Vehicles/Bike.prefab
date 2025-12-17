@@ -867,7 +867,7 @@ MonoBehaviour:
   vehicleSpeed: 0
   minSpeed: 8
   maxSpeed: 15
-  acceleration: 25
+  acceleration: 15
   accelerationSmoothness: 0.35
   turnSmoothness: 5
   brakeForce: 2000
@@ -887,7 +887,7 @@ MonoBehaviour:
   stopChance: 5
   nextStopCheckTime: 5
   reverseMechanics: 0
-  lockXRotation: 0
+  lockXRotation: 1
   lockZRotation: 1
   lockYPosition: 0
   frontChecker: {fileID: 7718435716229587630}
