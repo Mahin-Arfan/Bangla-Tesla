@@ -39,8 +39,8 @@ public class PlayerRickshawController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+        rb.constraints |= RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        //rb.collisionDetectionMode |= CollisionDetectionMode.Continuous;
 
         currentSpeed = baseSpeed;
     }
