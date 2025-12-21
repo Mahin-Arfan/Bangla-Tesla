@@ -197,6 +197,10 @@ public class NPCVehicleController : MonoBehaviour
         Vector3 dirToTarget = currentDriveTarget - transform.position;
         driveToTargetDistance = dirToTarget.magnitude;
         driveToTargetDot = Vector3.Dot(transform.forward, dirToTarget.normalized);
+        if(driveToTargetCheck >= 1f && !stopping && reverseMechanics? driveToTargetDot > 0f : driveToTargetDot < 0f)
+        {
+            driveTarget = new Vector3(transform.position.x, transform.position.y, transform.position.z - 1000f);
+        }
 
         vehicleSpeed = rb.linearVelocity.magnitude;
         float minimumStopDistance = isOvertaking ? 1.5f : 3f;
