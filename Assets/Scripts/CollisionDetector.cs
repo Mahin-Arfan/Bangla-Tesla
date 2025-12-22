@@ -31,7 +31,7 @@ public class CollisionDetector : MonoBehaviour
 
     void ProcessHit()
     {
-        float damage = (position == WheelPosition.Front) ? 50f : 20f;
+        float damage = (position == WheelPosition.Front) ? 100f : 20f;
         healthScript.TakeDamage(damage, position);
     }
 }

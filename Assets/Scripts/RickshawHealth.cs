@@ -19,6 +19,13 @@ public class RickshawHealth : MonoBehaviour
     [Header("Jiggle Settings")]
     public float jiggleSpeed = 20f;
 
+    [Header("References")]
+    public Transform baseCollider;
+    public Transform frontWheelCollider;
+    public Animator rickshawManAnimator;
+    public Collider[] rickshawManColliders;
+    public Rigidbody[] rickshawManRigidBodies;
+
     void Update()
     {
         ApplyWheelJiggle();
@@ -67,5 +74,26 @@ public class RickshawHealth : MonoBehaviour
     void Die()
     {
         Debug.Log("Game Over");
+        frontWheelCollider.GetComponent<BoxCollider>().enabled = true;
+        baseCollider.GetComponent<BoxCollider>().enabled = true;
+        leftWheelTransform.GetComponent<BoxCollider>().enabled = true;
+        rightWheelTransform.GetComponent<BoxCollider>().enabled = true;
+        GetComponent<PlayerRickshawController>().enabled = false;
+        GetComponent<CapsuleCollider>().enabled = false;
+        GetComponent<BoxCollider>().enabled = false;
+        frontWheelCollider.GetComponent<Rigidbody>().isKinematic = false;
+        baseCollider.GetComponent<Rigidbody>().isKinematic = false;
+        leftWheelTransform.GetComponent<Rigidbody>().isKinematic = false;
+        rightWheelTransform.GetComponent<Rigidbody>().isKinematic = false;
+        rickshawManAnimator.enabled = false;
+        GetComponent<Rigidbody>().isKinematic = true;
+        foreach (var col in rickshawManColliders)
+        {
+            col.enabled = true;
+        }
+        foreach(var rb in rickshawManRigidBodies)
+        {
+            rb.isKinematic = false;
+        }
     }
 }

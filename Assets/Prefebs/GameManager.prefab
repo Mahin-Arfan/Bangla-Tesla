@@ -1,0 +1,139 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7887398816664887179
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5180476570406194112}
+  - component: {fileID: 1307587833961996349}
+  - component: {fileID: 6995274334915770008}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5180476570406194112
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7887398816664887179}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.4886577, y: -2.7491877, z: -8.708591}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1307587833961996349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7887398816664887179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 462cff7cb181eba40a7757d8a0d5d9ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  roads:
+  - roadSegment: {fileID: 0}
+    endPoint: {fileID: 0}
+  - roadSegment: {fileID: 0}
+    endPoint: {fileID: 0}
+  - roadSegment: {fileID: 0}
+    endPoint: {fileID: 0}
+  roadSpawnDistance: 110
+  player: {fileID: 0}
+  vehicleGroups:
+  - type: 4
+    prefabs:
+    - {fileID: 8724004187032717744, guid: 1ba3d16b6453b9b42af9bc1e34d13df8, type: 3}
+    - {fileID: 5829743467850098795, guid: 3b74d1bc286103840a5d65d1ed216e12, type: 3}
+    xRange: {x: -5.5, y: 5.5}
+    weight: 40
+    bonusWeight: 0
+    weightIncrement: 1
+    maxBonusWeight: 10
+    spawnCheckSize: {x: 0.35, y: 0.5, z: 11}
+  - type: 3
+    prefabs:
+    - {fileID: 3837573111360809350, guid: 1a990a8638b6b714fa7a0a81bc48f40b, type: 3}
+    xRange: {x: -5, y: 5}
+    weight: 30
+    bonusWeight: 0
+    weightIncrement: 1
+    maxBonusWeight: 10
+    spawnCheckSize: {x: 0.675, y: 0.5, z: 11}
+  - type: 2
+    prefabs:
+    - {fileID: 3247104159443246242, guid: 8b2802472e56e054b92313fe260afe45, type: 3}
+    - {fileID: 3767484349822436447, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
+    - {fileID: 8710936298454423071, guid: 9b17be39194320a42b89287935b99200, type: 3}
+    - {fileID: 2628516971176168633, guid: ccc3768a06f30be4bb83ae6345c803eb, type: 3}
+    - {fileID: 3692262683567292511, guid: c82b5386b8570ce48b0703e0c2673ab6, type: 3}
+    xRange: {x: -4.3, y: 3}
+    weight: 35
+    bonusWeight: 0
+    weightIncrement: 1
+    maxBonusWeight: 10
+    spawnCheckSize: {x: 1.1, y: 0.5, z: 12.5}
+  - type: 1
+    prefabs:
+    - {fileID: 2278272101244545825, guid: d24893936d9c9c14abf8c373c88508c7, type: 3}
+    xRange: {x: -2.5, y: 2.5}
+    weight: 12
+    bonusWeight: 0
+    weightIncrement: 2
+    maxBonusWeight: 25
+    spawnCheckSize: {x: 1.5, y: 0.5, z: 15}
+  - type: 0
+    prefabs:
+    - {fileID: 8463349050262562609, guid: 752bb075a2b959b4baa3d10fe939c59d, type: 3}
+    - {fileID: 8724503343287003994, guid: c71ae82f75b86554f8c64b87a7f82b94, type: 3}
+    - {fileID: 8463349050262562609, guid: 752bb075a2b959b4baa3d10fe939c59d, type: 3}
+    xRange: {x: -3.25, y: 1.45}
+    weight: 5
+    bonusWeight: 0
+    weightIncrement: 2
+    maxBonusWeight: 10
+    spawnCheckSize: {x: 1.25, y: 0.5, z: 13}
+  - type: 6
+    prefabs:
+    - {fileID: 4768512161167820869, guid: d7d71b78f728d834fae1c7b76998427b, type: 3}
+    xRange: {x: 0.3, y: -1.8}
+    weight: 3
+    bonusWeight: 0
+    weightIncrement: 1
+    maxBonusWeight: 2
+    spawnCheckSize: {x: 2.05, y: 0.5, z: 12}
+  spawnRate: 10
+  spawnLocation: {x: 0, y: 0, z: 0}
+  baseSpawnTime: 3
+  spawnDistance: 70
+  spawnTimer: 0
+  recycleDistance: 80
+  maxActiveVehicles: 35
+  gizmosSpawnPos: {x: 0, y: 0, z: 0}
+  gizmosSpawnSize: {x: 0, y: 0, z: 0}
+--- !u!114 &6995274334915770008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7887398816664887179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fffbdb9479b2914f9c05e2a7b13b86c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
