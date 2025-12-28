@@ -249,6 +249,59 @@ Transform:
   - {fileID: 8699402357180599214}
   m_Father: {fileID: 9009012080238593778}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2421895462602293113
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5631714260527895351}
+  - component: {fileID: 2322990369998709768}
+  m_Layer: 8
+  m_Name: VehicleTriggerCollider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5631714260527895351
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2421895462602293113}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3015924137691194794}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &2322990369998709768
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2421895462602293113}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.75, y: 2, z: 0.2}
+  m_Center: {x: 0, y: 1.2, z: -1.2}
 --- !u!1 &3724972210809972721
 GameObject:
   m_ObjectHideFlags: 0
@@ -261,7 +314,6 @@ GameObject:
   - component: {fileID: 361886519837801121}
   - component: {fileID: 3145953014449129997}
   - component: {fileID: 7641619893088450844}
-  - component: {fileID: 3063264018344304154}
   m_Layer: 6
   m_Name: Bike
   m_TagString: Vehicle
@@ -357,28 +409,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.7, y: 1.0136201, z: 2.0405369}
-  m_Center: {x: -0.00000032782555, y: 0.63322484, z: -0.0014514923}
---- !u!65 &3063264018344304154
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3724972210809972721}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.75, y: 2, z: 0.2}
-  m_Center: {x: -0.00000032782555, y: 1.19, z: -1.2}
+  m_Center: {x: 0, y: 0.63322484, z: -0.0014514923}
 --- !u!1 &3973115394310775288
 GameObject:
   m_ObjectHideFlags: 0
@@ -513,6 +544,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4069152233791042187}
+  - {fileID: 5631714260527895351}
   - {fileID: 2422123272808452975}
   - {fileID: 9009012080238593778}
   - {fileID: 5260004728554330525}
@@ -590,7 +622,7 @@ MonoBehaviour:
   vehicleBodyCollider: {fileID: 7641619893088450844}
   vehicleLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 320
   wheels:
   - wheelModel: {fileID: 7074435864527595312}
     wheelCollider: {fileID: 7072081741321728258}

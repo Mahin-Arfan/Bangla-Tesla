@@ -265,6 +265,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6375780798345254646, guid: c71ae82f75b86554f8c64b87a7f82b94, type: 3}
   m_PrefabInstance: {fileID: 1717748737073985405}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &727004629 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7547312220196926216, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+  m_PrefabInstance: {fileID: 6580436349757128914}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -366,6 +371,11 @@ Transform:
 GameObject:
   m_CorrespondingSourceObject: {fileID: 331647725001492744, guid: 336ecb6c7f653904fbe43a0103b1c06d, type: 3}
   m_PrefabInstance: {fileID: 1817542418505526924}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1246042756 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2837455094286679700, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+  m_PrefabInstance: {fileID: 6580436349757128914}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1253950566 stripped
 Transform:
@@ -575,6 +585,14 @@ PrefabInstance:
       propertyPath: roads.Array.data[2].roadSegment
       value: 
       objectReference: {fileID: 1196089435}
+    - target: {fileID: 1307587833961996349, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
+      propertyPath: vehicleGroups.Array.data[0].weight
+      value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: 1307587833961996349, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
+      propertyPath: vehicleGroups.Array.data[2].weight
+      value: 40
+      objectReference: {fileID: 0}
     - target: {fileID: 5180476570406194112, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.4886577
@@ -618,6 +636,10 @@ PrefabInstance:
     - target: {fileID: 7887398816664887179, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
       propertyPath: m_Name
       value: GameManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 7887398816664887179, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1203,6 +1225,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1211070883527123226, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+      propertyPath: leftWheelTransform
+      value: 
+      objectReference: {fileID: 727004629}
+    - target: {fileID: 1211070883527123226, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+      propertyPath: rightWheelTransform
+      value: 
+      objectReference: {fileID: 1246042756}
     - target: {fileID: 1361896859863166564, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.6
@@ -1243,9 +1273,33 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1484203447816429725, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+      propertyPath: obstacleLayer.m_Bits
+      value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 2163867155340737052, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2163867155340737052, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+      propertyPath: steerSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4008471675998945919, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+      propertyPath: obstacleLayer.m_Bits
+      value: 64
+      objectReference: {fileID: 0}
     - target: {fileID: 5528649204639173851, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 5704196524089194717, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+      propertyPath: obstacleLayer.m_Bits
+      value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 8390959859729879075, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+      propertyPath: obstacleLayer.m_Bits
+      value: 64
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

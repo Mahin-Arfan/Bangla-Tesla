@@ -254,7 +254,6 @@ public class NPCVehicleController : MonoBehaviour
         }
 
         currentAcceleration = Mathf.Lerp(currentAcceleration, adjustedAcceleration, accelerationSmoothness * Time.fixedDeltaTime);
-        if(reverseMechanics) adjustedSpeedLimit = -adjustedSpeedLimit;
         if (isBraking) return;
 
         foreach (var w in wheels)
