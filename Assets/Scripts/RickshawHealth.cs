@@ -5,6 +5,7 @@ public class RickshawHealth : MonoBehaviour
 {
     [Header("Stats")]
     public float health = 100f;
+    public bool isDead = false;
     public bool leftWheelDamaged = false;
     public bool rightWheelDamaged = false;
 
@@ -28,7 +29,7 @@ public class RickshawHealth : MonoBehaviour
 
     void Update()
     {
-        ApplyWheelJiggle();
+        if(!isDead) ApplyWheelJiggle();
     }
 
     public void TakeDamage(float amount, CollisionDetector.WheelPosition part)
@@ -74,6 +75,7 @@ public class RickshawHealth : MonoBehaviour
     void Die()
     {
         Debug.Log("Game Over");
+        isDead = true;
         frontWheelCollider.GetComponent<BoxCollider>().enabled = true;
         baseCollider.GetComponent<BoxCollider>().enabled = true;
         leftWheelTransform.GetComponent<BoxCollider>().enabled = true;
