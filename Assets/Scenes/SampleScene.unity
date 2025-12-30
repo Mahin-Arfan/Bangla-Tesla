@@ -334,7 +334,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &931243697
 Transform:
   m_ObjectHideFlags: 0
@@ -440,7 +440,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2988417765632912261, guid: a52abc9d05beb0c44bb2bf93810250ff, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -95.59209
+      value: -0.69208527
       objectReference: {fileID: 0}
     - target: {fileID: 2988417765632912261, guid: a52abc9d05beb0c44bb2bf93810250ff, type: 3}
       propertyPath: m_LocalRotation.w
@@ -561,6 +561,10 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 5372999493176941875}
+    - target: {fileID: 1307587833961996349, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
+      propertyPath: maxDificultyScore
+      value: 1500
+      objectReference: {fileID: 0}
     - target: {fileID: 1307587833961996349, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
       propertyPath: roads.Array.data[0].endPoint
       value: 
@@ -721,7 +725,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1695601406904253836, guid: 336ecb6c7f653904fbe43a0103b1c06d, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -191.1842
+      value: -96.2842
       objectReference: {fileID: 0}
     - target: {fileID: 1695601406904253836, guid: 336ecb6c7f653904fbe43a0103b1c06d, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1170,7 +1174,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7561144685292000562, guid: b88964d0ad793cd4389d9b69f5d88d96, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 94.9
       objectReference: {fileID: 0}
     - target: {fileID: 7561144685292000562, guid: b88964d0ad793cd4389d9b69f5d88d96, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1267,7 +1271,7 @@ PrefabInstance:
       objectReference: {fileID: 1246042756}
     - target: {fileID: 1361896859863166564, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.96
+      value: 1.05
       objectReference: {fileID: 0}
     - target: {fileID: 1361896859863166564, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1275,7 +1279,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1361896859863166564, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -6.9
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1361896859863166564, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1304,6 +1308,10 @@ PrefabInstance:
     - target: {fileID: 1361896859863166564, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1426933045429412109, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1484203447816429725, guid: d04cd7afcf5cccc4da0dc66d0f8c775e, type: 3}
       propertyPath: obstacleLayer.m_Bits
@@ -1408,7 +1416,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5292735716209387520, guid: d24893936d9c9c14abf8c373c88508c7, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -8.6
+      value: -13.91
       objectReference: {fileID: 0}
     - target: {fileID: 5292735716209387520, guid: d24893936d9c9c14abf8c373c88508c7, type: 3}
       propertyPath: m_LocalRotation.w

@@ -5,6 +5,8 @@ public class PlayerRickshawController : MonoBehaviour
 {
     [Header("Speed Settings")]
     public float baseSpeed = 8f;         // always moves forward
+    public float startSpeed = 8f;
+    public float maxSpeed = 20f;        // maximum speed limit
     public float boostSpeed = 5f;        // extra speed when pressing W
     public float acceleration = 4f;      // smooth speed change
     public float currentSpeed;

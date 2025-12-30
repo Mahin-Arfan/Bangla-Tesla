@@ -16,6 +16,7 @@ public class CollisionDetector : MonoBehaviour
         Debug.LogWarning("Collision detected with " + collision.gameObject.name);
         if (((1 << collision.gameObject.layer) & obstacleLayer) != 0)
         {
+            Debug.LogError("Processing hit for " + gameObject.name);
             ProcessHit();
         }
     }
@@ -25,6 +26,7 @@ public class CollisionDetector : MonoBehaviour
         Debug.LogWarning("Collision detected with " + other.gameObject.name);
         if (((1 << other.gameObject.layer) & obstacleLayer) != 0)
         {
+            Debug.LogError("Processing hit for " + gameObject.name);
             ProcessHit();
         }
     }

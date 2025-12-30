@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class GameManagerScript : MonoBehaviour
 {
@@ -15,11 +16,16 @@ public class GameManagerScript : MonoBehaviour
         public Transform endPoint;
     }
 
+    [Header("Game Settings")]
+    public int score = 0;
+    public float maxDificultyScore = 1000f;
+
     [Header("Road Settings")]
     public Road[] roads;
     public float roadSpawnDistance = 110f;
 
     public GameObject player;
+    private PlayerRickshawController playerController;
 
     private Transform firstRoad;
     private Transform secondRoad;
@@ -49,6 +55,8 @@ public class GameManagerScript : MonoBehaviour
 
     [Header("Spawn Settings")]
     public float spawnRate = 2f; // base spawn rate
+    public float startSpawnRate = 2f;
+    public float maxSpawnRate = 10f;
     public Vector3 spawnLocation;
     public float baseSpawnTime = 3f;
     public float spawnDistance = 80f; // distance in front of player to spawn
@@ -70,6 +78,11 @@ public class GameManagerScript : MonoBehaviour
 
     void Start()
     {
+        playerController = player.GetComponent<PlayerRickshawController>();
+        if(playerController == null)
+        {
+            Debug.LogError("PlayerRickshawController not found on player!");
+        }
         // road initialization
         firstRoad = roads[0].roadSegment.transform;
         secondRoad = roads[1].roadSegment.transform;
@@ -88,6 +101,8 @@ public class GameManagerScript : MonoBehaviour
 
     void Update()
     {
+        score = (int)Mathf.Abs(player.transform.position.z);
+        UpdateDifficulty(score);
         HandleRoadSpawning();
         HandleVehicleSpawning();
         RecycleOldVehicles();
@@ -239,8 +254,13 @@ public class GameManagerScript : MonoBehaviour
 
             if (!v.activeSelf) continue;
 
-            // ✅ Recycle if far BEHIND player
-            if (v.transform.position.z > player.transform.position.z + recycleDistance)
+            Vector3 playerPos = player.transform.position;
+            Vector3 vPos = v.transform.position;
+
+            bool outOfZRange = Mathf.Abs(vPos.z - playerPos.z) > recycleDistance;
+            bool outOfYRange = vPos.y > 3f || vPos.y < -3f;
+
+            if (outOfZRange || outOfYRange)
             {
                 toRecycle.Add(v);
             }
@@ -322,6 +342,15 @@ public class GameManagerScript : MonoBehaviour
             vehicleGroupIndex[chosenGroupIndex] = 0;
         } 
         return vehiclePrefeb;
+    }
+
+    void UpdateDifficulty(int score)
+    {
+        float progress = Mathf.Clamp01(score / maxDificultyScore);
+        progress = Mathf.SmoothStep(0f, 1f, progress);
+
+        playerController.baseSpeed = Mathf.Lerp(playerController.startSpeed, playerController.maxSpeed, progress);
+        spawnRate = Mathf.Lerp(startSpawnRate, maxSpawnRate, progress);
     }
 
     //temp gizmos

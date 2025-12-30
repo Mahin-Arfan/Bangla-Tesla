@@ -11,7 +11,7 @@ public class RickshawHealth : MonoBehaviour
 
     [Header("Settings")]
     public float hitCooldown = 0.5f; // Prevent multi-hits in 1 frame
-    private float lastHitTime;
+    private float lastHitTime = 0f;
 
     [Header("Wheel References")]
     public Transform leftWheelTransform;
@@ -35,7 +35,6 @@ public class RickshawHealth : MonoBehaviour
     public void TakeDamage(float amount, CollisionDetector.WheelPosition part)
     {
         if (Time.time < lastHitTime + hitCooldown) return;
-
         health -= amount;
         lastHitTime = Time.time;
 

@@ -215,6 +215,7 @@ public class NPCVehicleController : MonoBehaviour
             return;
         }
 
+        if (isBraking) return;
 
         if (isOvertaking && ((reverseMechanics ? driveToTargetDot > 0f : driveToTargetDot < 0f) ||
             driveToTargetDistance <= overTakeCompleteDisctance || obstacleDistance > frontCheckerDistance))
@@ -254,7 +255,7 @@ public class NPCVehicleController : MonoBehaviour
         }
 
         currentAcceleration = Mathf.Lerp(currentAcceleration, adjustedAcceleration, accelerationSmoothness * Time.fixedDeltaTime);
-        if (isBraking) return;
+        if(reverseMechanics) adjustedSpeedLimit = Mathf.Abs(adjustedSpeedLimit);
 
         foreach (var w in wheels)
         {
@@ -274,6 +275,7 @@ public class NPCVehicleController : MonoBehaviour
                     w.wheelCollider.motorTorque = currentAcceleration * 50f;
                     // ensure brakes not stuck
                     w.wheelCollider.brakeTorque = 0f;
+                    Debug.LogError("Here1, adSpeed:" + adjustedSpeedLimit + gameObject.name);
                 }
                 else if (vehicleSpeed > adjustedSpeedLimit + 5f)
                 {
@@ -281,12 +283,14 @@ public class NPCVehicleController : MonoBehaviour
                     currentAcceleration = 0f;
                     w.wheelCollider.motorTorque = 0f;
                     w.wheelCollider.brakeTorque = brakeForce;
+                    Debug.LogError("Here2, adSpeed:" + adjustedSpeedLimit +  gameObject.name);
                 }
                 else
                 {
                     // at or slightly above allowed speed -> cut power, no heavy brake
                     w.wheelCollider.motorTorque = 0f;
                     w.wheelCollider.brakeTorque = 0f;
+                    Debug.LogError("Here3, adSpeed:" + adjustedSpeedLimit + gameObject.name);
                 }
             }
         }
