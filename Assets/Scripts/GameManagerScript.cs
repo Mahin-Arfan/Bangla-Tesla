@@ -19,6 +19,7 @@ public class GameManagerScript : MonoBehaviour
     [Header("Game Settings")]
     public int score = 0;
     public float maxDificultyScore = 1000f;
+    private float progress = 0f;
 
     [Header("Road Settings")]
     public Road[] roads;
@@ -177,19 +178,12 @@ public class GameManagerScript : MonoBehaviour
 
         GameObject vehicle = GetFromPool(chosenVehicle);
 
-        //temp gizmos
-        CheckBoxGizmoDrawer.boxes.Add(
-    new CheckBoxGizmoDrawer.CheckBoxData(
-        spawnPos,
-        chosenGroup.spawnCheckSize,
-        Quaternion.identity
-    ));
-
         vehicle.transform.position = spawnPos;
         NPCVehicleController npcController = vehicle.transform.GetComponent<NPCVehicleController>();
         if(npcController != null)
         {
             vehicle.transform.rotation = npcController.reverseMechanics ? Quaternion.Euler(0f, 0f, 0f) : Quaternion.Euler(0f, 180f, 0f);
+            npcController.currentMaxSpeed = Mathf.Lerp(npcController.minSpeed, npcController.maxSpeed, progress);
             npcController.ResetNPC();
         }
         vehicle.SetActive(true);
@@ -346,7 +340,7 @@ public class GameManagerScript : MonoBehaviour
 
     void UpdateDifficulty(int score)
     {
-        float progress = Mathf.Clamp01(score / maxDificultyScore);
+        progress = Mathf.Clamp01(score / maxDificultyScore);
         progress = Mathf.SmoothStep(0f, 1f, progress);
 
         playerController.baseSpeed = Mathf.Lerp(playerController.startSpeed, playerController.maxSpeed, progress);

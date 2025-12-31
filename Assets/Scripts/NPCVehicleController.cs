@@ -18,6 +18,7 @@ public class NPCVehicleController : MonoBehaviour
     [Header("Driving Settings")]
     public float vehicleSpeed;                // current speed (m/s)
     public float minSpeed = 5f;                // min random speed (m/s)
+    public float currentMaxSpeed;
     public float maxSpeed = 15f;               // max random speed (m/s)
     private float speedLimit;
     public float acceleration = 25f;           // base acceleration amount (units used as torque multiplier)
@@ -113,12 +114,13 @@ public class NPCVehicleController : MonoBehaviour
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         initialYPosition = transform.position.y;
         // Randomize driving speed
-        speedLimit = Random.Range(minSpeed, maxSpeed);
+        speedLimit = Random.Range(minSpeed, currentMaxSpeed);
         if (reverseMechanics) 
         { 
             acceleration = -acceleration;
             speedLimit = -speedLimit;
             minSpeed = -minSpeed;
+            currentMaxSpeed = -currentMaxSpeed;
             maxSpeed = -maxSpeed;
         }
         if(vehicleBodyCollider == null)
@@ -275,7 +277,6 @@ public class NPCVehicleController : MonoBehaviour
                     w.wheelCollider.motorTorque = currentAcceleration * 50f;
                     // ensure brakes not stuck
                     w.wheelCollider.brakeTorque = 0f;
-                    Debug.LogError("Here1, adSpeed:" + adjustedSpeedLimit + gameObject.name);
                 }
                 else if (vehicleSpeed > adjustedSpeedLimit + 5f)
                 {
@@ -283,14 +284,12 @@ public class NPCVehicleController : MonoBehaviour
                     currentAcceleration = 0f;
                     w.wheelCollider.motorTorque = 0f;
                     w.wheelCollider.brakeTorque = brakeForce;
-                    Debug.LogError("Here2, adSpeed:" + adjustedSpeedLimit +  gameObject.name);
                 }
                 else
                 {
                     // at or slightly above allowed speed -> cut power, no heavy brake
                     w.wheelCollider.motorTorque = 0f;
                     w.wheelCollider.brakeTorque = 0f;
-                    Debug.LogError("Here3, adSpeed:" + adjustedSpeedLimit + gameObject.name);
                 }
             }
         }
@@ -590,7 +589,7 @@ public class NPCVehicleController : MonoBehaviour
         if (lockYPosition) rb.constraints |= RigidbodyConstraints.FreezePositionY;
 
         // Re-randomize speed
-        speedLimit = Random.Range(minSpeed, maxSpeed);
+        speedLimit = Random.Range(minSpeed, currentMaxSpeed);
         if (reverseMechanics)
         {
             speedLimit = -speedLimit;
@@ -629,6 +628,8 @@ public class NPCVehicleController : MonoBehaviour
             checkSize = requested * 0.5f;
         }
     }
+
+#if UNITY_EDITOR
 
     // Optional: draw debug rays / boxes in Scene view
     void OnDrawGizmosSelected()
@@ -695,4 +696,5 @@ public class NPCVehicleController : MonoBehaviour
 
         Gizmos.matrix = Matrix4x4.identity;
     }
+#endif
 }
