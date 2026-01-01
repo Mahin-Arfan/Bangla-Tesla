@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class RickshawHealth : MonoBehaviour
@@ -26,6 +25,7 @@ public class RickshawHealth : MonoBehaviour
     public Animator rickshawManAnimator;
     public Collider[] rickshawManColliders;
     public Rigidbody[] rickshawManRigidBodies;
+    public GameManagerScript gameManagerScript;
 
     void Update()
     {
@@ -34,7 +34,7 @@ public class RickshawHealth : MonoBehaviour
 
     public void TakeDamage(float amount, CollisionDetector.WheelPosition part)
     {
-        if (Time.time < lastHitTime + hitCooldown) return;
+        if (Time.time < lastHitTime + hitCooldown || isDead) return;
         health -= amount;
         lastHitTime = Time.time;
 
@@ -75,6 +75,7 @@ public class RickshawHealth : MonoBehaviour
     {
         Debug.Log("Game Over");
         isDead = true;
+        gameManagerScript.gameOver = true;
         frontWheelCollider.GetComponent<BoxCollider>().enabled = true;
         baseCollider.GetComponent<BoxCollider>().enabled = true;
         leftWheelTransform.GetComponent<BoxCollider>().enabled = true;

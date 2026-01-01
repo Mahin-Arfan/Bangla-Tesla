@@ -20,13 +20,14 @@ public class GameManagerScript : MonoBehaviour
     public int score = 0;
     public float maxDificultyScore = 1000f;
     private float progress = 0f;
+    public bool gameStarted = false;
+    public bool gameOver = false;
+    private bool gameInitiaded = false;
+    private bool gameOverInitiaded = false;
 
     [Header("Road Settings")]
     public Road[] roads;
     public float roadSpawnDistance = 110f;
-
-    public GameObject player;
-    private PlayerRickshawController playerController;
 
     private Transform firstRoad;
     private Transform secondRoad;
@@ -72,6 +73,11 @@ public class GameManagerScript : MonoBehaviour
     private Dictionary<GameObject, Type> activeVehicles =
             new Dictionary<GameObject, Type>();
 
+
+    [Header("References")]
+    public GameObject player;
+    private PlayerRickshawController playerController;
+    public UIScript uIScript;
     //temp
     public Vector3 gizmosSpawnPos;
     public Vector3 gizmosSpawnSize;
@@ -80,9 +86,14 @@ public class GameManagerScript : MonoBehaviour
     void Start()
     {
         playerController = player.GetComponent<PlayerRickshawController>();
-        if(playerController == null)
+        uIScript = GetComponent<UIScript>();
+        if (playerController == null)
         {
             Debug.LogError("PlayerRickshawController not found on player!");
+        }
+        if(uIScript == null)
+        {
+            Debug.LogError("UIScript not found on GameManagerScript!");
         }
         // road initialization
         firstRoad = roads[0].roadSegment.transform;
@@ -107,6 +118,14 @@ public class GameManagerScript : MonoBehaviour
         HandleRoadSpawning();
         HandleVehicleSpawning();
         RecycleOldVehicles();
+        if(gameStarted && !gameInitiaded)
+        {
+            StartGame();
+        }
+        if(gameOver && !gameOverInitiaded)
+        {
+            GameOver();
+        }
     }
 
     void HandleRoadSpawning()
@@ -155,11 +174,15 @@ public class GameManagerScript : MonoBehaviour
         {
             float spawnX = Random.Range(chosenGroup.xRange.x, chosenGroup.xRange.y);
 
-            spawnPos = new Vector3(
-                spawnX,
-                1f,
-                player.transform.position.z - spawnDistance
-            );
+            if (gameStarted && !gameOver)
+            {
+                spawnPos = new Vector3(spawnX, 1f, player.transform.position.z - spawnDistance);
+            }
+            else
+            {
+                if (spawnX > 2.5f) spawnX = 2.5f;
+                spawnPos = new Vector3(spawnX, 1f, player.transform.position.z + spawnDistance);
+            }
 
             if (!Physics.CheckBox(spawnPos, chosenGroup.spawnCheckSize, Quaternion.identity))
             {
@@ -183,7 +206,16 @@ public class GameManagerScript : MonoBehaviour
         if(npcController != null)
         {
             vehicle.transform.rotation = npcController.reverseMechanics ? Quaternion.Euler(0f, 0f, 0f) : Quaternion.Euler(0f, 180f, 0f);
-            npcController.currentMaxSpeed = Mathf.Lerp(npcController.minSpeed, npcController.maxSpeed, progress);
+            if (gameStarted)
+            {
+                npcController.currentMaxSpeed = Mathf.Lerp(npcController.minSpeed, npcController.maxSpeed, progress);
+                npcController.currentStopDecision = npcController.randomStops;
+            }
+            else
+            {
+                npcController.currentMaxSpeed = npcController.maxSpeed;
+                npcController.currentStopDecision = false;
+            }
             npcController.ResetNPC();
         }
         vehicle.SetActive(true);
@@ -232,7 +264,6 @@ public class GameManagerScript : MonoBehaviour
                 pv.prefabSource = prefab;
 
                 prefabPool[prefab].Enqueue(obj);
-                Debug.Log("Prewarmed " + prefab.name);
             }
         }
     }
@@ -347,6 +378,19 @@ public class GameManagerScript : MonoBehaviour
         spawnRate = Mathf.Lerp(startSpawnRate, maxSpawnRate, progress);
     }
 
+    void StartGame()
+    {
+        playerController.enabled = true;
+        gameInitiaded = true;
+    }
+
+    void GameOver()
+    {
+        gameOverInitiaded = true;
+        uIScript.endMenuUI.SetActive(true);
+    }
+
+#if UNITY_EDITOR
     //temp gizmos
     void OnDrawGizmosSelected()
     {
@@ -366,4 +410,5 @@ public class GameManagerScript : MonoBehaviour
 
         Gizmos.matrix = Matrix4x4.identity;
     }
+#endif
 }

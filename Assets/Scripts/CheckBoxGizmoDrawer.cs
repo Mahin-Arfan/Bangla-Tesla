@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-
+#if UNITY_EDITOR
 public class CheckBoxGizmoDrawer : MonoBehaviour
 {
     public static List<CheckBoxData> boxes = new List<CheckBoxData>();
@@ -32,3 +32,4 @@ public class CheckBoxGizmoDrawer : MonoBehaviour
         Gizmos.matrix = Matrix4x4.identity;
     }
 }
+#endif

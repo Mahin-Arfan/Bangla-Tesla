@@ -10,13 +10,17 @@ public class PlayerRickshawController : MonoBehaviour
     public float boostSpeed = 5f;        // extra speed when pressing W
     public float acceleration = 4f;      // smooth speed change
     public float currentSpeed;
+    private bool boostPressed = false;
 
     [Header("Brake Settings")]
+    private bool brakePressed = false;
+    public float breakDeceleration = 5f;
     public float brakeForce = 10f;
     public float maxBrakeTime = 1f;      // how long S key works
     public float brakeCooldown = 2f;     // cooldown after brake
 
     [Header("Steering Settings")]
+    public float tiltSensitivity = 2.0f;
     public float steerSpeed = 5f;
     public float maxTurnAngle = 45f;
     public float sideCheckDistance = 1f;
@@ -54,7 +58,12 @@ public class PlayerRickshawController : MonoBehaviour
 
     void Update()
     {
+        float rawTilt = Input.acceleration.x;
+        horizontalInput = Mathf.Clamp(rawTilt * tiltSensitivity, -1f, 1f);
+#if UNITY_EDITOR
         horizontalInput = Input.GetAxis("Horizontal");
+#endif
+        ReadTouchInput();
         HandleBraking();
         UpdateSteerHandle(animSteer);
         sideCheckTimer += Time.deltaTime;
@@ -65,6 +74,32 @@ public class PlayerRickshawController : MonoBehaviour
         ApplyForwardMovement();
         Steer();
     }
+
+    void ReadTouchInput()
+    {
+        brakePressed = false;
+        boostPressed = false;
+
+        for (int i = 0; i < Input.touchCount; i++)
+        {
+            Touch t = Input.GetTouch(i);
+
+            if (t.phase == TouchPhase.Began || t.phase == TouchPhase.Stationary)
+            {
+                if (t.position.x < Screen.width * 0.5f)
+                    brakePressed = true;      // LEFT side
+                else
+                    boostPressed = true;      // RIGHT side
+            }
+        }
+#if UNITY_EDITOR
+        if(Input.GetKey(KeyCode.S))
+            brakePressed = true;
+        if(Input.GetKey(KeyCode.W))
+            boostPressed = true;
+#endif
+    }
+
 
     void Steer()
     {
@@ -87,10 +122,6 @@ public class PlayerRickshawController : MonoBehaviour
         // Block steering only toward obstacle
         if (steerInput > 0f && rightBlocked) steerInput = 0f;
         if (steerInput < 0f && leftBlocked) steerInput = 0f;
-        if(rightBlocked || leftBlocked)
-        {
-            Debug.Log("Right Blocked: " + rightBlocked + " | Left Blocked: " + leftBlocked);
-        }
 
         // POSITION-BASED STEER LIMIT
         float steerMultiplier = 1f;
@@ -142,7 +173,7 @@ public class PlayerRickshawController : MonoBehaviour
         if (isBraking)
         {
             // apply braking
-            currentSpeed = Mathf.Lerp(currentSpeed, 0f, brakeForce * Time.fixedDeltaTime);
+            currentSpeed = Mathf.Lerp(currentSpeed, breakDeceleration, brakeForce * Time.fixedDeltaTime);
         }
         else
         {
@@ -150,8 +181,7 @@ public class PlayerRickshawController : MonoBehaviour
             float targetSpeed = baseSpeed;
 
             // boost applied?
-            if (Input.GetKey(KeyCode.W))
-                targetSpeed += boostSpeed;
+            if (boostPressed) targetSpeed += boostSpeed;
 
             currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, acceleration * Time.fixedDeltaTime);
         }
@@ -165,7 +195,7 @@ public class PlayerRickshawController : MonoBehaviour
         if (brakeCooldownTimer > 0f)
             brakeCooldownTimer -= Time.deltaTime;
 
-        if (Input.GetKey(KeyCode.S) && brakeCooldownTimer <= 0f)
+        if (brakePressed && brakeCooldownTimer <= 0f)
         {
             isBraking = true;
             brakeTimer += Time.deltaTime;

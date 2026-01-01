@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5180476570406194112}
   - component: {fileID: 1307587833961996349}
+  - component: {fileID: 9186628493333926460}
   - component: {fileID: 6995274334915770008}
   m_Layer: 0
   m_Name: GameManager
@@ -45,6 +46,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 462cff7cb181eba40a7757d8a0d5d9ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  score: 0
+  maxDificultyScore: 1500
+  gameStarted: 0
   roads:
   - roadSegment: {fileID: 0}
     endPoint: {fileID: 0}
@@ -117,6 +121,8 @@ MonoBehaviour:
     maxBonusWeight: 2
     spawnCheckSize: {x: 2.05, y: 0.5, z: 12}
   spawnRate: 10
+  startSpawnRate: 2
+  maxSpawnRate: 8
   spawnLocation: {x: 0, y: 0, z: 0}
   baseSpawnTime: 3
   spawnDistance: 70
@@ -125,6 +131,19 @@ MonoBehaviour:
   maxActiveVehicles: 35
   gizmosSpawnPos: {x: 0, y: 0, z: 0}
   gizmosSpawnSize: {x: 0, y: 0, z: 0}
+--- !u!114 &9186628493333926460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7887398816664887179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99a6c0458057b934bab611203e97cb24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainMenuUI: {fileID: 0}
 --- !u!114 &6995274334915770008
 MonoBehaviour:
   m_ObjectHideFlags: 0

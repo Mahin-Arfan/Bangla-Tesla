@@ -18,8 +18,8 @@ public class NPCVehicleController : MonoBehaviour
     [Header("Driving Settings")]
     public float vehicleSpeed;                // current speed (m/s)
     public float minSpeed = 5f;                // min random speed (m/s)
-    public float currentMaxSpeed;
     public float maxSpeed = 15f;               // max random speed (m/s)
+    public float currentMaxSpeed;
     private float speedLimit;
     public float acceleration = 25f;           // base acceleration amount (units used as torque multiplier)
     public float accelerationSmoothness = 5f;  // lerp speed for acceleration changes
@@ -44,6 +44,7 @@ public class NPCVehicleController : MonoBehaviour
 
     [Header("Random Stops")]
     public bool randomStops = false;
+    [HideInInspector] public bool currentStopDecision = false;
     public float stopPositionX = 0f; // [Range -4 to -3]
     private bool stopping = false;
     public float stopDuration = 5f;
@@ -136,7 +137,7 @@ public class NPCVehicleController : MonoBehaviour
         }
         driveTarget = new Vector3(transform.position.x, transform.position.y, transform.position.z - 1000f);
         currentDriveTarget = driveTarget;
-        if (randomStops)
+        if (currentStopDecision)
         {
             stopCheckTimer = Random.Range(0f, nextStopCheckTime);
         }
@@ -154,7 +155,7 @@ public class NPCVehicleController : MonoBehaviour
             GroundCheck();
             lastCheckTime = 0f;
         }
-        if (randomStops)
+        if (currentStopDecision)
         {
             stopCheckTimer += Time.deltaTime;
             if (stopCheckTimer >= nextStopCheckTime && !stopping)
