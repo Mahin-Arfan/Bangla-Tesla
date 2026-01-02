@@ -82,7 +82,14 @@ public class GameManagerScript : MonoBehaviour
     public Vector3 gizmosSpawnPos;
     public Vector3 gizmosSpawnSize;
 
-
+    void Awake()
+    {
+        Screen.orientation = ScreenOrientation.LandscapeLeft;
+        Screen.autorotateToPortrait = false;
+        Screen.autorotateToPortraitUpsideDown = false;
+        Screen.autorotateToLandscapeLeft = true;
+        Screen.autorotateToLandscapeRight = false;
+    }
     void Start()
     {
         playerController = player.GetComponent<PlayerRickshawController>();

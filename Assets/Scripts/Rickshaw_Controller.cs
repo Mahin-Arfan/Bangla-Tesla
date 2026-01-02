@@ -1,4 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.EnhancedTouch;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
+using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 
 [RequireComponent(typeof(Rigidbody), typeof(BoxCollider))]
 public class PlayerRickshawController : MonoBehaviour
@@ -20,6 +24,8 @@ public class PlayerRickshawController : MonoBehaviour
     public float brakeCooldown = 2f;     // cooldown after brake
 
     [Header("Steering Settings")]
+    private bool leftPressed = false;
+    private bool rightPressed = false;
     public float tiltSensitivity = 2.0f;
     public float steerSpeed = 5f;
     public float maxTurnAngle = 45f;
@@ -45,7 +51,7 @@ public class PlayerRickshawController : MonoBehaviour
     private float brakeTimer = 0f;
     private float brakeCooldownTimer = 0f;
     private bool isBraking = false;
-    private float horizontalInput;
+    public float horizontalInput;
 
     void Start()
     {
@@ -58,10 +64,16 @@ public class PlayerRickshawController : MonoBehaviour
 
     void Update()
     {
-        float rawTilt = Input.acceleration.x;
-        horizontalInput = Mathf.Clamp(rawTilt * tiltSensitivity, -1f, 1f);
+        if (leftPressed)
+            horizontalInput = Mathf.Lerp(horizontalInput, -1f, Time.deltaTime * steerSpeed);
+        else if (rightPressed)
+            horizontalInput = Mathf.Lerp(horizontalInput, 1f, Time.deltaTime * steerSpeed);
+        else
+            horizontalInput = Mathf.Lerp(horizontalInput, 0f, Time.deltaTime * steerSpeed);
+        //float rawTilt = Input.acceleration.x;
+        //horizontalInput = Mathf.Clamp(rawTilt * tiltSensitivity, -1f, 1f);
 #if UNITY_EDITOR
-        horizontalInput = Input.GetAxis("Horizontal");
+        //horizontalInput = Input.GetAxis("Horizontal");
 #endif
         ReadTouchInput();
         HandleBraking();
@@ -80,26 +92,31 @@ public class PlayerRickshawController : MonoBehaviour
         brakePressed = false;
         boostPressed = false;
 
-        for (int i = 0; i < Input.touchCount; i++)
+        foreach (var t in Touch.activeTouches)
         {
-            Touch t = Input.GetTouch(i);
-
-            if (t.phase == TouchPhase.Began || t.phase == TouchPhase.Stationary)
+            if (t.phase == TouchPhase.Began ||
+                t.phase == TouchPhase.Moved ||
+                t.phase == TouchPhase.Stationary)
             {
-                if (t.position.x < Screen.width * 0.5f)
-                    brakePressed = true;      // LEFT side
+                if (t.screenPosition.x < Screen.width * 0.5f)
+                    brakePressed = true;   // LEFT
                 else
-                    boostPressed = true;      // RIGHT side
+                    boostPressed = true;   // RIGHT
             }
         }
+
 #if UNITY_EDITOR
-        if(Input.GetKey(KeyCode.S))
+        if (Keyboard.current.sKey.isPressed)
             brakePressed = true;
-        if(Input.GetKey(KeyCode.W))
+        if (Keyboard.current.wKey.isPressed)
             boostPressed = true;
 #endif
     }
 
+    public void LeftButtonDown() { leftPressed = true; }
+    public void LeftButtonUp() { leftPressed = false; }
+    public void RightButtonDown() { rightPressed = true; }
+    public void RightButtonUp() { rightPressed = false; }
 
     void Steer()
     {
