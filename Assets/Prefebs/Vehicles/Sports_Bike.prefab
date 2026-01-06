@@ -314,6 +314,7 @@ GameObject:
   - component: {fileID: 361886519837801121}
   - component: {fileID: 3145953014449129997}
   - component: {fileID: 7641619893088450844}
+  - component: {fileID: 4488351698343885976}
   m_Layer: 6
   m_Name: Bike
   m_TagString: Vehicle
@@ -410,6 +411,25 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.7, y: 1.0136201, z: 2.0405369}
   m_Center: {x: 0, y: 0.63322484, z: -0.0014514923}
+--- !u!114 &4488351698343885976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3724972210809972721}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a22abb55ff7efd4e9f121dcbf9f1e71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isNPC: 1
+  position: 0
+  healthScript: {fileID: 0}
+  npcVehicleController: {fileID: 935475964192472878}
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 192
 --- !u!1 &3973115394310775288
 GameObject:
   m_ObjectHideFlags: 0
@@ -548,6 +568,7 @@ Transform:
   - {fileID: 2422123272808452975}
   - {fileID: 9009012080238593778}
   - {fileID: 5260004728554330525}
+  - {fileID: 5868948881938929256}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!54 &6581643903880237555
@@ -592,11 +613,13 @@ MonoBehaviour:
   vehicleSpeed: 0
   minSpeed: 5
   maxSpeed: 16
+  currentMaxSpeed: 0
   acceleration: 15
   accelerationSmoothness: 0.35
   turnSmoothness: 5
   brakeForce: 2000
   stopDistanceMultiplier: 1.2
+  damageCooldown: 1
   tryOvertake: 1
   frontCheckerDistance: 20
   overTakeSideClearance: 1
@@ -606,6 +629,7 @@ MonoBehaviour:
   overTakingTendency: 3
   overTakeCompleteDisctance: 3
   randomStops: 1
+  currentStopDecision: 0
   stopPositionX: 5
   stopDuration: 5
   minimumStopDistance: 3
@@ -615,6 +639,7 @@ MonoBehaviour:
   lockXRotation: 1
   lockZRotation: 1
   lockYPosition: 0
+  NPCCharacterScript: {fileID: 0}
   frontChecker: {fileID: 4004249463670927986}
   frontRightChecker: {fileID: 4569156283574617839}
   frontLeftChecker: {fileID: 9080988606022894807}
@@ -937,3 +962,77 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5260004728554330525}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &2549237690081217002
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3015924137691194794}
+    m_Modifications:
+    - target: {fileID: 4276005892004112731, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: driving
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4276005892004112731, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: vehicleType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4276005892004112731, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: nPCVehicleController
+      value: 
+      objectReference: {fileID: 935475964192472878}
+    - target: {fileID: 7608566580439242773, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_Name
+      value: RickshawMan
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+--- !u!4 &5868948881938929256 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+  m_PrefabInstance: {fileID: 2549237690081217002}
+  m_PrefabAsset: {fileID: 0}

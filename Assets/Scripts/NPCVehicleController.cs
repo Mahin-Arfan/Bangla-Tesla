@@ -29,6 +29,11 @@ public class NPCVehicleController : MonoBehaviour
     public float stopDistanceMultiplier = 1f;  // multiplier used to compute stopDistance from speed
     private bool isBraking = false;
 
+    [Header("Damage Settings")]
+    private bool vehicleDamaged = false;
+    private float lastDamageTime = 0f;
+    public float damageCooldown = 1f;
+
     [Header("Obstacle & Overtake")]
     public bool tryOvertake = true;
     public float frontCheckerDistance = 20f;   // how far the rays check
@@ -86,6 +91,7 @@ public class NPCVehicleController : MonoBehaviour
     [Header("References")]
     private Vector3 driveTarget;              // main drive target
     private Vector3 overtakeTarget;           // target used while overtaking
+    public NPCCharacterScript NPCCharacterScript;
     public Transform frontChecker;             // center ray origin
     public Transform frontRightChecker;        // right ray origin
     public Transform frontLeftChecker;         // left ray origin
@@ -146,6 +152,8 @@ public class NPCVehicleController : MonoBehaviour
     void Update()
     {
         UpdateWheelModels();
+        if(vehicleDamaged) return;
+
         lastCheckTime += Time.deltaTime;
         overTakeCheckTimer += Time.deltaTime;
         driveToTargetCheck += Time.deltaTime;
@@ -187,6 +195,7 @@ public class NPCVehicleController : MonoBehaviour
 
     void FixedUpdate()
     {
+        if(vehicleDamaged) return;
         DriveTowardsTarget();
     }
 
@@ -576,10 +585,21 @@ public class NPCVehicleController : MonoBehaviour
         leftSideCheckGizmoPos = checkPos;
     }
 
+    public void VehicleHit()
+    {
+        if (Time.time < lastDamageTime + damageCooldown || vehicleDamaged) return;
+        lastDamageTime = Time.time;
+        vehicleDamaged = true;
+        if(NPCCharacterScript != null)
+            NPCCharacterScript.isDead = true;
+        //comment;
+    }
+
     public void ResetNPC()
     {
         // Reset Rigidbody
         if (rb == null) rb = GetComponent<Rigidbody>();
+        vehicleDamaged = false;
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
 

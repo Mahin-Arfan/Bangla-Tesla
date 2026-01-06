@@ -303,6 +303,7 @@ MonoBehaviour:
   vehicleSpeed: 0
   minSpeed: 3
   maxSpeed: 8
+  currentMaxSpeed: 0
   acceleration: 25
   accelerationSmoothness: 0.5
   turnSmoothness: 5
@@ -317,6 +318,7 @@ MonoBehaviour:
   overTakingTendency: 4
   overTakeCompleteDisctance: 3
   randomStops: 1
+  currentStopDecision: 0
   stopPositionX: 4.5
   stopDuration: 5
   minimumStopDistance: 3
@@ -957,5 +959,80 @@ Transform:
   - {fileID: 1742897071740584027}
   - {fileID: 7898529214422039922}
   - {fileID: 8058664688964129342}
+  - {fileID: 2140293725181105491}
   m_Father: {fileID: 5256159904769500774}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &8043954536774863569
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1935145800058541025}
+    m_Modifications:
+    - target: {fileID: 4276005892004112731, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: driving
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4276005892004112731, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: vehicleType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4276005892004112731, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: nPCVehicleController
+      value: 
+      objectReference: {fileID: 3267339224091878572}
+    - target: {fileID: 7608566580439242773, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_Name
+      value: RickshawMan
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+--- !u!4 &2140293725181105491 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+  m_PrefabInstance: {fileID: 8043954536774863569}
+  m_PrefabAsset: {fileID: 0}
