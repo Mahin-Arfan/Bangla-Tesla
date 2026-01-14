@@ -25,6 +25,7 @@ public class RickshawHealth : MonoBehaviour
     public Animator rickshawManAnimator;
     public Collider[] rickshawManColliders;
     public Rigidbody[] rickshawManRigidBodies;
+    public GameObject colliders;
     public GameManagerScript gameManagerScript;
 
     void Update()
@@ -78,6 +79,7 @@ public class RickshawHealth : MonoBehaviour
         gameManagerScript.gameOver = true;
         frontWheelCollider.GetComponent<BoxCollider>().enabled = true;
         baseCollider.GetComponent<BoxCollider>().enabled = true;
+        colliders.SetActive(false);
         leftWheelTransform.GetComponent<BoxCollider>().enabled = true;
         rightWheelTransform.GetComponent<BoxCollider>().enabled = true;
         GetComponent<PlayerRickshawController>().enabled = false;

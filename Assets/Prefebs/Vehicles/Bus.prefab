@@ -114,6 +114,8 @@ GameObject:
   - component: {fileID: 400403988132341288}
   - component: {fileID: 5898351038329225305}
   - component: {fileID: 3602538749406662550}
+  - component: {fileID: 3763091854602387183}
+  - component: {fileID: 7242925055056832371}
   m_Layer: 6
   m_Name: Bus
   m_TagString: Vehicle
@@ -210,6 +212,46 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.844808, y: 3.009411, z: 11.982847}
   m_Center: {x: 0.005378306, y: 0.07793701, z: -0.92778516}
+--- !u!65 &3763091854602387183
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1508879396747661567}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.8, y: 2.95, z: 11.8}
+  m_Center: {x: 0.005378306, y: 0.07793701, z: -0.92778516}
+--- !u!114 &7242925055056832371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1508879396747661567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a22abb55ff7efd4e9f121dcbf9f1e71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isNPC: 1
+  position: 0
+  healthScript: {fileID: 0}
+  npcVehicleController: {fileID: 7903760847422932928}
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 192
 --- !u!1 &1700477881952135139
 GameObject:
   m_ObjectHideFlags: 0
@@ -374,11 +416,16 @@ MonoBehaviour:
   vehicleSpeed: 0
   minSpeed: 4
   maxSpeed: 10
+  currentMaxSpeed: 0
   acceleration: 25
   accelerationSmoothness: 2
   turnSmoothness: 5
   brakeForce: 20000
   stopDistanceMultiplier: 3
+  vehicleCanBeDamaged: 1
+  damageCooldown: 1
+  damagedStopDuration: 5
+  hitForce: 0
   tryOvertake: 1
   frontCheckerDistance: 20
   overTakeSideClearance: 1.5
@@ -388,15 +435,18 @@ MonoBehaviour:
   overTakingTendency: 1
   overTakeCompleteDisctance: 4
   randomStops: 1
+  currentStopDecision: 0
   stopPositionX: 2.75
   stopDuration: 5
   minimumStopDistance: 3
   stopChance: 25
   nextStopCheckTime: 5
+  vehicleType: 1
   reverseMechanics: 0
   lockXRotation: 0
   lockZRotation: 1
   lockYPosition: 0
+  NPCCharacterScript: {fileID: 0}
   frontChecker: {fileID: 836747461992676279}
   frontRightChecker: {fileID: 5757461658901861867}
   frontLeftChecker: {fileID: 3109924176718023308}

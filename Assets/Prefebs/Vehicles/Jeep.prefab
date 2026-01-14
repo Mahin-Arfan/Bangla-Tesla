@@ -595,11 +595,17 @@ MonoBehaviour:
   vehicleSpeed: 0
   minSpeed: 5
   maxSpeed: 12
+  currentMaxSpeed: 0
   acceleration: 20
   accelerationSmoothness: 0.5
   turnSmoothness: 5
   brakeForce: 10000
   stopDistanceMultiplier: 1.6
+  vehicleCanBeDamaged: 1
+  vehicleDamaged: 0
+  damageCooldown: 1
+  damagedStopDuration: 5
+  hitForce: 0
   tryOvertake: 1
   frontCheckerDistance: 20
   overTakeSideClearance: 1
@@ -609,15 +615,18 @@ MonoBehaviour:
   overTakingTendency: 3
   overTakeCompleteDisctance: 3
   randomStops: 1
+  currentStopDecision: 0
   stopPositionX: 4.3
   stopDuration: 5
   minimumStopDistance: 3
   stopChance: 1.5
   nextStopCheckTime: 5
+  vehicleType: 2
   reverseMechanics: 0
   lockXRotation: 0
   lockZRotation: 1
   lockYPosition: 0
+  NPCCharacterScript: {fileID: 0}
   frontChecker: {fileID: 6721674250133991375}
   frontRightChecker: {fileID: 5765128428826784389}
   frontLeftChecker: {fileID: 440251658911015185}
@@ -717,6 +726,8 @@ GameObject:
   - component: {fileID: 1098983122387657170}
   - component: {fileID: 3342541696215842572}
   - component: {fileID: 2078148051151518877}
+  - component: {fileID: 8015814446417669645}
+  - component: {fileID: 8393335764860755825}
   m_Layer: 6
   m_Name: Body
   m_TagString: Vehicle
@@ -811,8 +822,48 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
+  m_Size: {x: 1.95, y: 1.48, z: 5.15}
+  m_Center: {x: -0.0003412366, y: 0.13313395, z: -0.4336666}
+--- !u!65 &8015814446417669645
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7658417348060739801}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
   m_Size: {x: 2.02, y: 1.5200248, z: 5.2340384}
   m_Center: {x: -0.0003412366, y: 0.13313395, z: -0.4336666}
+--- !u!114 &8393335764860755825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7658417348060739801}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a22abb55ff7efd4e9f121dcbf9f1e71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isNPC: 1
+  position: 0
+  healthScript: {fileID: 0}
+  npcVehicleController: {fileID: 8475960655202483446}
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 192
 --- !u!1 &7918468052850447890
 GameObject:
   m_ObjectHideFlags: 0

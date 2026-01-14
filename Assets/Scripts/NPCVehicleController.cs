@@ -4,6 +4,8 @@ using UnityEngine.Rendering;
 
 public class NPCVehicleController : MonoBehaviour
 {
+    public enum Type { Truck, Bus, Car, Cng, Bike, Rickshaw, Barrier }
+
     [System.Serializable]
     public enum Axel { Front, Rear }
 
@@ -30,9 +32,12 @@ public class NPCVehicleController : MonoBehaviour
     private bool isBraking = false;
 
     [Header("Damage Settings")]
-    private bool vehicleDamaged = false;
+    public bool vehicleCanBeDamaged = true;
+    public bool vehicleDamaged = false;
     private float lastDamageTime = 0f;
     public float damageCooldown = 1f;
+    public float damagedStopDuration = 0f;
+    public float hitForce = 500f;
 
     [Header("Obstacle & Overtake")]
     public bool tryOvertake = true;
@@ -64,6 +69,7 @@ public class NPCVehicleController : MonoBehaviour
     private float stopCheckTimer = 0f;
 
     [Header("Vehicle Mechanics")]
+    public Type vehicleType = Type.Car;
     public bool reverseMechanics = false;      // if true, the vehicle drives "backwards"
     public bool lockXRotation = false;         // if true, freezes X rotation on Rigidbody
     public bool lockZRotation  = false;          // if true, freezes Z rotation on Rigidbody
@@ -115,7 +121,11 @@ public class NPCVehicleController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        if(lockXRotation) rb.constraints |= RigidbodyConstraints.FreezeRotationX;
+        if(NPCCharacterScript == null)
+        {
+            NPCCharacterScript = GetComponentInChildren<NPCCharacterScript>();
+        }
+        if (lockXRotation) rb.constraints |= RigidbodyConstraints.FreezeRotationX;
         if(lockYPosition) rb.constraints |= RigidbodyConstraints.FreezePositionY;
         if(lockZRotation) rb.constraints |= RigidbodyConstraints.FreezeRotationZ;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
@@ -152,7 +162,17 @@ public class NPCVehicleController : MonoBehaviour
     void Update()
     {
         UpdateWheelModels();
-        if(vehicleDamaged) return;
+        if (vehicleDamaged) 
+        {
+            if(Time.time >= lastDamageTime + damagedStopDuration)
+            {
+                vehicleDamaged = false;
+                ApplyBrakes(false);
+                return;
+            }
+            ApplyBrakes(true);
+            return; 
+        }
 
         lastCheckTime += Time.deltaTime;
         overTakeCheckTimer += Time.deltaTime;
@@ -585,13 +605,18 @@ public class NPCVehicleController : MonoBehaviour
         leftSideCheckGizmoPos = checkPos;
     }
 
-    public void VehicleHit()
+    public void VehicleHit(Vector3 hitDirection)
     {
-        if (Time.time < lastDamageTime + damageCooldown || vehicleDamaged) return;
+        if (!vehicleCanBeDamaged || Time.time < lastDamageTime + damageCooldown || vehicleDamaged) return;
         lastDamageTime = Time.time;
         vehicleDamaged = true;
-        if(NPCCharacterScript != null)
+        if(vehicleType == Type.Bike)
+        {
+            rb.constraints = RigidbodyConstraints.None;
+        }
+        if (NPCCharacterScript != null)
             NPCCharacterScript.isDead = true;
+        rb.AddForce(hitDirection.normalized * hitForce, ForceMode.Impulse);
         //comment;
     }
 
@@ -600,8 +625,11 @@ public class NPCVehicleController : MonoBehaviour
         // Reset Rigidbody
         if (rb == null) rb = GetComponent<Rigidbody>();
         vehicleDamaged = false;
+        lastDamageTime = 0f;
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
+        if(NPCCharacterScript != null)
+            NPCCharacterScript.ResetNPC();
 
         // Reset constraints
         rb.constraints = RigidbodyConstraints.None;

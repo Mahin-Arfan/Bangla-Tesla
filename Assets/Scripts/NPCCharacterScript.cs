@@ -18,7 +18,6 @@ public class NPCCharacterScript : MonoBehaviour
     public NPCVehicleController nPCVehicleController;
     private Animator animator;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -39,7 +38,7 @@ public class NPCCharacterScript : MonoBehaviour
         {
             UpdateDrivingState();
         }
-        if(isDead && !rigidBodyActivated)
+        if(isDead && !rigidBodyActivated && vehicleType != 3)
         {
             RigidBodyActive();
             rigidBodyActivated = true;
@@ -48,6 +47,11 @@ public class NPCCharacterScript : MonoBehaviour
 
     void UpdateDrivingState()
     {
+        if (animator == null)
+        {
+            Debug.LogWarning("No Animator on " + gameObject.name);
+            return;
+        }
         animator.SetInteger("VehicleInt", vehicleType);
         animator.SetBool("Driving", true);
         drivingStateUpdated = true;
@@ -64,5 +68,33 @@ public class NPCCharacterScript : MonoBehaviour
         {
             rb.isKinematic = false;
         }
+    }
+
+    public void ResetNPC()
+    {
+        if (isDead)
+        {
+            isDead = false;
+            foreach (var col in bodyColliders)
+            {
+                col.enabled = false;
+            }
+            foreach (var rb in bodyRigidBodies)
+            {
+                rb.isKinematic = true;
+            }
+        }
+        drivingStateUpdated = false;
+        rigidBodyActivated = false;
+        if(animator != null)
+        {
+            animator.enabled = true;
+        }
+        else
+        {
+            animator = GetComponent<Animator>();
+            animator.enabled = true;
+        }
+        UpdateDrivingState();
     }
 }

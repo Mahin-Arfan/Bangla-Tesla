@@ -21,7 +21,8 @@ public class CollisionDetector : MonoBehaviour
     {
         if (((1 << collision.gameObject.layer) & obstacleLayer) != 0)
         {
-            ProcessHit();
+            Vector3 hitDirection = (transform.position - collision.transform.position).normalized;
+            ProcessHit(hitDirection);
         }
     }
 
@@ -29,15 +30,26 @@ public class CollisionDetector : MonoBehaviour
     {
         if (((1 << other.gameObject.layer) & obstacleLayer) != 0)
         {
-            ProcessHit();
+            Vector3 hitDirection = (transform.position - other.transform.position).normalized;
+            ProcessHit(hitDirection);
         }
     }
 
-    void ProcessHit()
+    private void OnTriggerStay(Collider other)
+    {
+        if (((1 << other.gameObject.layer) & obstacleLayer) != 0 && !isNPC)
+        {
+            Debug.Log("Trigger Stay Detected on " + gameObject.name);
+            Vector3 hitDirection = (transform.position - other.transform.position).normalized;
+            ProcessHit(hitDirection);
+        }
+    }
+
+    void ProcessHit(Vector3 hitDirection)
     {
         if (isNPC)
         {
-            npcVehicleController.VehicleHit();
+            npcVehicleController.VehicleHit(hitDirection);
         }
         else
         {

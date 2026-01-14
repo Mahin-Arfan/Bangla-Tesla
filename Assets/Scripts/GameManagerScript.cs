@@ -173,6 +173,7 @@ public class GameManagerScript : MonoBehaviour
             return;
 
         int chosenGroupIndex = ChooseWeightedTypeIndex();
+        //if (!gameStarted && chosenGroupIndex == 0) return;
         VehicleGroup chosenGroup = vehicleGroups[chosenGroupIndex];
 
         bool foundFreeSpot = false;
@@ -217,15 +218,17 @@ public class GameManagerScript : MonoBehaviour
             {
                 npcController.currentMaxSpeed = Mathf.Lerp(npcController.minSpeed, npcController.maxSpeed, progress);
                 npcController.currentStopDecision = npcController.randomStops;
+                npcController.vehicleCanBeDamaged = true;
             }
             else
             {
                 npcController.currentMaxSpeed = npcController.maxSpeed;
                 npcController.currentStopDecision = false;
+                npcController.vehicleCanBeDamaged = false;
             }
-            npcController.ResetNPC();
         }
         vehicle.SetActive(true);
+        if(npcController != null) npcController.ResetNPC();
         activeVehicles[vehicle] = chosenGroup.type;
         spawnTimer = 0f;
         IncreaseBonusForUnselected(chosenGroup);
@@ -288,6 +291,12 @@ public class GameManagerScript : MonoBehaviour
 
             Vector3 playerPos = player.transform.position;
             Vector3 vPos = v.transform.position;
+
+            if(!gameStarted && !gameOver && vPos.x > 2.5f && vPos.z > 17f)
+            {
+                toRecycle.Add(v);
+                continue;
+            }
 
             bool outOfZRange = Mathf.Abs(vPos.z - playerPos.z) > recycleDistance;
             bool outOfYRange = vPos.y > 3f || vPos.y < -3f;

@@ -1632,7 +1632,7 @@ MonoBehaviour:
   isDead: 0
   leftWheelDamaged: 0
   rightWheelDamaged: 0
-  hitCooldown: 0.5
+  hitCooldown: 0.25
   leftWheelTransform: {fileID: 8943956139844902946}
   rightWheelTransform: {fileID: 7854284381919479900}
   jiggleSpeed: 20
@@ -1663,6 +1663,7 @@ MonoBehaviour:
   - {fileID: 2097361750276194604}
   - {fileID: 6538346003398126158}
   - {fileID: 6660026961992312067}
+  colliders: {fileID: 2156978249505941016}
   gameManagerScript: {fileID: 0}
 --- !u!136 &1763203735674761387
 CapsuleCollider:
@@ -8294,7 +8295,7 @@ GameObject:
   - component: {fileID: 3496968813651894313}
   - component: {fileID: 6762368525566426975}
   - component: {fileID: 7166638178280022364}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Front Seat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8349,8 +8350,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a22abb55ff7efd4e9f121dcbf9f1e71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isNPC: 0
   position: 0
   healthScript: {fileID: 2313748500086058571}
+  npcVehicleController: {fileID: 0}
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -11756,7 +11759,7 @@ GameObject:
   - component: {fileID: 6057331252756052322}
   - component: {fileID: 3698126443618676114}
   - component: {fileID: 418716504648668099}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Right Side
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11811,8 +11814,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a22abb55ff7efd4e9f121dcbf9f1e71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isNPC: 0
   position: 2
   healthScript: {fileID: 2313748500086058571}
+  npcVehicleController: {fileID: 0}
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -11827,7 +11832,7 @@ GameObject:
   - component: {fileID: 2653176616794826098}
   - component: {fileID: 871016057737109941}
   - component: {fileID: 8124082128041272566}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11882,8 +11887,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a22abb55ff7efd4e9f121dcbf9f1e71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isNPC: 0
   position: 0
   healthScript: {fileID: 2313748500086058571}
+  npcVehicleController: {fileID: 0}
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -13043,7 +13050,7 @@ GameObject:
   - component: {fileID: 373958056371517925}
   - component: {fileID: 1212694942242301885}
   - component: {fileID: 8391384420841247889}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Left Side
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13098,8 +13105,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a22abb55ff7efd4e9f121dcbf9f1e71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isNPC: 0
   position: 1
   healthScript: {fileID: 2313748500086058571}
+  npcVehicleController: {fileID: 0}
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 64

@@ -314,6 +314,7 @@ GameObject:
   - component: {fileID: 361886519837801121}
   - component: {fileID: 3145953014449129997}
   - component: {fileID: 7641619893088450844}
+  - component: {fileID: 9073103433646968074}
   - component: {fileID: 4488351698343885976}
   m_Layer: 6
   m_Name: Bike
@@ -410,6 +411,27 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.7, y: 1.0136201, z: 2.0405369}
+  m_Center: {x: 0, y: 0.63322484, z: -0.0014514923}
+--- !u!65 &9073103433646968074
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3724972210809972721}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.65, y: 0.95, z: 1.95}
   m_Center: {x: 0, y: 0.63322484, z: -0.0014514923}
 --- !u!114 &4488351698343885976
 MonoBehaviour:
@@ -619,7 +641,11 @@ MonoBehaviour:
   turnSmoothness: 5
   brakeForce: 2000
   stopDistanceMultiplier: 1.2
+  vehicleCanBeDamaged: 1
+  vehicleDamaged: 0
   damageCooldown: 1
+  damagedStopDuration: 100
+  hitForce: 1000
   tryOvertake: 1
   frontCheckerDistance: 20
   overTakeSideClearance: 1
@@ -635,6 +661,7 @@ MonoBehaviour:
   minimumStopDistance: 3
   stopChance: 5
   nextStopCheckTime: 5
+  vehicleType: 4
   reverseMechanics: 0
   lockXRotation: 1
   lockZRotation: 1

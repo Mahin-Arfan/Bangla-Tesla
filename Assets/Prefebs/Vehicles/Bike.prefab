@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 962506002037570026}
   - component: {fileID: 8913539437683554040}
   - component: {fileID: 6019685334946048601}
+  - component: {fileID: 2614183987845719771}
   - component: {fileID: 2112141762322772937}
   m_Layer: 6
   m_Name: Bike.001
@@ -104,6 +105,27 @@ BoxCollider:
     m_Bits: 0
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.55, y: 0.78, z: 1.75}
+  m_Center: {x: -0.00021240115, y: 0.5392004, z: -0.09289408}
+--- !u!65 &2614183987845719771
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206671678937207870}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -926,7 +948,10 @@ MonoBehaviour:
   turnSmoothness: 5
   brakeForce: 2000
   stopDistanceMultiplier: 1.5
+  vehicleCanBeDamaged: 1
   damageCooldown: 1
+  damagedStopDuration: 100
+  hitForce: 1000
   tryOvertake: 1
   frontCheckerDistance: 20
   overTakeSideClearance: 1
@@ -942,11 +967,12 @@ MonoBehaviour:
   minimumStopDistance: 3
   stopChance: 5
   nextStopCheckTime: 5
+  vehicleType: 4
   reverseMechanics: 0
   lockXRotation: 1
   lockZRotation: 1
   lockYPosition: 0
-  NPCCharacterScript: {fileID: 0}
+  NPCCharacterScript: {fileID: 3678633866522289403}
   frontChecker: {fileID: 7718435716229587630}
   frontRightChecker: {fileID: 1648961669282363461}
   frontLeftChecker: {fileID: 7722520459673904897}
@@ -1031,6 +1057,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+--- !u!114 &3678633866522289403 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4276005892004112731, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+  m_PrefabInstance: {fileID: 601880047869595040}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4f80be158fe94e4a9d4ca20ea69f5af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &8811373429339509282 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
