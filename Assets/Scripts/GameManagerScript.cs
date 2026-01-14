@@ -213,7 +213,7 @@ public class GameManagerScript : MonoBehaviour
         NPCVehicleController npcController = vehicle.transform.GetComponent<NPCVehicleController>();
         if(npcController != null)
         {
-            vehicle.transform.rotation = npcController.reverseMechanics ? Quaternion.Euler(0f, 0f, 0f) : Quaternion.Euler(0f, 180f, 0f);
+            vehicle.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
             if (gameStarted)
             {
                 npcController.currentMaxSpeed = Mathf.Lerp(npcController.minSpeed, npcController.maxSpeed, progress);
@@ -291,8 +291,8 @@ public class GameManagerScript : MonoBehaviour
 
             Vector3 playerPos = player.transform.position;
             Vector3 vPos = v.transform.position;
-
-            if(!gameStarted && !gameOver && vPos.x > 2.5f && vPos.z > 17f)
+            NPCVehicleController npcScript = v.GetComponent<NPCVehicleController>();
+            if (!gameStarted && !gameOver && (vPos.x > 2.5f && vPos.z > 17f) || npcScript.idleTime > 10f)
             {
                 toRecycle.Add(v);
                 continue;
@@ -300,8 +300,14 @@ public class GameManagerScript : MonoBehaviour
 
             bool outOfZRange = Mathf.Abs(vPos.z - playerPos.z) > recycleDistance;
             bool outOfYRange = vPos.y > 3f || vPos.y < -3f;
+            bool rotatedWrong = Vector3.Angle(v.transform.forward, Vector3.forward) < 100f;
+            float angle = Vector3.Angle(v.transform.forward, Vector3.forward);
+            if (rotatedWrong)
+            {
+                Debug.Log("Recycling vehicle due to wrong rotation: " + v.name + "Rotated: " + angle);
+            }
 
-            if (outOfZRange || outOfYRange)
+            if (outOfZRange || outOfYRange || rotatedWrong)
             {
                 toRecycle.Add(v);
             }

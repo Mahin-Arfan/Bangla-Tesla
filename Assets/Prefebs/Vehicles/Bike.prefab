@@ -948,10 +948,16 @@ MonoBehaviour:
   turnSmoothness: 5
   brakeForce: 2000
   stopDistanceMultiplier: 1.5
+  idleTime: 0
   vehicleCanBeDamaged: 1
+  vehicleDamaged: 0
   damageCooldown: 1
   damagedStopDuration: 100
   hitForce: 1000
+  impactSprites:
+  - {fileID: 21300000, guid: 7cd32f8c8e418c447a9b5aa277fba460, type: 3}
+  - {fileID: 21300000, guid: f25cbbd6e42128e488667510fec6da51, type: 3}
+  effectOffset: 0.5
   tryOvertake: 1
   frontCheckerDistance: 20
   overTakeSideClearance: 1
@@ -968,7 +974,6 @@ MonoBehaviour:
   stopChance: 5
   nextStopCheckTime: 5
   vehicleType: 4
-  reverseMechanics: 0
   lockXRotation: 1
   lockZRotation: 1
   lockYPosition: 0

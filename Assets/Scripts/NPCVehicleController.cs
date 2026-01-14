@@ -30,6 +30,7 @@ public class NPCVehicleController : MonoBehaviour
     public float brakeForce = 2000f;           // brake torque
     public float stopDistanceMultiplier = 1f;  // multiplier used to compute stopDistance from speed
     private bool isBraking = false;
+    public float idleTime = 0f;
 
     [Header("Damage Settings")]
     public bool vehicleCanBeDamaged = true;
@@ -70,7 +71,6 @@ public class NPCVehicleController : MonoBehaviour
 
     [Header("Vehicle Mechanics")]
     public Type vehicleType = Type.Car;
-    public bool reverseMechanics = false;      // if true, the vehicle drives "backwards"
     public bool lockXRotation = false;         // if true, freezes X rotation on Rigidbody
     public bool lockZRotation  = false;          // if true, freezes Z rotation on Rigidbody
     public bool lockYPosition = true;         // if true, freezes Y position on Rigidbody
@@ -132,14 +132,7 @@ public class NPCVehicleController : MonoBehaviour
         initialYPosition = transform.position.y;
         // Randomize driving speed
         speedLimit = Random.Range(minSpeed, currentMaxSpeed);
-        if (reverseMechanics) 
-        { 
-            acceleration = -acceleration;
-            speedLimit = -speedLimit;
-            minSpeed = -minSpeed;
-            currentMaxSpeed = -currentMaxSpeed;
-            maxSpeed = -maxSpeed;
-        }
+
         if(vehicleBodyCollider == null)
         {
             Debug.LogError(transform.name + ": Vehicle body collider not found!");
@@ -177,6 +170,10 @@ public class NPCVehicleController : MonoBehaviour
         lastCheckTime += Time.deltaTime;
         overTakeCheckTimer += Time.deltaTime;
         driveToTargetCheck += Time.deltaTime;
+
+        if(vehicleSpeed < 0.1f) idleTime += Time.deltaTime;
+        else idleTime = 0f;
+
         if (lastCheckTime >= checkInterval)
         {
             ObstacleCheck();
@@ -229,7 +226,7 @@ public class NPCVehicleController : MonoBehaviour
         Vector3 dirToTarget = currentDriveTarget - transform.position;
         driveToTargetDistance = dirToTarget.magnitude;
         driveToTargetDot = Vector3.Dot(transform.forward, dirToTarget.normalized);
-        if(driveToTargetCheck >= 1f && !stopping && reverseMechanics? driveToTargetDot > 0f : driveToTargetDot < 0f)
+        if(driveToTargetCheck >= 1f && !stopping && driveToTargetDot < 0f)
         {
             driveTarget = new Vector3(transform.position.x, transform.position.y, transform.position.z - 1000f);
         }
@@ -238,8 +235,8 @@ public class NPCVehicleController : MonoBehaviour
         float minimumStopDistance = isOvertaking ? 1.5f : 3f;
         stopDistance = Mathf.Clamp(vehicleSpeed * 0.4f * stopDistanceMultiplier, minimumStopDistance, 20f);
         
-        // braking if close or target behind (respects reverseMechanics)
-        bool shouldBrake = driveToTargetDistance <= stopDistance || (reverseMechanics ? driveToTargetDot > 0f : driveToTargetDot < 0f);
+        // braking if close or target behind
+        bool shouldBrake = driveToTargetDistance <= stopDistance || driveToTargetDot < 0f;
         if (shouldBrake && !isOvertaking)
         {
             currentAcceleration = 0f;
@@ -249,7 +246,7 @@ public class NPCVehicleController : MonoBehaviour
 
         if (isBraking) return;
 
-        if (isOvertaking && ((reverseMechanics ? driveToTargetDot > 0f : driveToTargetDot < 0f) ||
+        if (isOvertaking && (driveToTargetDot < 0f ||
             driveToTargetDistance <= overTakeCompleteDisctance || obstacleDistance > frontCheckerDistance))
         {
             isOvertaking = false;
@@ -272,7 +269,6 @@ public class NPCVehicleController : MonoBehaviour
         Vector3 localTarget = transform.InverseTransformPoint(currentDriveTarget);
         float steerInput = localTarget.magnitude > 0f ? (localTarget.x / localTarget.magnitude) : 0f;
         float targetSteerAngle = steerInput * steerAngle;
-        if (reverseMechanics) targetSteerAngle = -targetSteerAngle;
 
         float absSteer = Mathf.Abs(targetSteerAngle);
 
@@ -287,7 +283,6 @@ public class NPCVehicleController : MonoBehaviour
         }
 
         currentAcceleration = Mathf.Lerp(currentAcceleration, adjustedAcceleration, accelerationSmoothness * Time.fixedDeltaTime);
-        if(reverseMechanics) adjustedSpeedLimit = Mathf.Abs(adjustedSpeedLimit);
 
         foreach (var w in wheels)
         {
@@ -530,14 +525,7 @@ public class NPCVehicleController : MonoBehaviour
         {
             // not grounded — apply simple gravity
             transform.position = new Vector3(transform.position.x, initialYPosition + 0.5f, transform.position.z);
-            if (reverseMechanics)
-            {
-                transform.rotation = Quaternion.identity;
-            }
-            else
-            {
-                transform.rotation = Quaternion.Euler(0f, 180f, 0f);
-            }
+            transform.rotation = Quaternion.Euler(0f, 180f, 0f);
         }
     }
 
@@ -605,7 +593,7 @@ public class NPCVehicleController : MonoBehaviour
         leftSideCheckGizmoPos = checkPos;
     }
 
-    public void VehicleHit(Vector3 hitDirection)
+    public void VehicleHit(Vector3 hitPoint)
     {
         if (!vehicleCanBeDamaged || Time.time < lastDamageTime + damageCooldown || vehicleDamaged) return;
         lastDamageTime = Time.time;
@@ -616,7 +604,7 @@ public class NPCVehicleController : MonoBehaviour
         }
         if (NPCCharacterScript != null)
             NPCCharacterScript.isDead = true;
-        rb.AddForce(hitDirection.normalized * hitForce, ForceMode.Impulse);
+        rb.AddForce(hitPoint.normalized * hitForce, ForceMode.Impulse);
         //comment;
     }
 
@@ -639,10 +627,6 @@ public class NPCVehicleController : MonoBehaviour
 
         // Re-randomize speed
         speedLimit = Random.Range(minSpeed, currentMaxSpeed);
-        if (reverseMechanics)
-        {
-            speedLimit = -speedLimit;
-        }
 
         // Reset drive target far ahead
         driveTarget = new Vector3(transform.position.x, transform.position.y, transform.position.z - 1000f);
