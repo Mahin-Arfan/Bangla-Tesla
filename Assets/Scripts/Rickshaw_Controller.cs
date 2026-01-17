@@ -46,6 +46,7 @@ public class PlayerRickshawController : MonoBehaviour
     public Transform rickshawSteerHandle;
     public Transform turnCheck;
     public LayerMask obstacleLayer;
+    private CameraScript cameraScript;
 
     private Rigidbody rb;
     private float brakeTimer = 0f;
@@ -57,7 +58,7 @@ public class PlayerRickshawController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         rb.constraints |= RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-        //rb.collisionDetectionMode |= CollisionDetectionMode.Continuous;
+        cameraScript = GetComponent<CameraScript>();
 
         currentSpeed = baseSpeed;
     }
@@ -160,6 +161,8 @@ public class PlayerRickshawController : MonoBehaviour
         // ROTATION (PHYSICS)
         float targetY = 180f + finalSteer * maxTurnAngle;
         Quaternion targetRot = Quaternion.Euler(0f, targetY, 0f);
+
+        if (cameraScript != null) cameraScript.SetSteerInput(finalSteer);
 
         rb.MoveRotation(
             Quaternion.Slerp(

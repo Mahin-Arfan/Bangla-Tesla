@@ -1,3 +1,4 @@
+using Unity.Cinemachine;
 using UnityEngine;
 
 public class RickshawHealth : MonoBehaviour
@@ -27,7 +28,12 @@ public class RickshawHealth : MonoBehaviour
     public Rigidbody[] rickshawManRigidBodies;
     public GameObject colliders;
     public GameManagerScript gameManagerScript;
+    private CinemachineImpulseSource impulseSource;
 
+    private void Start()
+    {
+        impulseSource = GetComponent<CinemachineImpulseSource>();
+    }
     void Update()
     {
         if(!isDead) ApplyWheelJiggle();
@@ -38,6 +44,8 @@ public class RickshawHealth : MonoBehaviour
         if (Time.time < lastHitTime + hitCooldown || isDead) return;
         health -= amount;
         lastHitTime = Time.time;
+
+        if (impulseSource != null) impulseSource.GenerateImpulse(1f);
 
         if (part == CollisionDetector.WheelPosition.Left) leftWheelDamaged = true;
         if (part == CollisionDetector.WheelPosition.Right) rightWheelDamaged = true;
