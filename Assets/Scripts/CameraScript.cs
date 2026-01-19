@@ -1,35 +1,51 @@
 using UnityEngine;
-using Unity.Cinemachine;
 
 public class CameraScript : MonoBehaviour
 {
     [Header("Settings")]
-    public CinemachineCamera virtualCamera;
-    public float maxTiltAngle = 5f;  // Maximum angle in degrees
-    public float smoothTime = 5f;    // How fast it tilts
+    public Transform cam;
 
-    private float currentSteerInput = 0f;
+    [Header("Position Settings")]
+    public Vector3 offset = new Vector3(5f, 4.2f, 3f);
+    public float followSpeed = 10f;
 
-    void Update()
+    [Header("Rotation Settings")]
+    public Vector3 cameraRotationStraight = new Vector3(40f, -180f, 0f);
+    public float yOffsetTurnAmount = 3f;
+    public float rotationSpeed = 5f;
+
+    private float turnInput = 0f;
+    private Transform playerTransform;
+
+    void Start()
     {
-        if (virtualCamera == null) return;
+        if (cam == null) cam = transform;
+        if(playerTransform  == null) playerTransform = transform;
+    }
 
-        // 1. Calculate target tilt
-        float targetTilt = -currentSteerInput * maxTiltAngle;
+    void LateUpdate()
+    {
+        if (playerTransform == null) return;
 
-        // 2. Get the current Lens settings (It's a struct now!)
-        LensSettings lens = virtualCamera.Lens;
+        FollowPlayer();
+        UpdateCameraRotation();
+    }
 
-        // 3. Modify the Dutch (Roll)
-        lens.Dutch = Mathf.Lerp(lens.Dutch, targetTilt, Time.deltaTime * smoothTime);
+    void UpdateCameraRotation()
+    {
+        Vector3 targetRotation = cameraRotationStraight;
+        targetRotation.y -= turnInput * yOffsetTurnAmount;
+        cam.rotation = Quaternion.Slerp(cam.rotation, Quaternion.Euler(targetRotation), Time.deltaTime * rotationSpeed);
+    }
 
-        // 4. Apply the modified Lens settings back to the camera
-        virtualCamera.Lens = lens;
+    void FollowPlayer()
+    {
+        Vector3 targetPosition = playerTransform.position + offset;
+        cam.transform.position = Vector3.Lerp(cam.transform.position, targetPosition, Time.deltaTime * followSpeed);
     }
 
     public void SetSteerInput(float input)
     {
-        // input should be between -1 (Left) and 1 (Right)
-        currentSteerInput = input;
+        turnInput = input; // -1 to 1
     }
 }
