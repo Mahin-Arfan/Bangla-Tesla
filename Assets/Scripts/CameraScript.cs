@@ -14,13 +14,18 @@ public class CameraScript : MonoBehaviour
     public float yOffsetTurnAmount = 3f;
     public float rotationSpeed = 5f;
 
+    [Header("Shake Settings")]
+    public float shakeIntensity = 0.5f;
+    public float shakeDecay = 5f;
+
     private float turnInput = 0f;
+    private float currentShake = 0f;
     private Transform playerTransform;
 
     void Start()
     {
-        if (cam == null) cam = transform;
-        if(playerTransform  == null) playerTransform = transform;
+        if (cam == null) Debug.LogError("Camera Transform not assigned in CameraScript.");
+        if (playerTransform  == null) playerTransform = transform;
     }
 
     void LateUpdate()
@@ -28,7 +33,8 @@ public class CameraScript : MonoBehaviour
         if (playerTransform == null) return;
 
         FollowPlayer();
-        UpdateCameraRotation();
+        UpdateCameraRotation(); 
+        HandleShakeDecay();
     }
 
     void UpdateCameraRotation()
@@ -41,7 +47,26 @@ public class CameraScript : MonoBehaviour
     void FollowPlayer()
     {
         Vector3 targetPosition = playerTransform.position + offset;
-        cam.transform.position = Vector3.Lerp(cam.transform.position, targetPosition, Time.deltaTime * followSpeed);
+        Vector3 smoothedPosition = Vector3.Lerp(cam.transform.position, targetPosition, Time.deltaTime * followSpeed);
+        if (currentShake > 0)
+        {
+            smoothedPosition += Random.insideUnitSphere * currentShake;
+        }
+        cam.transform.position = smoothedPosition;
+    }
+
+    void HandleShakeDecay()
+    {
+        if (currentShake > 0)
+        {
+            currentShake -= Time.deltaTime * shakeDecay;
+            if (currentShake < 0) currentShake = 0f;
+        }
+    }
+
+    public void TriggerShake()
+    {
+        currentShake = shakeIntensity;
     }
 
     public void SetSteerInput(float input)

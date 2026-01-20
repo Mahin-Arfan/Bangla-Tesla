@@ -28,6 +28,12 @@ public class RickshawHealth : MonoBehaviour
     public Rigidbody[] rickshawManRigidBodies;
     public GameObject colliders;
     public GameManagerScript gameManagerScript;
+    private CameraScript cameraScript;
+
+    void Start()
+    {
+        cameraScript = GetComponent<CameraScript>();
+    }
 
     void Update()
     {
@@ -39,6 +45,8 @@ public class RickshawHealth : MonoBehaviour
         if (Time.time < lastHitTime + hitCooldown || isDead) return;
         health -= amount;
         lastHitTime = Time.time;
+
+        cameraScript.TriggerShake();
 
         if (part == CollisionDetector.WheelPosition.Left) leftWheelDamaged = true;
         if (part == CollisionDetector.WheelPosition.Right) rightWheelDamaged = true;
