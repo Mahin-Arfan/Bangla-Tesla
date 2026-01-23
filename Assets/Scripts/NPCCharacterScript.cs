@@ -4,19 +4,32 @@ public class NPCCharacterScript : MonoBehaviour
 {
     [Header("NPC Settings")]
     public bool driving = true;
-    public float walkSpeed = 2.0f;
-    public int vehicleType = 0;
+    public bool walking = false;
+    public bool salesman = false;
     public bool isDead = false;
 
-    private bool drivingStateUpdated = false;
-    private bool rigidBodyActivated = false;
+    [Header("Walk Settings")]
+    public float walkSpeed = 2.0f;
+    public float detectionDistance = 1.5f;
+    public LayerMask obstacleLayer;
+    public bool isWalking = false;
 
-    public Collider[] bodyColliders;
-    public Rigidbody[] bodyRigidBodies;
+    [Header("Drive Settings")]
+    public int vehicleType = 0; //0: None, 1: Bike, 2: SportsBike, 3: Texi
 
     [Header("References")]
     public NPCVehicleController nPCVehicleController;
     private Animator animator;
+    public Collider[] bodyColliders;
+    public Rigidbody[] bodyRigidBodies;
+
+    private bool stateUpdated = false;
+    private bool rigidBodyActivated = false;
+
+    void OnEnable()
+    {
+        ResetNPC();
+    }
 
     void Start()
     {
@@ -24,17 +37,19 @@ public class NPCCharacterScript : MonoBehaviour
         if (animator == null)
         {
             Debug.LogWarning("Animator component not found on NPCCharacterScript GameObject.");
+            gameObject.SetActive(false);
         }
-        if (nPCVehicleController == null)
+        if (driving && nPCVehicleController == null)
         {
             Debug.LogWarning("NPCVehicleController component not found on NPCCharacterScript GameObject.");
+            gameObject.SetActive(false);
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(driving & !drivingStateUpdated)
+        if(!stateUpdated && driving)
         {
             UpdateDrivingState();
         }
@@ -42,6 +57,45 @@ public class NPCCharacterScript : MonoBehaviour
         {
             RigidBodyActive();
             rigidBodyActivated = true;
+        }
+        if(!isDead && walking)
+        {
+            UpdateWalking();
+        }
+    }
+
+    void UpdateWalking()
+    {
+        if(!stateUpdated)
+        {
+            if(Random.value > 0.5f)
+            {
+                transform.Rotate(0f, 180f, 0f);
+            }
+            else
+            {
+                transform.Rotate(0f, 0f, 0f);
+            }
+            stateUpdated = true;
+        }
+        Vector3 origin = transform.position + Vector3.up * 0.5f;
+        bool pathBlocked = Physics.Raycast(origin, transform.forward, detectionDistance, obstacleLayer);
+        if (pathBlocked)
+        {
+            if (isWalking)
+            {
+                isWalking = false;
+                if (animator) animator.SetBool("IsWalking", false);
+            }
+        }
+        else
+        {
+            if (!isWalking)
+            {
+                isWalking = true;
+                if (animator) animator.SetBool("IsWalking", true);
+            }
+            transform.Translate(Vector3.forward * walkSpeed * Time.deltaTime);
         }
     }
 
@@ -54,7 +108,7 @@ public class NPCCharacterScript : MonoBehaviour
         }
         animator.SetInteger("VehicleInt", vehicleType);
         animator.SetBool("Driving", true);
-        drivingStateUpdated = true;
+        stateUpdated = true;
     }
 
     void RigidBodyActive()
@@ -84,7 +138,7 @@ public class NPCCharacterScript : MonoBehaviour
                 rb.isKinematic = true;
             }
         }
-        drivingStateUpdated = false;
+        stateUpdated = false;
         rigidBodyActivated = false;
         if(animator != null)
         {
@@ -95,6 +149,7 @@ public class NPCCharacterScript : MonoBehaviour
             animator = GetComponent<Animator>();
             animator.enabled = true;
         }
-        UpdateDrivingState();
+        animator.SetBool("IsWalking", false);
+        isWalking = false;
     }
 }

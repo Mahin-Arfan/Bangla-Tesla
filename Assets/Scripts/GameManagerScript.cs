@@ -18,7 +18,7 @@ public class GameManagerScript : MonoBehaviour
     [Header("Game Settings")]
     public int score = 0;
     public float maxDificultyScore = 1000f;
-    private float progress = 0f;
+    [HideInInspector] public float progress = 0f;
     public bool gameStarted = false;
     public bool gameOver = false;
     private bool gameInitiaded = false;
@@ -64,16 +64,18 @@ public class GameManagerScript : MonoBehaviour
     private float recycleTimer;
 
     [Header("Pedestrians")]
-    public GameObject[] pedestrianPrefabs;
     public float pedestrianSpawnRate = 1f;
     public int maxActivePedestrians = 10; // New Limit just for people
-    public float pedestrianXOffset = 4.5f;
+    public Vector2 pedestrianXOffset = new Vector2(7f, 10.5f);
     public float pedestrianYOffset = 0f;
+    public float padestrianSpawnDistance = 35f;
+    public GameObject[] pedestrianPrefabs;
 
     private float pedestrianTimer;
 
     [Header("Pooling")]
-    public float recycleDistance = 90f;
+    public float vehicleRecycleDistance = 90f;
+    public float pedestrianRecycleDistance = 40f;
     public int maxActiveVehicles = 35;
 
     private Dictionary<GameObject, Queue<GameObject>> prefabPool = new Dictionary<GameObject, Queue<GameObject>>();
@@ -84,7 +86,7 @@ public class GameManagerScript : MonoBehaviour
     [Header("References")]
     public GameObject player;
     private PlayerRickshawController playerController;
-    public UIScript uIScript;
+    private UIScript uIScript;
     //temp
     public Vector3 gizmosSpawnPos;
     public Vector3 gizmosSpawnSize;
@@ -231,25 +233,7 @@ public class GameManagerScript : MonoBehaviour
         GameObject vehicle = GetFromPool(chosenVehicle);
 
         vehicle.transform.position = spawnPos;
-        NPCVehicleController npcController = vehicle.transform.GetComponent<NPCVehicleController>();
-        if(npcController != null)
-        {
-            vehicle.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
-            if (gameStarted)
-            {
-                npcController.currentMaxSpeed = Mathf.Lerp(npcController.minSpeed, npcController.maxSpeed, progress);
-                npcController.currentStopDecision = npcController.randomStops;
-                npcController.vehicleCanBeDamaged = true;
-            }
-            else
-            {
-                npcController.currentMaxSpeed = npcController.maxSpeed;
-                npcController.currentStopDecision = false;
-                npcController.vehicleCanBeDamaged = false;
-            }
-        }
         vehicle.SetActive(true);
-        if(npcController != null) npcController.ResetNPC();
         activeVehicles[vehicle] = chosenGroup.type;
         spawnTimer = 0f;
         IncreaseBonusForUnselected(chosenGroup);
@@ -261,9 +245,17 @@ public class GameManagerScript : MonoBehaviour
             return;
 
         float sideMultiplier = (Random.value > 0.5f) ? 1f : -1f; // 1. Pick Side
-        float spawnX = sideMultiplier * pedestrianXOffset;
-
-        Vector3 spawnPos = new Vector3(spawnX, pedestrianYOffset, player.transform.position.z + spawnDistance);
+        float spawnX = sideMultiplier * Random.Range(pedestrianXOffset.x, pedestrianXOffset.y);
+        Vector3 spawnPos = Vector3.zero;
+        if (gameStarted && !gameOver)
+        {
+            spawnPos = new Vector3(spawnX, pedestrianYOffset, player.transform.position.z - spawnDistance);
+        }
+        else
+        {
+            float zPositionMultiplier = (Random.value > 0.5f) ? 1f : -1f;
+            spawnPos = new Vector3(spawnX, pedestrianYOffset, player.transform.position.z + (zPositionMultiplier * padestrianSpawnDistance));
+        }
 
         GameObject prefab = pedestrianPrefabs[Random.Range(0, pedestrianPrefabs.Length)];
         GameObject ped = GetFromPool(prefab);
@@ -307,7 +299,7 @@ public class GameManagerScript : MonoBehaviour
 
         if (pedestrianPrefabs != null)  //For Pedestrians
         {
-            foreach (GameObject prefab in pedestrianPrefabs)
+            foreach (GameObject prefab in pedestrianPrefabs) //each prefeb gets 5 instances
             {
                 for (int i = 0; i < 5; i++)
                 {
@@ -361,7 +353,7 @@ public class GameManagerScript : MonoBehaviour
                 continue;
             }
 
-            bool outOfZRange = Mathf.Abs(vPos.z - playerPos.z) > recycleDistance;
+            bool outOfZRange = Mathf.Abs(vPos.z - playerPos.z) > vehicleRecycleDistance;
             bool outOfYRange = vPos.y > 3f || vPos.y < -3f;
             bool rotatedWrong = Vector3.Angle(v.transform.forward, Vector3.forward) < 100f;
 
@@ -383,7 +375,7 @@ public class GameManagerScript : MonoBehaviour
             GameObject p = pair.Key;
             if (!p.activeSelf) continue;
 
-            bool outOfZRange = Mathf.Abs(p.transform.position.z - playerPos.z) > recycleDistance;
+            bool outOfZRange = Mathf.Abs(p.transform.position.z - playerPos.z) > pedestrianRecycleDistance;
 
             if (outOfZRange)
             {

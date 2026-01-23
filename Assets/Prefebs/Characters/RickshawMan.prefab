@@ -9103,8 +9103,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   driving: 0
+  walking: 1
+  salesman: 0
+  isDead: 0
   walkSpeed: 2
+  detectionDistance: 1.5
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 193
   vehicleType: 0
+  nPCVehicleController: {fileID: 0}
   bodyColliders:
   - {fileID: 8068337004655424842}
   - {fileID: 3829445555530271796}
@@ -9129,7 +9137,6 @@ MonoBehaviour:
   - {fileID: 6876078325076396422}
   - {fileID: 1237420781669805248}
   - {fileID: 6419971783156233603}
-  nPCVehicleController: {fileID: 0}
 --- !u!1 &7626073925062824109
 GameObject:
   m_ObjectHideFlags: 0

@@ -1164,25 +1164,37 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4276005892004112731, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: walking
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4276005892004112731, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: detectionDistance
+      value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 4276005892004112731, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+      propertyPath: obstacleLayer.m_Bits
+      value: 193
+      objectReference: {fileID: 0}
     - target: {fileID: 7608566580439242773, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
       propertyPath: m_Name
       value: RickshawMan
       objectReference: {fileID: 0}
     - target: {fileID: 7608566580439242773, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.6802541
+      value: 10.48
       objectReference: {fileID: 0}
     - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.97
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.9000318
+      value: -4.37
       objectReference: {fileID: 0}
     - target: {fileID: 8219640816716570498, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
       propertyPath: m_LocalRotation.w
@@ -4957,6 +4969,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1307587833961996349, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
+      propertyPath: pedestrianYOffset
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1307587833961996349, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
       propertyPath: maxActivePedestrians
       value: 1
       objectReference: {fileID: 0}
@@ -5043,6 +5059,10 @@ PrefabInstance:
     - target: {fileID: 7887398816664887179, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7887398816664887179, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
+      propertyPath: m_TagString
+      value: GameController
       objectReference: {fileID: 0}
     - target: {fileID: 9186628493333926460, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
       propertyPath: endMenuUI
@@ -10677,7 +10697,7 @@ MonoBehaviour:
   isDead: 0
   leftWheelDamaged: 0
   rightWheelDamaged: 0
-  hitCooldown: 0.35
+  hitCooldown: 0.45
   leftWheelTransform: {fileID: 2252406355205198917}
   rightWheelTransform: {fileID: 1035107827540180027}
   jiggleSpeed: 20

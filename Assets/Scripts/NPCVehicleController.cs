@@ -104,6 +104,7 @@ public class NPCVehicleController : MonoBehaviour
     public Transform groundChecker;           // ground check origin
     public BoxCollider vehicleBodyCollider;    // used for sizing overtake checks
     public LayerMask vehicleLayer;             // layer mask for raycasts/CheckBox
+    private GameManagerScript gameManager;
 
     [Header("Wheels Setup")]
     public Wheel[] wheels;
@@ -117,11 +118,17 @@ public class NPCVehicleController : MonoBehaviour
     private Vector3 rightSideCheckGizmoPos;
     private Vector3 leftSideCheckGizmoPos;
 
+    private void OnEnable()
+    {
+        ResetNPC();
+    }
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        if(NPCCharacterScript == null)
+        gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerScript>();
+        if(gameManager ==  null) Debug.LogError("Game Manager not found in scene!");
+        if (NPCCharacterScript == null)
         {
             NPCCharacterScript = GetComponentInChildren<NPCCharacterScript>();
         }
@@ -611,13 +618,30 @@ public class NPCVehicleController : MonoBehaviour
     public void ResetNPC()
     {
         // Reset Rigidbody
+        transform.rotation = Quaternion.Euler(0f, 180f, 0f);
         if (rb == null) rb = GetComponent<Rigidbody>();
         vehicleDamaged = false;
         lastDamageTime = 0f;
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
-        if(NPCCharacterScript != null)
-            NPCCharacterScript.ResetNPC();
+
+        //Reset Settings based on game state
+        if(gameManager == null)
+        {
+            gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerScript>();
+        }
+        if (gameManager.gameStarted)
+        {
+            currentMaxSpeed = Mathf.Lerp(minSpeed, maxSpeed, gameManager.progress);
+            currentStopDecision = randomStops;
+            vehicleCanBeDamaged = true;
+        }
+        else
+        {
+            currentMaxSpeed = maxSpeed;
+            currentStopDecision = false;
+            vehicleCanBeDamaged = false;
+        }
 
         // Reset constraints
         rb.constraints = RigidbodyConstraints.None;
@@ -652,14 +676,6 @@ public class NPCVehicleController : MonoBehaviour
         currentAcceleration = 0f;
         isBraking = false;
         ApplyBrakes(false);
-
-        // Recompute vehicle body size & CheckBox sizes
-        if (vehicleBodyCollider != null)
-        {
-            Vector3 fullSize = Vector3.Scale(vehicleBodyCollider.size, vehicleBodyCollider.transform.lossyScale);
-            Vector3 requested = new Vector3(fullSize.x, 1f, fullSize.z * overTakingTendency);
-            checkSize = requested * 0.5f;
-        }
     }
 
 #if UNITY_EDITOR

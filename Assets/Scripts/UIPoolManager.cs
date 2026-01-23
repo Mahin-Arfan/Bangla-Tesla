@@ -14,8 +14,15 @@ public class UIPoolManager : MonoBehaviour
 
     void Awake()
     {
-        Instance = this;
-        InitializePools();
+        if (Instance == null)
+        {
+            Instance = this;
+            InitializePools();
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
     }
 
     void InitializePools()
