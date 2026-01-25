@@ -4,6 +4,8 @@ public class CameraScript : MonoBehaviour
 {
     [Header("Settings")]
     public Transform cam;
+    private Vector3 velocity = Vector3.zero;
+    public float smoothTime = 0.1f; //(lower = snappier, higher = looser)
 
     [Header("Position Settings")]
     public Vector3 offset = new Vector3(5f, 4.2f, 3f);
@@ -47,7 +49,8 @@ public class CameraScript : MonoBehaviour
     void FollowPlayer()
     {
         Vector3 targetPosition = playerTransform.position + offset;
-        Vector3 smoothedPosition = Vector3.Lerp(cam.transform.position, targetPosition, Time.deltaTime * followSpeed);
+        // SmoothDamp is much smoother than Lerp for following Physics objects
+        Vector3 smoothedPosition = Vector3.SmoothDamp(cam.transform.position, targetPosition, ref velocity, smoothTime);
         if (currentShake > 0)
         {
             smoothedPosition += Random.insideUnitSphere * currentShake;

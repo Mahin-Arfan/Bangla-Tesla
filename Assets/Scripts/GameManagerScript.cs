@@ -249,7 +249,7 @@ public class GameManagerScript : MonoBehaviour
         Vector3 spawnPos = Vector3.zero;
         if (gameStarted && !gameOver)
         {
-            spawnPos = new Vector3(spawnX, pedestrianYOffset, player.transform.position.z - spawnDistance);
+            spawnPos = new Vector3(spawnX, pedestrianYOffset, player.transform.position.z - padestrianSpawnDistance);
         }
         else
         {

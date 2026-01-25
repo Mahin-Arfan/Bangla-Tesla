@@ -3937,7 +3937,7 @@ Transform:
   m_GameObject: {fileID: 8000725856076866300}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 5, y: 0, z: 0}
+  m_LocalPosition: {x: 5, y: 0.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5238,6 +5238,14 @@ PrefabInstance:
     - target: {fileID: 1307587833961996349, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
       propertyPath: maxActivePedestrians
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1307587833961996349, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
+      propertyPath: padestrianSpawnDistance
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 1307587833961996349, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
+      propertyPath: pedestrianRecycleDistance
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 1307587833961996349, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
       propertyPath: pedestrianPrefabs.Array.size
@@ -9800,7 +9808,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 1
   m_Constraints: 116
@@ -17167,7 +17175,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8000725856076866300}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 9c3af27eb9736674fa201d245904c136, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -17196,12 +17204,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 5837253883906380274}
+  smoothTime: 0.1
   offset: {x: 0, y: 3.5, z: 2.5}
   followSpeed: 20
   cameraRotationStraight: {x: 30, y: -180, z: 0}
   yOffsetTurnAmount: -30
   rotationSpeed: 5
-  shakeIntensity: 0.15
+  shakeIntensity: 0.25
   shakeDecay: 1
 --- !u!54 &8880891387267463019
 Rigidbody:
