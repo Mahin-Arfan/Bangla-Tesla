@@ -74,6 +74,7 @@ public class NPCVehicleController : MonoBehaviour
     public bool lockXRotation = false;         // if true, freezes X rotation on Rigidbody
     public bool lockZRotation  = false;          // if true, freezes Z rotation on Rigidbody
     public bool lockYPosition = true;         // if true, freezes Y position on Rigidbody
+    public bool reverseMechanics = false;
 
     // runtime
     private Rigidbody rb;              // randomly chosen top speed (m/s)
@@ -624,9 +625,17 @@ public class NPCVehicleController : MonoBehaviour
         lastDamageTime = 0f;
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
+        if (!reverseMechanics)
+        {
+            vehicleBodyCollider.transform.localRotation = Quaternion.identity;
+        }
+        else
+        {
+            vehicleBodyCollider.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+        }
 
         //Reset Settings based on game state
-        if(gameManager == null)
+        if (gameManager == null)
         {
             gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerScript>();
         }

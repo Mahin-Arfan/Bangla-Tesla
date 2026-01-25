@@ -8803,6 +8803,59 @@ Transform:
   - {fileID: 8381845879924404992}
   m_Father: {fileID: 1205231768162571337}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7355280523586244834
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1492124809134083624}
+  - component: {fileID: 8648150931993079628}
+  m_Layer: 8
+  m_Name: Collider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1492124809134083624
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7355280523586244834}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8219640816716570498}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &8648150931993079628
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7355280523586244834}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.5, y: 1.8, z: 1.5}
+  m_Center: {x: 0, y: 0.91, z: 0}
 --- !u!1 &7364819757664787236
 GameObject:
   m_ObjectHideFlags: 0
@@ -9036,6 +9089,8 @@ GameObject:
   - component: {fileID: 8219640816716570498}
   - component: {fileID: 2594178064370075217}
   - component: {fileID: 4276005892004112731}
+  - component: {fileID: 6265480245077322958}
+  - component: {fileID: 2556865663893271084}
   m_Layer: 0
   m_Name: RickshawMan
   m_TagString: Untagged
@@ -9052,7 +9107,7 @@ Transform:
   m_GameObject: {fileID: 7608566580439242773}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: -0.6802541, y: 1.97, z: 2.9000318}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -9066,6 +9121,7 @@ Transform:
   - {fileID: 4569616263179362143}
   - {fileID: 1698055070584344272}
   - {fileID: 4273580772396998598}
+  - {fileID: 1492124809134083624}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!95 &2594178064370075217
@@ -9107,10 +9163,16 @@ MonoBehaviour:
   salesman: 0
   isDead: 0
   walkSpeed: 2
-  detectionDistance: 1.5
+  detectionDistance: 1
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 193
+  isWalking: 0
+  roadCrossing: 0
+  roadCrossEnableDistance: -500
+  roadCrossingProbability: 0.1
+  roadCrossCheckDistance: 5
+  roadCheckForwadOffset: 1
   vehicleType: 0
   nPCVehicleController: {fileID: 0}
   bodyColliders:
@@ -9137,6 +9199,49 @@ MonoBehaviour:
   - {fileID: 6876078325076396422}
   - {fileID: 1237420781669805248}
   - {fileID: 6419971783156233603}
+  stateUpdated: 0
+--- !u!65 &6265480245077322958
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7608566580439242773}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.6, y: 1.8, z: 0.6}
+  m_Center: {x: 0, y: 0.91, z: 0}
+--- !u!114 &2556865663893271084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7608566580439242773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a22abb55ff7efd4e9f121dcbf9f1e71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isNPC: 1
+  pedestrian: 0
+  position: 0
+  healthScript: {fileID: 0}
+  npcVehicleController: {fileID: 0}
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 192
+  npcCharacterScript: {fileID: 0}
 --- !u!1 &7626073925062824109
 GameObject:
   m_ObjectHideFlags: 0

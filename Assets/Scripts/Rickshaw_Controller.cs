@@ -71,12 +71,13 @@ public class PlayerRickshawController : MonoBehaviour
             horizontalInput = Mathf.Lerp(horizontalInput, 1f, Time.deltaTime * steerSpeed);
         else
             horizontalInput = Mathf.Lerp(horizontalInput, 0f, Time.deltaTime * steerSpeed);
+
         //float rawTilt = Input.acceleration.x;
         //horizontalInput = Mathf.Clamp(rawTilt * tiltSensitivity, -1f, 1f);
 #if UNITY_EDITOR
         //horizontalInput = Input.GetAxis("Horizontal");
 #endif
-        ReadTouchInput();
+        //ReadTouchInput();
         HandleBraking();
         UpdateSteerHandle(animSteer);
         sideCheckTimer += Time.deltaTime;
@@ -87,7 +88,7 @@ public class PlayerRickshawController : MonoBehaviour
         ApplyForwardMovement();
         Steer();
     }
-
+    /*
     void ReadTouchInput()
     {
         brakePressed = false;
@@ -113,11 +114,16 @@ public class PlayerRickshawController : MonoBehaviour
             boostPressed = true;
 #endif
     }
-
+    */
     public void LeftButtonDown() { leftPressed = true; }
     public void LeftButtonUp() { leftPressed = false; }
     public void RightButtonDown() { rightPressed = true; }
     public void RightButtonUp() { rightPressed = false; }
+    public void BoostButtonUp() { boostPressed = false; }
+    public void BoostButtonDown() { boostPressed = true; }
+    public void BreakButtonUp() { brakePressed = false; }
+    public void BreakButtonDown() { brakePressed = true; }
+
 
     void Steer()
     {

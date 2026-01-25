@@ -6,6 +6,7 @@ public class CollisionDetector : MonoBehaviour
 
     [Header("Setup")]
     public bool isNPC = false;
+    [HideInInspector] public bool pedestrian = false;
 
     [Tooltip("Not Needed if isNPC")]
     public WheelPosition position;
@@ -16,6 +17,8 @@ public class CollisionDetector : MonoBehaviour
 
     [Header("Collision Layers")]
     public LayerMask obstacleLayer;
+
+    [HideInInspector] public NPCCharacterScript npcCharacterScript;
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -76,7 +79,14 @@ public class CollisionDetector : MonoBehaviour
     {
         if (isNPC)
         {
-            npcVehicleController.VehicleHit(hitPoint);
+            if(pedestrian)
+            {
+                npcCharacterScript.isDead = true;
+            }
+            else
+            {
+                npcVehicleController.VehicleHit(hitPoint);
+            }
         }
         else
         {
@@ -91,9 +101,8 @@ public class CollisionDetector : MonoBehaviour
                 Random.Range(-0.5f, 0.5f),
                 Random.Range(0.2f, 0.5f),
                 Random.Range(-0.5f, 0.5f)
-            );
+        );
 
-        // ONE LINE OF CODE - No drag and drop needed here
         UIPoolManager.Instance.SpawnRandomEffect(spawnPosition + randomOffset);
     }
 }

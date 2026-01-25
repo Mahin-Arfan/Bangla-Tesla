@@ -95,7 +95,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -804570019351152502, guid: f0bb57848c6f542468e454236a1dc99d, type: 3}
+  - {fileID: 2100000, guid: f8257e93ff0eb87498118b6640b984b6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -358,7 +358,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -804570019351152502, guid: f0bb57848c6f542468e454236a1dc99d, type: 3}
+  - {fileID: 2100000, guid: f8257e93ff0eb87498118b6640b984b6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -482,7 +482,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -804570019351152502, guid: f0bb57848c6f542468e454236a1dc99d, type: 3}
+  - {fileID: 2100000, guid: f8257e93ff0eb87498118b6640b984b6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -559,12 +559,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isNPC: 1
+  pedestrian: 0
   position: 0
   healthScript: {fileID: 0}
   npcVehicleController: {fileID: 2885689461017025927}
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 192
+  npcCharacterScript: {fileID: 0}
 --- !u!1 &3112083027062970438
 GameObject:
   m_ObjectHideFlags: 0
@@ -629,7 +631,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -804570019351152502, guid: f0bb57848c6f542468e454236a1dc99d, type: 3}
+  - {fileID: 2100000, guid: f8257e93ff0eb87498118b6640b984b6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -768,7 +770,9 @@ MonoBehaviour:
   turnSmoothness: 5
   brakeForce: 2000
   stopDistanceMultiplier: 1.5
+  idleTime: 0
   vehicleCanBeDamaged: 1
+  vehicleDamaged: 0
   damageCooldown: 1
   damagedStopDuration: 5
   hitForce: 0
@@ -788,10 +792,10 @@ MonoBehaviour:
   stopChance: 3.5
   nextStopCheckTime: 5
   vehicleType: 2
-  reverseMechanics: 0
   lockXRotation: 0
   lockZRotation: 1
   lockYPosition: 0
+  reverseMechanics: 0
   NPCCharacterScript: {fileID: 0}
   frontChecker: {fileID: 8139565245904766345}
   frontRightChecker: {fileID: 2832349509042877378}
@@ -1082,7 +1086,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -804570019351152502, guid: f0bb57848c6f542468e454236a1dc99d, type: 3}
+  - {fileID: 2100000, guid: f8257e93ff0eb87498118b6640b984b6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -61,7 +61,6 @@ public class GameManagerScript : MonoBehaviour
     public float baseSpawnTime = 3f;
     public float spawnDistance = 80f;
     public float spawnTimer;
-    private float recycleTimer;
 
     [Header("Pedestrians")]
     public float pedestrianSpawnRate = 1f;
@@ -77,6 +76,7 @@ public class GameManagerScript : MonoBehaviour
     public float vehicleRecycleDistance = 90f;
     public float pedestrianRecycleDistance = 40f;
     public int maxActiveVehicles = 35;
+    private float recycleTimer;
 
     private Dictionary<GameObject, Queue<GameObject>> prefabPool = new Dictionary<GameObject, Queue<GameObject>>();
     private Dictionary<GameObject, Type> activeVehicles = new Dictionary<GameObject, Type>();

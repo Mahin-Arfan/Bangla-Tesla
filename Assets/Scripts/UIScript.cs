@@ -5,16 +5,19 @@ public class UIScript : MonoBehaviour
 {
     public GameObject mainMenuUI;
     public GameObject endMenuUI;
+    public GameObject inputUI;
     private GameManagerScript gameManagerScript;
 
     void Start()
     {
         gameManagerScript = GetComponent<GameManagerScript>();
+        inputUI.SetActive(false);
     }
 
     public void PlayGame()
     {
         mainMenuUI.SetActive(false);
+        inputUI.SetActive(true);
         gameManagerScript.gameStarted = true;
     }
 
