@@ -19,62 +19,51 @@ public class CollisionDetector : MonoBehaviour
     public LayerMask obstacleLayer;
 
     [HideInInspector] public NPCCharacterScript npcCharacterScript;
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (((1 << collision.gameObject.layer) & obstacleLayer) != 0)
-        {
-            Vector3 hitDirection = (transform.position - collision.transform.position).normalized;
-            SpawnImpactEffects(hitDirection);
-            ProcessHit(hitDirection);
-        }
-    }
+    private float onTriggerEnterTime = 0f;
+    private float onTriggerStayTime = 0f;
 
     private void OnTriggerEnter(Collider other)
     {
         if (((1 << other.gameObject.layer) & obstacleLayer) != 0)
         {
-            Vector3 hitPoint = other.ClosestPoint(transform.position);
-
-            bool shouldSpawnVisuals = true;
-            CollisionDetector otherVehicle = other.GetComponent<CollisionDetector>();
-            if (otherVehicle != null)
-            {
-                if (GetInstanceID() < otherVehicle.GetInstanceID())
-                {
-                    shouldSpawnVisuals = false;
-                }
-            }
-            if (shouldSpawnVisuals)
-            {
-                SpawnImpactEffects(hitPoint);
-            }
-            ProcessHit(hitPoint);
+            onTriggerEnterTime = Time.time;
+            HandleCollision(other);
         }
     }
 
     private void OnTriggerStay(Collider other)
     {
+        if (Time.time < onTriggerEnterTime + 0.5f || Time.time < onTriggerStayTime + 0.5f)
+        {
+            return;
+        }
+
         if (((1 << other.gameObject.layer) & obstacleLayer) != 0 && !isNPC)
         {
-            Vector3 hitPoint = other.ClosestPoint(transform.position);
-            bool shouldSpawnVisuals = true;
-            CollisionDetector otherVehicle = other.GetComponent<CollisionDetector>();
-            if (otherVehicle != null)
-            {
-                if (GetInstanceID() < otherVehicle.GetInstanceID())
-                {
-                    shouldSpawnVisuals = false;
-                }
-            }
-            if (shouldSpawnVisuals)
-            {
-                SpawnImpactEffects(hitPoint);
-            }
-            ProcessHit(hitPoint);
+            onTriggerStayTime = Time.time;
+            HandleCollision(other);
         }
     }
 
+    void HandleCollision(Collider other)
+    {
+        Vector3 hitPoint = other.ClosestPoint(transform.position);
+        bool shouldSpawnVisuals = true;
+
+        if (other.TryGetComponent(out CollisionDetector otherVehicle))
+        {
+            if (GetInstanceID() < otherVehicle.GetInstanceID())
+            {
+                shouldSpawnVisuals = false;
+            }
+        }
+
+        if (shouldSpawnVisuals)
+        {
+            SpawnImpactEffects(hitPoint);
+        }
+        ProcessHit(hitPoint);
+    }
     void ProcessHit(Vector3 hitPoint)
     {
         if (isNPC)
@@ -82,6 +71,7 @@ public class CollisionDetector : MonoBehaviour
             if(pedestrian)
             {
                 npcCharacterScript.isDead = true;
+                npcCharacterScript.hitPoint = hitPoint;
             }
             else
             {
@@ -97,6 +87,7 @@ public class CollisionDetector : MonoBehaviour
 
     void SpawnImpactEffects(Vector3 spawnPosition)
     {
+        if (UIPoolManager.Instance == null) return;
         Vector3 randomOffset = new Vector3(
                 Random.Range(-0.5f, 0.5f),
                 Random.Range(0.2f, 0.5f),

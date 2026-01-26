@@ -619,7 +619,6 @@ public class NPCVehicleController : MonoBehaviour
     public void ResetNPC()
     {
         // Reset Rigidbody
-        transform.rotation = Quaternion.Euler(0f, 180f, 0f);
         if (rb == null) rb = GetComponent<Rigidbody>();
         vehicleDamaged = false;
         lastDamageTime = 0f;
@@ -685,6 +684,7 @@ public class NPCVehicleController : MonoBehaviour
         currentAcceleration = 0f;
         isBraking = false;
         ApplyBrakes(false);
+        transform.rotation = Quaternion.Euler(0f, 180f, 0f);
     }
 
 #if UNITY_EDITOR

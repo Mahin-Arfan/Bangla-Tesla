@@ -76,6 +76,7 @@ public class GameManagerScript : MonoBehaviour
     public float vehicleRecycleDistance = 90f;
     public float pedestrianRecycleDistance = 40f;
     public int maxActiveVehicles = 35;
+    public int prewarmPerPrefeb = 5;
     private float recycleTimer;
 
     private Dictionary<GameObject, Queue<GameObject>> prefabPool = new Dictionary<GameObject, Queue<GameObject>>();
@@ -124,7 +125,7 @@ public class GameManagerScript : MonoBehaviour
         for (int i = 0; i < vehicleGroupIndex.Length; i++)
             vehicleGroupIndex[i] = 0;
 
-        PrewarmPool(5);
+        PrewarmPool();
     }
 
     void Update()
@@ -212,7 +213,7 @@ public class GameManagerScript : MonoBehaviour
             else
             {
                 if (spawnX > 2.5f) spawnX = 2.5f;
-                spawnPos = new Vector3(spawnX, 1f, player.transform.position.z + spawnDistance);
+                spawnPos = new Vector3(spawnX, 1f, 50f);
             }
 
             if (!Physics.CheckBox(spawnPos, chosenGroup.spawnCheckSize, Quaternion.identity))
@@ -284,24 +285,24 @@ public class GameManagerScript : MonoBehaviour
         return obj;
     }
 
-    void PrewarmPool(int maxInstantiate)
+    void PrewarmPool()
     {
         foreach (var group in vehicleGroups)    //For Vehicles
         {
             int prefabCount = group.prefabs.Length;
-            int countToInstantiate = Mathf.Min(prefabCount, maxInstantiate);
 
-            for (int i = 0; i < countToInstantiate; i++)
+            for (int i = 0; i < prefabCount; i++)
             {
-                CreateAndEnqueue(group.prefabs[i]);
+                for(int j = 0; j < prewarmPerPrefeb; j++)
+                    CreateAndEnqueue(group.prefabs[i]);
             }
         }
 
         if (pedestrianPrefabs != null)  //For Pedestrians
         {
-            foreach (GameObject prefab in pedestrianPrefabs) //each prefeb gets 5 instances
+            foreach (GameObject prefab in pedestrianPrefabs) //each prefeb gets prewarmPerPrefeb instances
             {
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < prewarmPerPrefeb; i++)
                 {
                     CreateAndEnqueue(prefab);
                 }
@@ -338,19 +339,23 @@ public class GameManagerScript : MonoBehaviour
             if (!v.activeSelf) continue;
 
             Vector3 vPos = v.transform.position;
-            NPCVehicleController npcScript = v.GetComponent<PooledVehicle>().controller;
-            if (npcScript != null)
+            
+            if (!gameStarted)
             {
-                if (npcScript.idleTime > 10f)
+                NPCVehicleController npcScript = v.GetComponent<PooledVehicle>().controller;
+                if (npcScript != null)
+                {
+                    if (npcScript.idleTime > 10f)
+                    {
+                        toRecycle.Add(v);
+                        continue;
+                    }
+                }
+                if (vPos.x > 2.5f && vPos.z > 17f)
                 {
                     toRecycle.Add(v);
                     continue;
                 }
-            }
-            if (!gameStarted && !gameOver && (vPos.x > 2.5f && vPos.z > 17f))
-            {
-                toRecycle.Add(v);
-                continue;
             }
 
             bool outOfZRange = Mathf.Abs(vPos.z - playerPos.z) > vehicleRecycleDistance;
