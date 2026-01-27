@@ -451,12 +451,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isNPC: 1
+  pedestrian: 0
   position: 0
   healthScript: {fileID: 0}
   npcVehicleController: {fileID: 3216620928815828853}
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 192
+    m_Bits: 712
+  npcCharacterScript: {fileID: 0}
 --- !u!1 &1496889464592333257
 GameObject:
   m_ObjectHideFlags: 0
@@ -1961,7 +1963,7 @@ MonoBehaviour:
   vehicleBodyCollider: {fileID: 6452160010391556617}
   vehicleLayer:
     serializedVersion: 2
-    m_Bits: 320
+    m_Bits: 840
   wheels:
   - wheelModel: {fileID: 3871769339388347420}
     wheelCollider: {fileID: 7640875178536228849}

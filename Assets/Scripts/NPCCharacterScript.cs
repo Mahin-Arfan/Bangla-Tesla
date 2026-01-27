@@ -37,6 +37,7 @@ public class NPCCharacterScript : MonoBehaviour
     private Animator animator;
     public Collider[] bodyColliders;
     public Rigidbody[] bodyRigidBodies;
+    public BoxCollider npcTriggerCollider;
 
     private bool stateUpdated = false;
     private bool rigidBodyActivated = false;
@@ -198,6 +199,8 @@ public class NPCCharacterScript : MonoBehaviour
         {
             boxCollider.enabled = false;
             detector.enabled = false;
+            if(npcTriggerCollider != null)
+                npcTriggerCollider.enabled = false;
             bodyRigidBodies[0].AddForce(hitPoint.normalized * hitForce, ForceMode.Impulse);
         }
     }
@@ -231,9 +234,10 @@ public class NPCCharacterScript : MonoBehaviour
             {
                 detector.enabled = true;
                 detector.pedestrian = true;
-                detector.npcCharacterScript = this; // Ensure link is set
+                detector.npcCharacterScript = this;
             }
             if (boxCollider != null) boxCollider.enabled = true;
+            if(npcTriggerCollider != null) npcTriggerCollider.enabled = true;
 
             hitPoint = Vector3.zero;
 

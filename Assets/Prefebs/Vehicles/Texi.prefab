@@ -1137,6 +1137,14 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 0
+  isWalking: 0
+  hitForce: 1000
+  hitPoint: {x: 0, y: 0, z: 0}
+  roadCrossing: 0
+  roadCrossEnableDistance: -500
+  roadCrossingProbability: 0.1
+  roadCrossCheckDistance: 5
+  roadCheckForwadOffset: 1
   vehicleType: 3
   nPCVehicleController: {fileID: 3267339224091878572}
   bodyColliders:
@@ -5469,6 +5477,7 @@ MonoBehaviour:
   lockXRotation: 1
   lockZRotation: 1
   lockYPosition: 0
+  reverseMechanics: 0
   NPCCharacterScript: {fileID: 0}
   frontChecker: {fileID: 5463632639180564904}
   frontRightChecker: {fileID: 7072317312007140423}
@@ -5477,7 +5486,7 @@ MonoBehaviour:
   vehicleBodyCollider: {fileID: 5958089426664976528}
   vehicleLayer:
     serializedVersion: 2
-    m_Bits: 320
+    m_Bits: 840
   wheels:
   - wheelModel: {fileID: 3481483009947062745}
     wheelCollider: {fileID: 1425690072737479223}
@@ -8999,12 +9008,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isNPC: 1
+  pedestrian: 0
   position: 0
   healthScript: {fileID: 0}
   npcVehicleController: {fileID: 3267339224091878572}
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 192
+    m_Bits: 712
+  npcCharacterScript: {fileID: 0}
 --- !u!1 &6603807884196521723
 GameObject:
   m_ObjectHideFlags: 0

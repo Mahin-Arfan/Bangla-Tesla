@@ -17,21 +17,22 @@ public class PlayerRickshawController : MonoBehaviour
     private bool boostPressed = false;
 
     [Header("Brake Settings")]
-    private bool brakePressed = false;
     public float breakDeceleration = 5f;
     public float brakeForce = 10f;
     public float maxBrakeTime = 1f;      // how long S key works
     public float brakeCooldown = 2f;     // cooldown after brake
+    private bool brakePressed = false;
 
     [Header("Steering Settings")]
-    private bool leftPressed = false;
-    private bool rightPressed = false;
     public float tiltSensitivity = 2.0f;
     public float steerSpeed = 5f;
     public float maxTurnAngle = 45f;
     public float sideCheckDistance = 1f;
     public float sideCheckInterval = 0.2f;
     public float turnCheckDistance = 0.5f;
+    public float maxTurnMinusVisual = 20f;
+    private bool leftPressed = false;
+    private bool rightPressed = false;
 
     private Vector3 steerHandleLeft = new Vector3(-42f, -20f, 28f);
     private Vector3 steerHandleNeutral = new Vector3(0.733f, 0.137f, 21.114f);
@@ -132,6 +133,10 @@ public class PlayerRickshawController : MonoBehaviour
         float posX = transform.position.x;
         float absX = Mathf.Abs(posX);
 
+        //PositionCheck
+        if(posX < -5.6) transform.position = new Vector3(-5.6f, transform.position.y, transform.position.z);
+        if(posX > 5.6) transform.position = new Vector3(5.6f, transform.position.y, transform.position.z);
+
         //Side Check
         bool leftBlocked = false;
         bool rightBlocked = false;
@@ -182,7 +187,7 @@ public class PlayerRickshawController : MonoBehaviour
         float deltaFromForward =
             Mathf.Abs(Mathf.DeltaAngle(180f, rb.rotation.eulerAngles.y));
 
-        bool atMaxSteer = deltaFromForward >= (maxTurnAngle - 5f);
+        bool atMaxSteer = deltaFromForward >= (maxTurnAngle - maxTurnMinusVisual);
 
         if (atMaxSteer)
         {

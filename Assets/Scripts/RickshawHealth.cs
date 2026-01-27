@@ -11,9 +11,14 @@ public class RickshawHealth : MonoBehaviour
     public bool rightWheelDamaged = false;
 
     [Header("Settings")]
-    public float hitCooldown = 0.5f; // Prevent multi-hits in 1 frame
-    private float lastHitTime = 0f;
+    public float hitCooldown = 0.5f;
     public float healthDrainSpeed = 0.025f;
+    private float lastHitTime = 0f;
+    public float leftWheelHealth = 100f;
+    public float rightWheelHealth = 100f;
+    public LayerMask pedestrianLayer;
+    public LayerMask BikeLayer;
+    public LayerMask obstacleLayer;
 
     [Header("Wheel References")]
     public Transform leftWheelTransform;
@@ -53,16 +58,54 @@ public class RickshawHealth : MonoBehaviour
         }
     }
 
-    public void TakeDamage(float amount, CollisionDetector.WheelPosition part)
+    public void TakeDamage(int hitLayer, CollisionDetector.WheelPosition wheelPos)
     {
         if (Time.time < lastHitTime + hitCooldown || isDead) return;
-        health -= amount;
+
+        float damageToApply = 0f;
+
+        if (wheelPos == CollisionDetector.WheelPosition.Front)
+        {
+            if (((1 << hitLayer) & pedestrianLayer) != 0)
+            {
+                damageToApply = 20f;
+            }
+            else if (((1 << hitLayer) & BikeLayer) != 0)
+            {
+                damageToApply = 50f;
+            }
+            else
+            {
+                damageToApply = 100f;
+            }
+        }
+        else
+        {
+            if (((1 << hitLayer) & pedestrianLayer) != 0)
+            {
+                damageToApply = 10f;
+            }
+            else
+            {
+                damageToApply = 20f;
+            }
+
+            if (wheelPos == CollisionDetector.WheelPosition.Left)
+            {
+                leftWheelDamaged = true;
+                leftWheelHealth -= damageToApply;
+            }
+            else if (wheelPos == CollisionDetector.WheelPosition.Right)
+            {
+                rightWheelDamaged = true;
+                rightWheelHealth -= damageToApply;
+            }
+        }
+
+        health -= damageToApply;
         lastHitTime = Time.time;
 
-        cameraScript.TriggerShake();
-
-        if (part == CollisionDetector.WheelPosition.Left) leftWheelDamaged = true;
-        if (part == CollisionDetector.WheelPosition.Right) rightWheelDamaged = true;
+        if (cameraScript != null) cameraScript.TriggerShake();
 
         if (health <= 0) Die();
     }
@@ -71,32 +114,28 @@ public class RickshawHealth : MonoBehaviour
     {
         if (health >= 100 && !leftWheelDamaged && !rightWheelDamaged) return;
 
-        float damagePercent = Mathf.InverseLerp(100f, 20f, health);
-
-        float maxJiggle = Mathf.Lerp(0f, 12f, damagePercent);
-
-        float jiggleOffset = Mathf.Sin(Time.time * jiggleSpeed) * (maxJiggle / 2f);
-
         if (leftWheelDamaged)
         {
-            ApplyRotation(leftWheelTransform, jiggleOffset);
+            ApplyRotation(leftWheelTransform, leftWheelHealth);
         }
 
         if (rightWheelDamaged)
         {
-            ApplyRotation(rightWheelTransform, jiggleOffset);
+            ApplyRotation(rightWheelTransform, rightWheelHealth);
         }
     }
-    void ApplyRotation(Transform wheel, float offset)
+    void ApplyRotation(Transform wheel, float wheelHealth)
     {
+        float damagePercent = Mathf.InverseLerp(100f, 50f, wheelHealth);
+        float maxJiggle = Mathf.Lerp(0f, 12f, damagePercent);
+        float jiggleOffset = Mathf.Sin(Time.time * jiggleSpeed) * (maxJiggle / 2f);
         Vector3 rot = wheel.localEulerAngles;
-        rot.y = offset;
+        rot.y = jiggleOffset;
         wheel.localEulerAngles = rot;
     }
 
     void Die()
     {
-        Debug.Log("Game Over");
         isDead = true;
         gameManagerScript.gameOver = true;
         frontWheelCollider.GetComponent<BoxCollider>().enabled = true;

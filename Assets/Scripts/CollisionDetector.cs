@@ -22,8 +22,18 @@ public class CollisionDetector : MonoBehaviour
     private float onTriggerEnterTime = 0f;
     private float onTriggerStayTime = 0f;
 
+    void Awake()
+    {
+        if (isNPC && pedestrian && npcCharacterScript == null)
+        {
+            npcCharacterScript = GetComponent<NPCCharacterScript>();
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
+        if (Time.time < onTriggerEnterTime + 0.5f) return;
+
         if (((1 << other.gameObject.layer) & obstacleLayer) != 0)
         {
             onTriggerEnterTime = Time.time;
@@ -48,6 +58,7 @@ public class CollisionDetector : MonoBehaviour
     void HandleCollision(Collider other)
     {
         Vector3 hitPoint = other.ClosestPoint(transform.position);
+        int hitLayer = other.gameObject.layer;
         bool shouldSpawnVisuals = true;
 
         if (other.TryGetComponent(out CollisionDetector otherVehicle))
@@ -62,9 +73,9 @@ public class CollisionDetector : MonoBehaviour
         {
             SpawnImpactEffects(hitPoint);
         }
-        ProcessHit(hitPoint);
+        ProcessHit(hitPoint, hitLayer);
     }
-    void ProcessHit(Vector3 hitPoint)
+    void ProcessHit(Vector3 hitPoint, int hitLayer)
     {
         if (isNPC)
         {
@@ -78,10 +89,9 @@ public class CollisionDetector : MonoBehaviour
                 npcVehicleController.VehicleHit(hitPoint);
             }
         }
-        else
+        else if(healthScript != null)
         {
-            float damage = (position == WheelPosition.Front) ? 100f : 20f;
-            healthScript.TakeDamage(damage, position);
+            healthScript.TakeDamage(hitLayer, position);
         }
     }
 
