@@ -9168,6 +9168,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 193
   isWalking: 0
+  hitForce: 150
+  hitPoint: {x: 0, y: 0, z: 0}
   roadCrossing: 0
   roadCrossEnableDistance: -500
   roadCrossingProbability: 0.1
@@ -9199,7 +9201,6 @@ MonoBehaviour:
   - {fileID: 6876078325076396422}
   - {fileID: 1237420781669805248}
   - {fileID: 6419971783156233603}
-  stateUpdated: 0
 --- !u!65 &6265480245077322958
 BoxCollider:
   m_ObjectHideFlags: 0

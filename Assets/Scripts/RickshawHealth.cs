@@ -1,5 +1,6 @@
-using Unity.Cinemachine;
+
 using UnityEngine;
+using UnityEngine.UI;
 
 public class RickshawHealth : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class RickshawHealth : MonoBehaviour
     [Header("Settings")]
     public float hitCooldown = 0.5f; // Prevent multi-hits in 1 frame
     private float lastHitTime = 0f;
+    public float healthDrainSpeed = 0.025f;
 
     [Header("Wheel References")]
     public Transform leftWheelTransform;
@@ -28,6 +30,8 @@ public class RickshawHealth : MonoBehaviour
     public Rigidbody[] rickshawManRigidBodies;
     public GameObject colliders;
     public GameManagerScript gameManagerScript;
+    public Slider healthSlider;
+    public Slider easeHealthSlider;
     private CameraScript cameraScript;
 
     void Start()
@@ -38,6 +42,15 @@ public class RickshawHealth : MonoBehaviour
     void Update()
     {
         if(!isDead) ApplyWheelJiggle();
+
+        if(healthSlider.value != health)
+        {
+            healthSlider.value = health;
+        }
+        if(healthSlider.value != easeHealthSlider.value)
+        {
+            easeHealthSlider.value = Mathf.Lerp(easeHealthSlider.value, health, Time.deltaTime * healthDrainSpeed);
+        }
     }
 
     public void TakeDamage(float amount, CollisionDetector.WheelPosition part)

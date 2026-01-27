@@ -6,7 +6,7 @@ public class UIPoolManager : MonoBehaviour
     public static UIPoolManager Instance;
 
     [Header("Pool Configuration")]
-    public GameObject[] effectPrefabs; // Drag your different Prefabs here (Bang, Pow, Boom)
+    public GameObject[] effectPrefabs;
     public int amountPerType = 4;
 
     // A list of lists. Each inner list represents one type of effect.
@@ -21,7 +21,7 @@ public class UIPoolManager : MonoBehaviour
         }
         else if (Instance != this)
         {
-            Destroy(gameObject);
+            Destroy(this);
         }
     }
 
@@ -29,17 +29,15 @@ public class UIPoolManager : MonoBehaviour
     {
         allPools = new List<List<PooledImpactEffect>>();
 
-        // Loop through every prefab type you dragged in
         foreach (GameObject prefab in effectPrefabs)
         {
             List<PooledImpactEffect> specificPool = new List<PooledImpactEffect>();
 
             for (int i = 0; i < amountPerType; i++)
             {
-                GameObject obj = Instantiate(prefab, transform); // Keep hierarchy clean
+                GameObject obj = Instantiate(prefab, transform);
                 obj.SetActive(false);
 
-                // Add the script if missing (safety check)
                 var script = obj.GetComponent<PooledImpactEffect>();
                 if (script == null) script = obj.AddComponent<PooledImpactEffect>();
 
@@ -54,11 +52,9 @@ public class UIPoolManager : MonoBehaviour
     {
         if (allPools.Count == 0) return;
 
-        // 1. Pick a random TYPE of effect (e.g., Type 0 is "Pow", Type 1 is "Bang")
         int randomTypeIndex = Random.Range(0, allPools.Count);
         List<PooledImpactEffect> selectedPool = allPools[randomTypeIndex];
 
-        // 2. Find an available object in that specific pool
         foreach (var effect in selectedPool)
         {
             if (!effect.gameObject.activeInHierarchy)
