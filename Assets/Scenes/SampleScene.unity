@@ -1269,6 +1269,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 532807854}
+  - component: {fileID: 532807855}
+  - component: {fileID: 532807856}
   m_Layer: 0
   m_Name: BatteryPickUp
   m_TagString: Untagged
@@ -1285,13 +1287,52 @@ Transform:
   m_GameObject: {fileID: 532807853}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.7, y: 0.94, z: -2.07}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 268102531}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &532807855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 532807853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3f9ff13a51e45c4a813560f7ed0e43e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pickUpType: 1
+  minSpawnGap: 150
+  maxSpawnGap: 400
+  spawnXRange: 4.5
+  gameManager: {fileID: 577771590}
+  rickshawHealthScript: {fileID: 4846261451994651180}
+--- !u!65 &532807856
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 532807853}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.3, y: 1.3, z: 1.3}
+  m_Center: {x: 0, y: 0.09, z: 0}
 --- !u!1 &554105361
 GameObject:
   m_ObjectHideFlags: 0
@@ -2498,6 +2539,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1171927735}
+  - component: {fileID: 1171927736}
+  - component: {fileID: 1171927737}
   m_Layer: 0
   m_Name: HealthPickUp
   m_TagString: Untagged
@@ -2514,13 +2557,52 @@ Transform:
   m_GameObject: {fileID: 1171927734}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.69, y: 1.63, z: -3.42}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1934848114}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1171927736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1171927734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3f9ff13a51e45c4a813560f7ed0e43e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pickUpType: 0
+  minSpawnGap: 150
+  maxSpawnGap: 400
+  spawnXRange: 4.5
+  gameManager: {fileID: 577771590}
+  rickshawHealthScript: {fileID: 4846261451994651180}
+--- !u!65 &1171927737
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1171927734}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.3, y: 1.3, z: 1.3}
+  m_Center: {x: 0, y: 0.09, z: 0}
 --- !u!4 &1191402423 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4951257008385761496, guid: 752bb075a2b959b4baa3d10fe939c59d, type: 3}
@@ -3716,6 +3798,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1707962582 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7712588264693006223, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
+  m_PrefabInstance: {fileID: 4574800586596629500}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1720335387
 GameObject:
   m_ObjectHideFlags: 0
@@ -4655,6 +4748,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 3f42f6cf9572f87439f2ad71dd2d2418, type: 2}
+    - target: {fileID: -1375265071186848646, guid: 0c87ad94f49ee9e4c92c1aaa9d5d0a32, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 0c87ad94f49ee9e4c92c1aaa9d5d0a32, type: 3}
       propertyPath: m_Name
       value: PickUps
@@ -13094,12 +13191,44 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: cdf202e4ca501884d82d08b6379e1bbe, type: 3}
     - target: {fileID: 2544789746656663760, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
+      propertyPath: m_Color.a
+      value: 0.7882353
+      objectReference: {fileID: 0}
+    - target: {fileID: 2544789746656663760, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
       propertyPath: m_UseSpriteMesh
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2544789746656663760, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
       propertyPath: m_PreserveAspect
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3089874332872987841, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3089874332872987841, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3089874332872987841, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3089874332872987841, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 8000725856076866300}
+    - target: {fileID: 3089874332872987841, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3089874332872987841, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3089874332872987841, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 3628605719115570308, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
       propertyPath: m_SizeDelta.x
@@ -13293,6 +13422,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: cdf202e4ca501884d82d08b6379e1bbe, type: 3}
+    - target: {fileID: 5872051111447572552, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
+      propertyPath: m_Color.a
+      value: 0.7882353
+      objectReference: {fileID: 0}
     - target: {fileID: 6655270978430346851, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
       propertyPath: m_Name
       value: Canvas
@@ -13321,6 +13454,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: cdf202e4ca501884d82d08b6379e1bbe, type: 3}
+    - target: {fileID: 7561344945413463832, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
+      propertyPath: m_Color.a
+      value: 0.7882353
+      objectReference: {fileID: 0}
     - target: {fileID: 7561344945413463832, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
       propertyPath: m_RaycastTarget
       value: 1
@@ -13381,6 +13518,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: cdf202e4ca501884d82d08b6379e1bbe, type: 3}
+    - target: {fileID: 8641434146476976509, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
+      propertyPath: m_Color.a
+      value: 0.7882353
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -13727,7 +13868,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b22927dc10c92ff46a21f53f177c71e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 100
+  health: 1e+10
+  maxBattery: 100
   isDead: 0
   leftWheelDamaged: 0
   rightWheelDamaged: 0
@@ -13744,6 +13886,9 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 64
+  initialRangeInMeters: 250
+  currentBattery: 0
+  drainCoefficient: 0
   leftWheelTransform: {fileID: 2252406355205198917}
   rightWheelTransform: {fileID: 1035107827540180027}
   jiggleSpeed: 20
@@ -13778,6 +13923,7 @@ MonoBehaviour:
   gameManagerScript: {fileID: 577771590}
   healthSlider: {fileID: 832527630}
   easeHealthSlider: {fileID: 981995460}
+  batterySlider: {fileID: 1707962582}
 --- !u!4 &4850246109907921497
 Transform:
   m_ObjectHideFlags: 0
@@ -15982,7 +16128,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8000725856076866300}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f48746198b59ad9458ab45e42a665619, type: 3}
   m_Name: 
@@ -16010,6 +16156,7 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 64
+  gamgeStarted: 0
   horizontalInput: 0
 --- !u!4 &6083704931040507378
 Transform:

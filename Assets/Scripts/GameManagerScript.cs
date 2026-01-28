@@ -69,7 +69,6 @@ public class GameManagerScript : MonoBehaviour
     public float pedestrianYOffset = 0f;
     public float padestrianSpawnDistance = 35f;
     public GameObject[] pedestrianPrefabs;
-
     private float pedestrianTimer;
 
     [Header("Pooling")]
@@ -480,7 +479,7 @@ public class GameManagerScript : MonoBehaviour
 
     void StartGame()
     {
-        playerController.enabled = true;
+        playerController.gamgeStarted = true;
         gameInitiaded = true;
     }
 

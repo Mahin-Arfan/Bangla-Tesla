@@ -9,7 +9,7 @@ public class PlayerRickshawController : MonoBehaviour
 {
     [Header("Speed Settings")]
     public float baseSpeed = 8f;         // always moves forward
-    public float startSpeed = 8f;
+    [HideInInspector] public float startSpeed = 8f;
     public float maxSpeed = 20f;        // maximum speed limit
     public float boostSpeed = 5f;        // extra speed when pressing W
     public float acceleration = 4f;      // smooth speed change
@@ -48,6 +48,7 @@ public class PlayerRickshawController : MonoBehaviour
     public Transform turnCheck;
     public LayerMask obstacleLayer;
     private CameraScript cameraScript;
+    [HideInInspector] public bool gamgeStarted = false;
 
     private Rigidbody rb;
     private float brakeTimer = 0f;
@@ -60,12 +61,13 @@ public class PlayerRickshawController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.constraints |= RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         cameraScript = GetComponent<CameraScript>();
-
-        currentSpeed = baseSpeed;
+        startSpeed = baseSpeed;
+        //currentSpeed = baseSpeed;
     }
 
     void Update()
     {
+        if(!gamgeStarted)   return;
         if (leftPressed)
             horizontalInput = Mathf.Lerp(horizontalInput, -1f, Time.deltaTime * steerSpeed);
         else if (rightPressed)
@@ -86,6 +88,7 @@ public class PlayerRickshawController : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (!gamgeStarted) return;
         ApplyForwardMovement();
         Steer();
     }

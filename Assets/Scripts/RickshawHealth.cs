@@ -6,6 +6,7 @@ public class RickshawHealth : MonoBehaviour
 {
     [Header("Stats")]
     public float health = 100f;
+    public float maxBattery = 100f;
     public bool isDead = false;
     public bool leftWheelDamaged = false;
     public bool rightWheelDamaged = false;
@@ -19,6 +20,12 @@ public class RickshawHealth : MonoBehaviour
     public LayerMask pedestrianLayer;
     public LayerMask BikeLayer;
     public LayerMask obstacleLayer;
+
+    [Header("Battery Settings")]
+    [Tooltip("How many meters can the it go with full battery?")]
+    public float initialRangeInMeters = 250f;
+    public float currentBattery;
+    public float drainCoefficient;
 
     [Header("Wheel References")]
     public Transform leftWheelTransform;
@@ -35,19 +42,22 @@ public class RickshawHealth : MonoBehaviour
     public Rigidbody[] rickshawManRigidBodies;
     public GameObject colliders;
     public GameManagerScript gameManagerScript;
+    private PlayerRickshawController playerRickshawController;
     public Slider healthSlider;
     public Slider easeHealthSlider;
+    public Slider batterySlider;
     private CameraScript cameraScript;
 
     void Start()
     {
         cameraScript = GetComponent<CameraScript>();
+        playerRickshawController = GetComponent<PlayerRickshawController>();
+        currentBattery = maxBattery;
+        drainCoefficient = maxBattery / initialRangeInMeters;
     }
 
     void Update()
     {
-        if(!isDead) ApplyWheelJiggle();
-
         if(healthSlider.value != health)
         {
             healthSlider.value = health;
@@ -55,6 +65,14 @@ public class RickshawHealth : MonoBehaviour
         if(healthSlider.value != easeHealthSlider.value)
         {
             easeHealthSlider.value = Mathf.Lerp(easeHealthSlider.value, health, Time.deltaTime * healthDrainSpeed);
+        }
+        if (isDead) return;
+        if (!playerRickshawController.gamgeStarted) return;
+        ApplyWheelJiggle();
+        if (currentBattery > 0 && playerRickshawController.enabled)
+        {
+            UpdateBatteryHealth();
+            batterySlider.value = currentBattery;
         }
     }
 
@@ -108,6 +126,31 @@ public class RickshawHealth : MonoBehaviour
         if (cameraScript != null) cameraScript.TriggerShake();
 
         if (health <= 0) Die();
+    }
+
+    void UpdateBatteryHealth()
+    {
+        float drainAmount = playerRickshawController.currentSpeed * drainCoefficient * Time.deltaTime;
+        currentBattery -= drainAmount;
+        if (currentBattery <= 0)
+        {
+            currentBattery = 0;
+            Debug.Log("Battery Empty! at - " + transform.position.z);
+        }
+    }
+
+    public void HealthPickUp()
+    {
+        if(isDead) return;
+        health = 100f;
+        leftWheelHealth = 100f;
+        rightWheelHealth = 100f;
+    }
+
+    public void BatteryPickUp()
+    {
+        if(isDead) return;
+        currentBattery = maxBattery;
     }
 
     void ApplyWheelJiggle()
