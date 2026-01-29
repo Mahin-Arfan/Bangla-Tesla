@@ -11,15 +11,16 @@ public class PlayerRickshawController : MonoBehaviour
     public float baseSpeed = 8f;         // always moves forward
     [HideInInspector] public float startSpeed = 8f;
     public float maxSpeed = 20f;        // maximum speed limit
-    public float boostSpeed = 5f;        // extra speed when pressing W
+    public float boostSpeed = 5f;        // extra speed
     public float acceleration = 4f;      // smooth speed change
     public float currentSpeed;
     private bool boostPressed = false;
+    [HideInInspector] public bool outOfBattery = false;
 
     [Header("Brake Settings")]
     public float breakDeceleration = 5f;
     public float brakeForce = 10f;
-    public float maxBrakeTime = 1f;      // how long S key works
+    public float maxBrakeTime = 1f;      // how long brakes works
     public float brakeCooldown = 2f;     // cooldown after brake
     private bool brakePressed = false;
 
@@ -62,7 +63,6 @@ public class PlayerRickshawController : MonoBehaviour
         rb.constraints |= RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         cameraScript = GetComponent<CameraScript>();
         startSpeed = baseSpeed;
-        //currentSpeed = baseSpeed;
     }
 
     void Update()
@@ -204,24 +204,28 @@ public class PlayerRickshawController : MonoBehaviour
 
     void ApplyForwardMovement()
     {
+        if (outOfBattery)
+        {
+            currentSpeed = Mathf.Lerp(currentSpeed, 0f, 0.5f * Time.fixedDeltaTime);
+            Vector3 forward = transform.forward * currentSpeed;
+            rb.linearVelocity = new Vector3(forward.x, rb.linearVelocity.y, forward.z);
+            return;
+        }
+
         if (isBraking)
         {
-            // apply braking
-            currentSpeed = Mathf.Lerp(currentSpeed, breakDeceleration, brakeForce * Time.fixedDeltaTime);
+            float brakingSpeed = baseSpeed - breakDeceleration;
+            currentSpeed = Mathf.Lerp(currentSpeed, brakingSpeed, brakeForce * Time.fixedDeltaTime);
         }
         else
         {
-            // normal acceleration toward base + boost
             float targetSpeed = baseSpeed;
-
-            // boost applied?
             if (boostPressed) targetSpeed += boostSpeed;
-
             currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, acceleration * Time.fixedDeltaTime);
         }
 
-        Vector3 forward = transform.forward * currentSpeed;
-        rb.linearVelocity = new Vector3(forward.x, rb.linearVelocity.y, forward.z);
+        Vector3 normalForward = transform.forward * currentSpeed;
+        rb.linearVelocity = new Vector3(normalForward.x, rb.linearVelocity.y, normalForward.z);
     }
 
     void HandleBraking()

@@ -20,9 +20,10 @@ public class RickshawHealth : MonoBehaviour
     public LayerMask pedestrianLayer;
     public LayerMask BikeLayer;
     public LayerMask obstacleLayer;
+    private bool dieCausedByBattery = false;
 
     [Header("Battery Settings")]
-    [Tooltip("How many meters can the it go with full battery?")]
+    [Tooltip("How many meters can it go with full battery?")]
     public float initialRangeInMeters = 250f;
     public float currentBattery;
     public float drainCoefficient;
@@ -42,16 +43,38 @@ public class RickshawHealth : MonoBehaviour
     public Rigidbody[] rickshawManRigidBodies;
     public GameObject colliders;
     public GameManagerScript gameManagerScript;
-    private PlayerRickshawController playerRickshawController;
     public Slider healthSlider;
     public Slider easeHealthSlider;
     public Slider batterySlider;
+
+    // Internal References
     private CameraScript cameraScript;
+    private PlayerRickshawController playerRickshawController;
+    private BoxCollider frontWheelBoxCollider;
+    private BoxCollider baseBoxCollider;
+    private BoxCollider leftWheelBoxCollider;
+    private BoxCollider rightWheelBoxCollider;
+    private BoxCollider rickshawBoxCollider;
+    private CapsuleCollider rickshawCapsuleCollider;
+    private Rigidbody frontWheelRigidbody;
+    private Rigidbody baseRigidbody;
+    private Rigidbody leftWheelRigidbody;
+    private Rigidbody rightWheelRigidbody;
 
     void Start()
     {
         cameraScript = GetComponent<CameraScript>();
         playerRickshawController = GetComponent<PlayerRickshawController>();
+        frontWheelBoxCollider = frontWheelCollider.GetComponent<BoxCollider>();
+        baseBoxCollider = baseCollider.GetComponent<BoxCollider>();
+        leftWheelBoxCollider = leftWheelTransform.GetComponent<BoxCollider>();
+        rightWheelBoxCollider = rightWheelTransform.GetComponent<BoxCollider>();
+        rickshawBoxCollider = GetComponent<BoxCollider>();
+        rickshawCapsuleCollider = GetComponent<CapsuleCollider>();
+        frontWheelRigidbody = frontWheelCollider.GetComponent<Rigidbody>();
+        baseRigidbody = baseCollider.GetComponent<Rigidbody>();
+        leftWheelRigidbody = leftWheelTransform.GetComponent<Rigidbody>();
+        rightWheelRigidbody = rightWheelTransform.GetComponent<Rigidbody>();
         currentBattery = maxBattery;
         drainCoefficient = maxBattery / initialRangeInMeters;
     }
@@ -67,6 +90,11 @@ public class RickshawHealth : MonoBehaviour
             easeHealthSlider.value = Mathf.Lerp(easeHealthSlider.value, health, Time.deltaTime * healthDrainSpeed);
         }
         if (isDead) return;
+        if (playerRickshawController.outOfBattery && playerRickshawController.currentSpeed < 0.1f && !isDead)
+        {
+            dieCausedByBattery = true;
+            Die();
+        }
         if (!playerRickshawController.gamgeStarted) return;
         ApplyWheelJiggle();
         if (currentBattery > 0 && playerRickshawController.enabled)
@@ -125,7 +153,11 @@ public class RickshawHealth : MonoBehaviour
 
         if (cameraScript != null) cameraScript.TriggerShake();
 
-        if (health <= 0) Die();
+        if (health <= 0)
+        { 
+            dieCausedByBattery = false;
+            Die(); 
+        }
     }
 
     void UpdateBatteryHealth()
@@ -135,7 +167,11 @@ public class RickshawHealth : MonoBehaviour
         if (currentBattery <= 0)
         {
             currentBattery = 0;
-            Debug.Log("Battery Empty! at - " + transform.position.z);
+            if (!playerRickshawController.outOfBattery)
+            {
+                playerRickshawController.outOfBattery = true;
+                //Play a "Power Down" sound here
+            }
         }
     }
 
@@ -151,6 +187,11 @@ public class RickshawHealth : MonoBehaviour
     {
         if(isDead) return;
         currentBattery = maxBattery;
+        if(playerRickshawController.outOfBattery)
+        {
+            playerRickshawController.outOfBattery = false;
+            //Play a "Power Up" sound here
+        }
     }
 
     void ApplyWheelJiggle()
@@ -181,27 +222,30 @@ public class RickshawHealth : MonoBehaviour
     {
         isDead = true;
         gameManagerScript.gameOver = true;
-        frontWheelCollider.GetComponent<BoxCollider>().enabled = true;
-        baseCollider.GetComponent<BoxCollider>().enabled = true;
         colliders.SetActive(false);
-        leftWheelTransform.GetComponent<BoxCollider>().enabled = true;
-        rightWheelTransform.GetComponent<BoxCollider>().enabled = true;
-        GetComponent<PlayerRickshawController>().enabled = false;
-        GetComponent<CapsuleCollider>().enabled = false;
-        GetComponent<BoxCollider>().enabled = false;
-        frontWheelCollider.GetComponent<Rigidbody>().isKinematic = false;
-        baseCollider.GetComponent<Rigidbody>().isKinematic = false;
-        leftWheelTransform.GetComponent<Rigidbody>().isKinematic = false;
-        rightWheelTransform.GetComponent<Rigidbody>().isKinematic = false;
-        rickshawManAnimator.enabled = false;
-        GetComponent<Rigidbody>().isKinematic = true;
-        foreach (var col in rickshawManColliders)
+        playerRickshawController.enabled = false;
+
+        if (!dieCausedByBattery) 
         {
-            col.enabled = true;
-        }
-        foreach(var rb in rickshawManRigidBodies)
-        {
-            rb.isKinematic = false;
+            frontWheelBoxCollider.enabled = true;
+            baseBoxCollider.enabled = true;
+            leftWheelBoxCollider.enabled = true;
+            rightWheelBoxCollider.enabled = true;
+            rickshawCapsuleCollider.enabled = false;
+            rickshawBoxCollider.enabled = false;
+            frontWheelRigidbody.isKinematic = false;
+            baseRigidbody.isKinematic = false;
+            leftWheelRigidbody.isKinematic = false;
+            rightWheelRigidbody.isKinematic = false;
+            rickshawManAnimator.enabled = false;
+            foreach (var col in rickshawManColliders)
+            {
+                col.enabled = true;
+            }
+            foreach (var rb in rickshawManRigidBodies)
+            {
+                rb.isKinematic = false;
+            }
         }
     }
 }
