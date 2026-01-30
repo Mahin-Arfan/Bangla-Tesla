@@ -163,11 +163,8 @@ public class PlayerRickshawController : MonoBehaviour
             float t = Mathf.InverseLerp(zeroSteerX, fullSteerX, absX);
             t = Mathf.Clamp01(t);
 
-            if (posX < 0f && steerInput > 0f)
-                steerMultiplier = t;
-
-            else if (posX > 0f && steerInput < 0f)
-                steerMultiplier = t;
+            if (posX < 0f && steerInput > 0f)   steerMultiplier = t;
+            else if (posX > 0f && steerInput < 0f)  steerMultiplier = t;
         }
 
         float finalSteer = steerInput * steerMultiplier;
@@ -178,11 +175,15 @@ public class PlayerRickshawController : MonoBehaviour
 
         if (cameraScript != null) cameraScript.SetSteerInput(finalSteer);
 
+        float speedFactor = Mathf.Clamp01(currentSpeed / baseSpeed);
+        float dynamicSteerSpeed = steerSpeed * speedFactor;
+        dynamicSteerSpeed = Mathf.Max(dynamicSteerSpeed, 0.5f);
+
         rb.MoveRotation(
             Quaternion.Slerp(
                 rb.rotation,
                 targetRot,
-                steerSpeed * Time.fixedDeltaTime
+                dynamicSteerSpeed * Time.fixedDeltaTime
             )
         );
 
