@@ -8,8 +8,8 @@ using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 public class PlayerRickshawController : MonoBehaviour
 {
     [Header("Speed Settings")]
-    public float baseSpeed = 8f;         // always moves forward
-    [HideInInspector] public float startSpeed = 8f;
+    [HideInInspector] public float baseSpeed = 8f;         // always moves forward
+    public float startSpeed = 8f;
     public float maxSpeed = 20f;        // maximum speed limit
     public float boostSpeed = 5f;        // extra speed
     public float acceleration = 4f;      // smooth speed change
@@ -34,6 +34,8 @@ public class PlayerRickshawController : MonoBehaviour
     public float maxTurnMinusVisual = 20f;
     private bool leftPressed = false;
     private bool rightPressed = false;
+    bool leftBlocked = false;
+    bool rightBlocked = false;
 
     private Vector3 steerHandleLeft = new Vector3(-42f, -20f, 28f);
     private Vector3 steerHandleNeutral = new Vector3(0.733f, 0.137f, 21.114f);
@@ -62,7 +64,7 @@ public class PlayerRickshawController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.constraints |= RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         cameraScript = GetComponent<CameraScript>();
-        startSpeed = baseSpeed;
+        baseSpeed = startSpeed;
     }
 
     void Update()
@@ -141,12 +143,9 @@ public class PlayerRickshawController : MonoBehaviour
         if(posX > 5.6) transform.position = new Vector3(5.6f, transform.position.y, transform.position.z);
 
         //Side Check
-        bool leftBlocked = false;
-        bool rightBlocked = false;
         if (sideCheckTimer >= sideCheckInterval)
         {
             rightBlocked = Physics.Raycast(turnCheck.position, turnCheck.right, turnCheckDistance, obstacleLayer);
-
             leftBlocked = Physics.Raycast(turnCheck.position, -turnCheck.right, turnCheckDistance, obstacleLayer);
             sideCheckTimer = 0f;
         }
