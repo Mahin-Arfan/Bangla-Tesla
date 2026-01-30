@@ -37,6 +37,13 @@ public class PlayerRickshawController : MonoBehaviour
     bool leftBlocked = false;
     bool rightBlocked = false;
 
+    [Header("Damage Effects")]
+    public float maxDamagePullAngle = 5f; // The pull rotation
+    public float damageWobbleSpeed = 15f;  // How fast it shakes
+    public float damageWobbleAmount = 2f;  // How violent the shake is
+    float damageBias = 0f;
+    float damageWobbleTimer = 0f;
+
     private Vector3 steerHandleLeft = new Vector3(-42f, -20f, 28f);
     private Vector3 steerHandleNeutral = new Vector3(0.733f, 0.137f, 21.114f);
     private Vector3 steerHandleRight = new Vector3(42f, 20f, 28f);
@@ -51,6 +58,7 @@ public class PlayerRickshawController : MonoBehaviour
     public Transform turnCheck;
     public LayerMask obstacleLayer;
     private CameraScript cameraScript;
+    private RickshawHealth healthScript;
     [HideInInspector] public bool gamgeStarted = false;
 
     private Rigidbody rb;
@@ -64,6 +72,7 @@ public class PlayerRickshawController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.constraints |= RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         cameraScript = GetComponent<CameraScript>();
+        healthScript = GetComponent<RickshawHealth>();
         baseSpeed = startSpeed;
     }
 
@@ -86,6 +95,7 @@ public class PlayerRickshawController : MonoBehaviour
         HandleBraking();
         UpdateSteerHandle(animSteer);
         sideCheckTimer += Time.deltaTime;
+        damageWobbleTimer += Time.deltaTime;
     }
 
     void FixedUpdate()
@@ -168,8 +178,36 @@ public class PlayerRickshawController : MonoBehaviour
 
         float finalSteer = steerInput * steerMultiplier;
 
+        //Wobble Effect when damaged
+        if (healthScript != null && damageWobbleTimer > 0.2f)
+        {
+            float leftDamage = Mathf.Clamp01(1f - (healthScript.leftWheelHealth / 100f));
+            float rightDamage = Mathf.Clamp01(1f - (healthScript.rightWheelHealth / 100f));
+
+            float damageDiff = rightDamage - leftDamage;
+            float constantPull = damageDiff * maxDamagePullAngle;
+            float shakeIntensity = Mathf.Max(leftDamage, rightDamage);
+
+            float totalShake = 0f;
+            if (currentSpeed > 1f && shakeIntensity > 0f)
+            {
+                float vibration = Mathf.Sin(Time.time * damageWobbleSpeed) * damageWobbleAmount * shakeIntensity;
+                float randomDrift = 0f;
+                if (leftDamage > 0.5f && rightDamage > 0.5f)
+                {
+                    randomDrift = (Mathf.PerlinNoise(Time.time * 2f, 0f) - 0.5f) * 2f;
+                    randomDrift *= 5f;
+                }
+
+                totalShake = vibration + randomDrift;
+            }
+            damageBias = constantPull + totalShake;
+            damageWobbleTimer = 0f;
+        }
+
+
         // ROTATION (PHYSICS)
-        float targetY = 180f + finalSteer * maxTurnAngle;
+        float targetY = 180f + (finalSteer * maxTurnAngle) + damageBias;
         Quaternion targetRot = Quaternion.Euler(0f, targetY, 0f);
 
         if (cameraScript != null) cameraScript.SetSteerInput(finalSteer);

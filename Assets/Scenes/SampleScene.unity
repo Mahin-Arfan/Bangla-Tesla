@@ -1796,7 +1796,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &931243697
 Transform:
   m_ObjectHideFlags: 0
@@ -12966,7 +12966,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 1e+10
-  maxBattery: 100
+  maxBattery: 100000000
   isDead: 0
   leftWheelDamaged: 0
   rightWheelDamaged: 0
@@ -12983,7 +12983,7 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 64
-  initialRangeInMeters: 250
+  initialRangeInMeters: 250000000
   currentBattery: 0
   drainCoefficient: 0
   leftWheelTransform: {fileID: 2252406355205198917}
@@ -15235,7 +15235,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f48746198b59ad9458ab45e42a665619, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseSpeed: 8
+  baseSpeed: 0
   startSpeed: 8
   maxSpeed: 20
   boostSpeed: 5
@@ -15253,12 +15253,15 @@ MonoBehaviour:
   sideCheckInterval: 0.2
   turnCheckDistance: 0.8
   maxTurnMinusVisual: 20
+  maxDamagePullAngle: 5
+  damageWobbleSpeed: 15
+  damageWobbleAmount: 2
   rickshawManAnimator: {fileID: 1256020565862362862}
   rickshawSteerHandle: {fileID: 3271787688817410482}
   turnCheck: {fileID: 2913030776840198298}
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 576
   gamgeStarted: 0
   horizontalInput: 0
 --- !u!4 &6083704931040507378
@@ -16254,7 +16257,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5292735716209387520, guid: d24893936d9c9c14abf8c373c88508c7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.75
+      value: 2.92
       objectReference: {fileID: 0}
     - target: {fileID: 5292735716209387520, guid: d24893936d9c9c14abf8c373c88508c7, type: 3}
       propertyPath: m_LocalPosition.y
@@ -16262,7 +16265,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5292735716209387520, guid: d24893936d9c9c14abf8c373c88508c7, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 14.82
+      value: 7.15
       objectReference: {fileID: 0}
     - target: {fileID: 5292735716209387520, guid: d24893936d9c9c14abf8c373c88508c7, type: 3}
       propertyPath: m_LocalRotation.w
@@ -16292,6 +16295,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7242925055056832371, guid: d24893936d9c9c14abf8c373c88508c7, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7903760847422932928, guid: d24893936d9c9c14abf8c373c88508c7, type: 3}
       propertyPath: maxSpeed
       value: 0
@@ -16302,7 +16309,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7903760847422932928, guid: d24893936d9c9c14abf8c373c88508c7, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7903760847422932928, guid: d24893936d9c9c14abf8c373c88508c7, type: 3}
       propertyPath: randomStops
@@ -17675,6 +17682,18 @@ PrefabInstance:
     - target: {fileID: 4862015055813114685, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4862015055813114685, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5899742465159916926, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
+      propertyPath: m_Value
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 6375025716996292636, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
+      propertyPath: m_Value
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 6846083128475446970, guid: 9034dc1901633b84f845c4499cef07b2, type: 3}
       propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -19126,7 +19145,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3837573111360809350, guid: 1a990a8638b6b714fa7a0a81bc48f40b, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5256159904769500774, guid: 1a990a8638b6b714fa7a0a81bc48f40b, type: 3}
       propertyPath: m_LocalPosition.x
