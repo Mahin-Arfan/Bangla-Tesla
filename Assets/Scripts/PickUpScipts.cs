@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class PickUpScipts : MonoBehaviour
 {
@@ -12,10 +13,13 @@ public class PickUpScipts : MonoBehaviour
     private float nextSpawnZ;
     private LayerMask playerLayer;
     private float onTriggerEnterTime = 0f;
+    private float positionCheckTimer = 0f;
+    private float distanceProgress = 0f;
 
     [Header("References")]
     public GameManagerScript gameManager;
     public RickshawHealth rickshawHealthScript;
+    private Transform rickshawTransform;
 
     void Start()
     {
@@ -27,8 +31,22 @@ public class PickUpScipts : MonoBehaviour
         {
             rickshawHealthScript = GameObject.FindGameObjectWithTag("Player").transform.GetComponent<RickshawHealth>();
         }
+        rickshawTransform = rickshawHealthScript.transform;
         playerLayer = LayerMask.GetMask("Player");
         RespawnPickup();
+    }
+
+    void Update()
+    {
+        positionCheckTimer += Time.deltaTime;
+        if(positionCheckTimer >= 1f)
+        {
+            positionCheckTimer = 0f;
+            if (transform.position.z > rickshawTransform.position.z + 10f)
+            {
+                RespawnPickup();
+            }
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -59,8 +77,9 @@ public class PickUpScipts : MonoBehaviour
     void RespawnPickup()
     {
         float posX = Random.Range(-spawnXRange, spawnXRange);
-        float currentProgress = (gameManager != null) ? gameManager.progress : 0f;
-        float currentGap = Mathf.Lerp(minSpawnGap, maxSpawnGap, currentProgress);
+        distanceProgress = Mathf.Clamp01(gameManager.score / gameManager.maxDificultyScore * 2);
+        distanceProgress = Mathf.SmoothStep(0f, 1f, distanceProgress);
+        float currentGap = Mathf.Lerp(minSpawnGap, maxSpawnGap, distanceProgress);
         nextSpawnZ = transform.position.z - currentGap;
         transform.position = new Vector3(posX, transform.position.y, nextSpawnZ);
     }

@@ -11,10 +11,12 @@ GameObject:
   - component: {fileID: 5180476570406194112}
   - component: {fileID: 1307587833961996349}
   - component: {fileID: 9186628493333926460}
+  - component: {fileID: 7641818565905946149}
+  - component: {fileID: 8456191857478658620}
   - component: {fileID: 6995274334915770008}
   m_Layer: 0
   m_Name: GameManager
-  m_TagString: Untagged
+  m_TagString: GameController
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -48,7 +50,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   score: 0
   maxDificultyScore: 1500
+  progress: 0
   gameStarted: 0
+  gameOver: 0
   roads:
   - roadSegment: {fileID: 0}
     endPoint: {fileID: 0}
@@ -57,7 +61,6 @@ MonoBehaviour:
   - roadSegment: {fileID: 0}
     endPoint: {fileID: 0}
   roadSpawnDistance: 110
-  player: {fileID: 0}
   vehicleGroups:
   - type: 4
     prefabs:
@@ -103,7 +106,7 @@ MonoBehaviour:
   - type: 0
     prefabs:
     - {fileID: 8463349050262562609, guid: 752bb075a2b959b4baa3d10fe939c59d, type: 3}
-    - {fileID: 8724503343287003994, guid: c71ae82f75b86554f8c64b87a7f82b94, type: 3}
+    - {fileID: 8724503343287003994, guid: 31803df8313969f4ab575bca6a7b0290, type: 3}
     - {fileID: 8463349050262562609, guid: 752bb075a2b959b4baa3d10fe939c59d, type: 3}
     xRange: {x: -3.25, y: 1.45}
     weight: 5
@@ -120,15 +123,25 @@ MonoBehaviour:
     weightIncrement: 1
     maxBonusWeight: 2
     spawnCheckSize: {x: 2.05, y: 0.5, z: 12}
-  spawnRate: 10
+  spawnRate: 0
   startSpawnRate: 2
   maxSpawnRate: 8
   spawnLocation: {x: 0, y: 0, z: 0}
   baseSpawnTime: 3
-  spawnDistance: 70
+  spawnDistance: 150
   spawnTimer: 0
-  recycleDistance: 80
+  pedestrianSpawnRate: 1
+  maxActivePedestrians: 10
+  pedestrianXOffset: {x: 7, y: 10.5}
+  pedestrianYOffset: 0.3
+  padestrianSpawnDistance: 40
+  pedestrianPrefabs:
+  - {fileID: 7608566580439242773, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+  vehicleRecycleDistance: 180
+  pedestrianRecycleDistance: 60
   maxActiveVehicles: 35
+  prewarmPerPrefeb: 10
+  player: {fileID: 0}
   gizmosSpawnPos: {x: 0, y: 0, z: 0}
   gizmosSpawnSize: {x: 0, y: 0, z: 0}
 --- !u!114 &9186628493333926460
@@ -144,6 +157,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainMenuUI: {fileID: 0}
+  endMenuUI: {fileID: 0}
+  inputUI: {fileID: 0}
+--- !u!114 &7641818565905946149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7887398816664887179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ed0a64f4305ba64daa5dab1cfd554c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8456191857478658620
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7887398816664887179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f93ff35c87b7e224380b3af7e9aaa43e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  effectPrefabs:
+  - {fileID: 497811166449478340, guid: bcbdbe8e302f4454b93ec502082aacf7, type: 3}
+  - {fileID: 497811166449478340, guid: 68969d6e604f8254f9c8b4efd1294180, type: 3}
+  amountPerType: 4
 --- !u!114 &6995274334915770008
 MonoBehaviour:
   m_ObjectHideFlags: 0

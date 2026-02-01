@@ -26,7 +26,7 @@ public class RickshawHealth : MonoBehaviour
     [Tooltip("How many meters can it go with full battery?")]
     public float initialRangeInMeters = 250f;
     public float currentBattery;
-    public float drainCoefficient;
+    private float drainCoefficient;
 
     [Header("Wheel References")]
     public Transform leftWheelTransform;
