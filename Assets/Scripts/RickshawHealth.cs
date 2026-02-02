@@ -147,6 +147,7 @@ public class RickshawHealth : MonoBehaviour
                 rightWheelHealth -= damageToApply;
             }
         }
+        Debug.Log("Damage Applied: " + damageToApply);
 
         health -= damageToApply;
         lastHitTime = Time.time;

@@ -1430,13 +1430,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3090069920216765531}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0.00000013318775, z: 0.00000001792828, w: 0.7071067}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: -0.00072766776, y: 0.03431881, z: 0.0004769781}
-  m_LocalScale: {x: 1, y: 0.9999999, z: 1.0000001}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.65, y: 0.65, z: 0.65}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2202155874688538655}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!33 &8734410905529146880
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -2778,6 +2778,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6450354034212497676}
   - component: {fileID: 2513076161125053421}
+  - component: {fileID: 2068991355266576469}
   m_Layer: 0
   m_Name: Environment_Crane
   m_TagString: Untagged
@@ -2794,7 +2795,7 @@ Transform:
   m_GameObject: {fileID: 5142590435766976932}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071069, y: 0, z: 0, w: 0.7071067}
-  m_LocalPosition: {x: -0.028970718, y: 0.00000090111524, z: -191.9}
+  m_LocalPosition: {x: 0, y: 0, z: 144}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2857,6 +2858,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2068991355266576469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5142590435766976932}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c270988c952038148ae384dabb8d3c93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actionDistance: 50
+  objectDropDistance: 15
+  inactiveDistace: 80
+  rigidObject: {fileID: 5087369040473726269}
+  playerTransform: {fileID: 0}
 --- !u!1 &5174630011490296339
 GameObject:
   m_ObjectHideFlags: 0

@@ -8,6 +8,7 @@ public class SpecialRoadScript : MonoBehaviour
     public Rigidbody rigidObject;
     public Transform playerTransform;
     private Animator animator;
+    private Collider objectCollider;
 
     //internals
     float distanceToPlayer;
@@ -18,30 +19,36 @@ public class SpecialRoadScript : MonoBehaviour
     void Start()
     {
         animator = GetComponent<Animator>();
-        dropObjectPosition = rigidObject.transform.position;
-        dropObjectRotation = rigidObject.transform.eulerAngles;
+        objectCollider = rigidObject.GetComponent<Collider>();
+        dropObjectPosition = rigidObject.transform.localPosition;
+        dropObjectRotation = rigidObject.transform.localEulerAngles;
     }
 
     // Update is called once per frame
     void Update()
     {
         distanceToPlayer = playerTransform.position.z - transform.position.z;
-        if(distanceToPlayer < actionDistance)
+        //Debug.Log("Distance to Player: " + distanceToPlayer);
+        if(distanceToPlayer > 0f)
         {
-            StartAction();
-            return;
+            if (distanceToPlayer < actionDistance)
+            {
+                StartAction();
+            }
         }
-        float distanceToPlayerPassed = transform.position.z - playerTransform.position.z;
-        Debug.Log("Distance to Player Passed: " + distanceToPlayerPassed);
-        if (distanceToPlayerPassed > inactiveDistace)
+        else
         {
-            rigidObject.isKinematic = true;
-            rigidObject.transform.position = dropObjectPosition;
-            rigidObject.transform.eulerAngles = dropObjectRotation;
-            actionStarted = false;
-            animator.SetTrigger("Reset");
-            this.gameObject.SetActive(false);
-            Debug.Log("Special Road Reset");
+            if (Mathf.Abs(distanceToPlayer) > inactiveDistace)
+            {
+                rigidObject.isKinematic = true;
+                rigidObject.transform.localPosition = dropObjectPosition;
+                rigidObject.transform.localEulerAngles = dropObjectRotation;
+                actionStarted = false;
+                objectCollider.enabled = false;
+                animator.SetTrigger("Reset");
+                this.gameObject.SetActive(false);
+                Debug.Log("Special Road Reset");
+            }
         }
     }
 
@@ -52,9 +59,9 @@ public class SpecialRoadScript : MonoBehaviour
             animator.SetTrigger("Action");
             actionStarted = true;
         }
-
         if (distanceToPlayer < objectDropDistance && rigidObject.isKinematic)
         {
+            objectCollider.enabled = true;
             rigidObject.isKinematic = false;
         }
     }
