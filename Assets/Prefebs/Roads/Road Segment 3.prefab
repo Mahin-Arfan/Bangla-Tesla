@@ -736,6 +736,59 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.0071835816, y: 0.0071835844, z: 0.021311982}
   m_Center: {x: -0.00002740383, y: 0.000027342829, z: 0.010623269}
+--- !u!1 &1421479327692843798
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8090616137706512185}
+  - component: {fileID: 2678565742420429617}
+  m_Layer: 0
+  m_Name: Road Collider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8090616137706512185
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1421479327692843798}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7006595870751401571}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &2678565742420429617
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1421479327692843798}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 12.5, y: 0.029232055, z: 95.61489}
+  m_Center: {x: 0, y: -0.017073855, z: -47.78603}
 --- !u!1 &1434295211840314963
 GameObject:
   m_ObjectHideFlags: 0
@@ -1362,7 +1415,6 @@ GameObject:
   - component: {fileID: 5515219311006515043}
   - component: {fileID: 3053821769491819274}
   - component: {fileID: 3608895713980825409}
-  - component: {fileID: 6293093882414976016}
   m_Layer: 0
   m_Name: Road.001
   m_TagString: Untagged
@@ -1438,27 +1490,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &6293093882414976016
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2311195510103614602}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.12338359, y: 0.11949008, z: 0.000000018022302}
-  m_Center: {x: -0.00028970465, y: -0.00039139384, z: 2.220446e-15}
 --- !u!1 &2933562255131608909
 GameObject:
   m_ObjectHideFlags: 0
@@ -1696,7 +1727,6 @@ GameObject:
   - component: {fileID: 4856035785668447424}
   - component: {fileID: 1136485202834495009}
   - component: {fileID: 2603430834427550340}
-  - component: {fileID: 4676682658445540666}
   m_Layer: 0
   m_Name: Road.003
   m_TagString: Untagged
@@ -1772,27 +1802,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &4676682658445540666
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3100218644512508285}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.12338359, y: 0.11949008, z: 0.000000018022302}
-  m_Center: {x: -0.00028970465, y: -0.0003914162, z: 5.7731597e-15}
 --- !u!1 &3297238067503305511
 GameObject:
   m_ObjectHideFlags: 0
@@ -1913,6 +1922,7 @@ Transform:
   - {fileID: 8238451131886591405}
   - {fileID: 1347065015692372501}
   - {fileID: 1101785902811023411}
+  - {fileID: 8090616137706512185}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3420136474890718488
@@ -1926,7 +1936,6 @@ GameObject:
   - component: {fileID: 3379153146638960610}
   - component: {fileID: 4233543387379454986}
   - component: {fileID: 6222107643636506833}
-  - component: {fileID: 3730830528306562159}
   m_Layer: 0
   m_Name: Road.002
   m_TagString: Untagged
@@ -2002,27 +2011,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &3730830528306562159
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3420136474890718488}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.12338359, y: 0.11949008, z: 0.000000018022302}
-  m_Center: {x: -0.00028970465, y: 0.00039128208, z: 4.440892e-16}
 --- !u!1 &3541251592279083456
 GameObject:
   m_ObjectHideFlags: 0
@@ -2570,7 +2558,6 @@ GameObject:
   - component: {fileID: 6473116721718553712}
   - component: {fileID: 8028170164826447016}
   - component: {fileID: 2806192192989314860}
-  - component: {fileID: 2558903717124046427}
   m_Layer: 0
   m_Name: Road.002
   m_TagString: Untagged
@@ -2646,27 +2633,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &2558903717124046427
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4382591124995769642}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.12338359, y: 0.11949008, z: 0.000000018022302}
-  m_Center: {x: -0.00028970465, y: 0.00039128208, z: 4.440892e-16}
 --- !u!1 &4494826808365647310
 GameObject:
   m_ObjectHideFlags: 0
@@ -4145,7 +4111,6 @@ GameObject:
   - component: {fileID: 2476094926753970932}
   - component: {fileID: 4524039018182971594}
   - component: {fileID: 4615175901662437992}
-  - component: {fileID: 4059681706766331648}
   m_Layer: 0
   m_Name: Road
   m_TagString: Untagged
@@ -4221,27 +4186,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &4059681706766331648
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6159826980583945650}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.12338359, y: 0.11949008, z: 0.000000018022302}
-  m_Center: {x: -0.00028970465, y: 0.0003913454, z: 1.7763568e-15}
 --- !u!1 &6197861108929268121
 GameObject:
   m_ObjectHideFlags: 0
@@ -4317,7 +4261,6 @@ GameObject:
   - component: {fileID: 4697263234008808051}
   - component: {fileID: 650874249304816326}
   - component: {fileID: 2806444126303765471}
-  - component: {fileID: 425477557103363813}
   m_Layer: 0
   m_Name: Road.003
   m_TagString: Untagged
@@ -4393,27 +4336,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &425477557103363813
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6363550235584956425}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.12338359, y: 0.11949008, z: 0.000000018022302}
-  m_Center: {x: -0.00028970465, y: -0.0003914162, z: 5.7731597e-15}
 --- !u!1 &6539839667254741895
 GameObject:
   m_ObjectHideFlags: 0
@@ -5028,7 +4950,6 @@ GameObject:
   - component: {fileID: 5471248312314613305}
   - component: {fileID: 1441901510070818143}
   - component: {fileID: 696932633198788995}
-  - component: {fileID: 1440227072459075049}
   m_Layer: 0
   m_Name: Road
   m_TagString: Untagged
@@ -5104,27 +5025,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &1440227072459075049
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7708869505177379485}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.12338359, y: 0.11949008, z: 0.000000018022302}
-  m_Center: {x: -0.00028970465, y: 0.0003913454, z: 1.7763568e-15}
 --- !u!1 &7801318968429822000
 GameObject:
   m_ObjectHideFlags: 0
@@ -5656,7 +5556,6 @@ GameObject:
   - component: {fileID: 9057042096913382932}
   - component: {fileID: 2716798349204313794}
   - component: {fileID: 2840232197286557061}
-  - component: {fileID: 2006492502349757747}
   m_Layer: 0
   m_Name: Road.001
   m_TagString: Untagged
@@ -5732,27 +5631,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &2006492502349757747
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8316485259670626400}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.12338359, y: 0.11949008, z: 0.000000018022302}
-  m_Center: {x: -0.00028970465, y: -0.00039139384, z: 2.220446e-15}
 --- !u!1 &8365852346074863404
 GameObject:
   m_ObjectHideFlags: 0

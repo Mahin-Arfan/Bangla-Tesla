@@ -15,6 +15,13 @@ public class GameManagerScript : MonoBehaviour
         public Transform endPoint;
     }
 
+    [System.Serializable]
+    public struct SpecialRoad
+    {
+        public GameObject roadSegment;
+        public Transform endPoint;
+    }
+
     [Header("Game Settings")]
     public int score = 0;
     public float maxDificultyScore = 1000f;
@@ -26,6 +33,7 @@ public class GameManagerScript : MonoBehaviour
 
     [Header("Road Settings")]
     public Road[] roads;
+    public SpecialRoad[] specialRoads;
     public float roadSpawnDistance = 110f;
     public float specialRoadSpawnDistance = 500f;
 
@@ -36,8 +44,8 @@ public class GameManagerScript : MonoBehaviour
     private Vector3 roadSpawnLocation;
     private int currentRoadIndex = 2;
     private float firstRoadDistance;
-    private Vector3 specialRoadSpawnLocation = Vector3.zero;
-    private int specialRoadIndex = 3;
+    private float specialRoadSpawnLocation = 0f;
+    private int specialRoadIndex = 0;
 
     [System.Serializable]
     public struct VehicleGroup
@@ -104,6 +112,7 @@ public class GameManagerScript : MonoBehaviour
     }
     void Start()
     {
+        if(player == null) player = GameObject.FindGameObjectWithTag("Player");
         playerController = player.GetComponent<PlayerRickshawController>();
         uIScript = GetComponent<UIScript>();
         if (playerController == null)
@@ -120,8 +129,11 @@ public class GameManagerScript : MonoBehaviour
         thirdRoad = roads[2].roadSegment.transform;
 
         roadSpawnLocation = roads[2].endPoint.position;
-        roads[3].roadSegment.SetActive(false);
-        roads[4].roadSegment.SetActive(false);
+
+        for(int i = 0; i<specialRoads.Length; i++)
+        {
+            specialRoads[i].roadSegment.SetActive(false);
+        }
 
         vehicleGroupIndex = new int[vehicleGroups.Length];
         for (int i = 0; i < vehicleGroupIndex.Length; i++)
@@ -155,7 +167,7 @@ public class GameManagerScript : MonoBehaviour
 
     void HandleRoadSpawning()
     {
-        float specialRoadDistance = specialRoadSpawnLocation.z - player.transform.position.z;
+        float specialRoadDistance = specialRoadSpawnLocation - player.transform.position.z;
         if (specialRoadDistance > specialRoadSpawnDistance)
         {
             SpawnSpecialRoad();
@@ -176,20 +188,20 @@ public class GameManagerScript : MonoBehaviour
         thirdRoad = temp;
 
         currentRoadIndex++;
-        if (currentRoadIndex > 2)
+        if (currentRoadIndex >= roads.Length)
             currentRoadIndex = 0;
         roadSpawnLocation = roads[currentRoadIndex].endPoint.position;
     }
 
     void SpawnSpecialRoad()
     {
-        roads[specialRoadIndex].roadSegment.SetActive(true);
-        roads[specialRoadIndex].roadSegment.transform.position = roadSpawnLocation;
-        specialRoadSpawnLocation = roadSpawnLocation;
-        roadSpawnLocation = roads[specialRoadIndex].endPoint.position;
+        specialRoads[specialRoadIndex].roadSegment.transform.position = roadSpawnLocation;
+        specialRoads[specialRoadIndex].roadSegment.SetActive(true);
+        specialRoadSpawnLocation = roadSpawnLocation.z;
+        roadSpawnLocation = specialRoads[specialRoadIndex].endPoint.position;
         specialRoadIndex++;
-        if (specialRoadIndex > 4)
-            specialRoadIndex = 3;
+        if (specialRoadIndex >= specialRoads.Length)
+            specialRoadIndex = 0;
     }
 
     void HandleVehicleSpawning()

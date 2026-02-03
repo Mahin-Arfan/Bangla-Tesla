@@ -10,6 +10,7 @@ public class SpecialRoadScript : MonoBehaviour
     public float objectDropDistance = 15f;
     public float inactiveDistace = 100f;
 
+    [Header("References")]
     public Rigidbody[] rigidObjects;
     public Transform playerTransform;
     private Animator animator;
@@ -25,7 +26,12 @@ public class SpecialRoadScript : MonoBehaviour
 
     void Start()
     {
+        if(playerTransform == null)
+        {
+            playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
+        }
         animator = GetComponent<Animator>();
+        
         objectColliders = new Collider[rigidObjects.Length];
         if (environmentType == EnvironmentTypes.CraneWork)
         {
@@ -60,7 +66,6 @@ public class SpecialRoadScript : MonoBehaviour
                 rigidObjects[actionObjectIndex].transform.localPosition = dropObjectPosition;
                 rigidObjects[actionObjectIndex].transform.localEulerAngles = dropObjectRotation;
                 objectColliders[actionObjectIndex].enabled = false;
-                animator.enabled = false;
                 actionStarted = false;
                 objectDropped = false;
                 this.gameObject.SetActive(false);
@@ -72,7 +77,6 @@ public class SpecialRoadScript : MonoBehaviour
     {
         if (!actionStarted)
         {
-            animator.enabled = true;
             animator.SetTrigger("Action");
             actionStarted = true;
         }
