@@ -13,7 +13,7 @@ public class NPCCharacterScript : MonoBehaviour
     public float walkSpeed = 2.0f;
     public float detectionDistance = 1.5f;
     public LayerMask obstacleLayer;
-    public bool isWalking = false;
+    private bool isWalking = false;
     public float hitForce = 150f;
     [HideInInspector] public Vector3 hitPoint = Vector3.zero;
 
@@ -48,7 +48,7 @@ public class NPCCharacterScript : MonoBehaviour
     {
         animator = GetComponent<Animator>();
 
-        if (!driving && walking)
+        if (!driving)
         {
             detector = GetComponent<CollisionDetector>();
             boxCollider = GetComponent<BoxCollider>();

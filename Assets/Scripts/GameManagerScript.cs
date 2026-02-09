@@ -331,12 +331,9 @@ public class GameManagerScript : MonoBehaviour
 
         if (pedestrianPrefabs != null)  //For Pedestrians
         {
-            foreach (GameObject prefab in pedestrianPrefabs) //each prefeb gets prewarmPerPrefeb instances
+            foreach (GameObject prefab in pedestrianPrefabs)
             {
-                for (int i = 0; i < prewarmPerPrefeb; i++)
-                {
-                    CreateAndEnqueue(prefab);
-                }
+                CreateAndEnqueue(prefab);
             }
         }
     }
