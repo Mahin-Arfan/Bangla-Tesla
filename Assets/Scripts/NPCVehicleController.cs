@@ -105,7 +105,6 @@ public class NPCVehicleController : MonoBehaviour
     public Transform groundChecker;           // ground check origin
     public BoxCollider vehicleBodyCollider;    // used for sizing overtake checks
     public LayerMask vehicleLayer;             // layer mask for raycasts/CheckBox
-    private GameManagerScript gameManager;
 
     [Header("Wheels Setup")]
     public Wheel[] wheels;
@@ -127,8 +126,6 @@ public class NPCVehicleController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerScript>();
-        if(gameManager ==  null) Debug.LogError("Game Manager not found in scene!");
         if (NPCCharacterScript == null)
         {
             NPCCharacterScript = GetComponentInChildren<NPCCharacterScript>();
@@ -634,13 +631,9 @@ public class NPCVehicleController : MonoBehaviour
         }
 
         //Reset Settings based on game state
-        if (gameManager == null)
+        if (GameManagerScript.Instance.gameStarted)
         {
-            gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerScript>();
-        }
-        if (gameManager.gameStarted)
-        {
-            currentMaxSpeed = Mathf.Lerp(minSpeed, maxSpeed, gameManager.progress);
+            currentMaxSpeed = Mathf.Lerp(minSpeed, maxSpeed, GameManagerScript.Instance.progress);
             currentStopDecision = randomStops;
             vehicleCanBeDamaged = true;
         }

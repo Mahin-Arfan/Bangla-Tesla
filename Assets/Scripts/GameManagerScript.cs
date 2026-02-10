@@ -5,6 +5,8 @@ using UnityEngine.SocialPlatforms.Impl;
 
 public class GameManagerScript : MonoBehaviour
 {
+    public static GameManagerScript Instance { get; private set; }
+
     [System.Serializable]
     public enum Type { Truck, Bus, Car, Cng, Bike, Rickshaw, Barrier, Pedestrian}
 
@@ -80,6 +82,7 @@ public class GameManagerScript : MonoBehaviour
     public float pedestrianYOffset = 0f;
     public float padestrianSpawnDistance = 35f;
     public GameObject[] pedestrianPrefabs;
+    private int pedestrianPrefabIndex = 0;
     private float pedestrianTimer;
 
     [Header("Pooling")]
@@ -104,6 +107,12 @@ public class GameManagerScript : MonoBehaviour
 
     void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
         Screen.orientation = ScreenOrientation.LandscapeLeft;
         Screen.autorotateToPortrait = false;
         Screen.autorotateToPortraitUpsideDown = false;
@@ -289,13 +298,15 @@ public class GameManagerScript : MonoBehaviour
             spawnPos = new Vector3(spawnX, pedestrianYOffset, player.transform.position.z + (zPositionMultiplier * padestrianSpawnDistance));
         }
 
-        GameObject prefab = pedestrianPrefabs[Random.Range(0, pedestrianPrefabs.Length)];
+        GameObject prefab = pedestrianPrefabs[pedestrianPrefabIndex];
+        pedestrianPrefabIndex++;
+        if (pedestrianPrefabIndex >= pedestrianPrefabs.Length)
+        {
+            pedestrianPrefabIndex = 0;
+        }
         GameObject ped = GetFromPool(prefab);
-
         ped.transform.position = spawnPos;
-
         ped.SetActive(true);
-
         activePedestrians[ped] = Type.Pedestrian;
     }
 
@@ -508,7 +519,7 @@ public class GameManagerScript : MonoBehaviour
 
     void StartGame()
     {
-        playerController.gamgeStarted = true;
+        playerController.gameStarted = true;
         gameInitiaded = true;
     }
 

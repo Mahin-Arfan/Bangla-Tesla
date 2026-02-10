@@ -42,12 +42,12 @@ public class RickshawHealth : MonoBehaviour
     public Collider[] rickshawManColliders;
     public Rigidbody[] rickshawManRigidBodies;
     public GameObject colliders;
-    public GameManagerScript gameManagerScript;
     public Slider healthSlider;
     public Slider easeHealthSlider;
     public Slider batterySlider;
 
     // Internal References
+    private GameManagerScript gameManagerScript;
     private CameraScript cameraScript;
     private PlayerRickshawController playerRickshawController;
     private BoxCollider frontWheelBoxCollider;
@@ -63,6 +63,7 @@ public class RickshawHealth : MonoBehaviour
 
     void Start()
     {
+        gameManagerScript = GameManagerScript.Instance;
         cameraScript = GetComponent<CameraScript>();
         playerRickshawController = GetComponent<PlayerRickshawController>();
         frontWheelBoxCollider = frontWheelCollider.GetComponent<BoxCollider>();
@@ -95,7 +96,7 @@ public class RickshawHealth : MonoBehaviour
             dieCausedByBattery = true;
             Die();
         }
-        if (!playerRickshawController.gamgeStarted) return;
+        if (!playerRickshawController.gameStarted) return;
         ApplyWheelJiggle();
         if (currentBattery > 0 && playerRickshawController.enabled)
         {

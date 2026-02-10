@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using static UnityEngine.UI.Image;
 
@@ -41,6 +42,7 @@ public class NPCCharacterScript : MonoBehaviour
 
     private bool stateUpdated = false;
     private bool rigidBodyActivated = false;
+    private Transform salesmanParentStall;
     private CollisionDetector detector;
     private BoxCollider boxCollider;
 
@@ -53,6 +55,10 @@ public class NPCCharacterScript : MonoBehaviour
             detector = GetComponent<CollisionDetector>();
             boxCollider = GetComponent<BoxCollider>();
         }
+        if (salesman)
+        {
+            salesmanParentStall = transform.parent.transform;
+        }
     }
 
     void OnEnable()
@@ -64,21 +70,26 @@ public class NPCCharacterScript : MonoBehaviour
     {
         if(rigidBodyActivated) return;
 
-        if (!stateUpdated && driving)
-        {
-            UpdateDrivingState();
-        }
         if(isDead && !rigidBodyActivated && vehicleType != 3)
         {
             RigidBodyActive();
             rigidBodyActivated = true;
+            return;
         }
-        if (!isDead && walking)
+        if(walking)
         {
             if (roadCrossing)
                 RoadCross();
             else
                 UpdateWalking();
+        }
+        else if(!stateUpdated && salesman)
+        {
+            UpdateSalesman();
+        }
+        else if (!stateUpdated && driving)
+        {
+            UpdateDrivingState();
         }
     }
 
@@ -114,6 +125,30 @@ public class NPCCharacterScript : MonoBehaviour
             }
             transform.Translate(Vector3.forward * walkSpeed * Time.deltaTime);
         }
+    }
+
+    void UpdateSalesman()
+    {
+        if(!GameManagerScript.Instance.gameStarted)
+        {
+            salesmanParentStall.gameObject.SetActive(false);
+            return;
+        }
+        if (transform.position.x > 0f)
+        {
+            Vector3 stallPosition = salesmanParentStall.position;
+            stallPosition.x = 6.3f;
+            salesmanParentStall.position = stallPosition;
+            salesmanParentStall.rotation = Quaternion.identity;
+        }
+        else
+        {
+            Vector3 stallPosition = salesmanParentStall.position;
+            stallPosition.x = -6.3f;
+            salesmanParentStall.position = stallPosition;
+            salesmanParentStall.rotation = Quaternion.Euler(0f, 180f, 0f);
+        }
+        stateUpdated = true;
     }
 
     void UpdateDrivingState()
@@ -217,7 +252,6 @@ public class NPCCharacterScript : MonoBehaviour
         // 2. Reset Logic
         stateUpdated = false;
         rigidBodyActivated = false;
-        raycastTimer = 0f;
 
         if (animator != null)
         {
@@ -240,9 +274,10 @@ public class NPCCharacterScript : MonoBehaviour
             if(npcTriggerCollider != null) npcTriggerCollider.enabled = true;
 
             hitPoint = Vector3.zero;
+            raycastTimer = 0f;
 
             // 4. Randomize Road Crossing
-            if (transform.position.z < roadCrossEnableDistance)
+            if (GameManagerScript.Instance.progress >= 0.5f)
             {
                 roadCrossing = (Random.value <= roadCrossingProbability);
             }
@@ -250,6 +285,15 @@ public class NPCCharacterScript : MonoBehaviour
             {
                 roadCrossing = false;
             }
+        }
+        else if (salesman)
+        {
+            detector.enabled = true;
+            detector.pedestrian = true;
+            detector.npcCharacterScript = this;
+            if (boxCollider != null) boxCollider.enabled = true;
+            if (npcTriggerCollider != null) npcTriggerCollider.enabled = true;
+            hitPoint = Vector3.zero;
         }
     }
 }

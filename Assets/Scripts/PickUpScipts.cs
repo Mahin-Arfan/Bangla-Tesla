@@ -17,15 +17,15 @@ public class PickUpScipts : MonoBehaviour
     private float distanceProgress = 0f;
 
     [Header("References")]
-    public GameManagerScript gameManager;
     public RickshawHealth rickshawHealthScript;
+    private GameManagerScript gameManager;
     private Transform rickshawTransform;
 
     void Start()
     {
         if (gameManager == null)
         {
-            gameManager = GameObject.FindGameObjectWithTag("GameController").transform.GetComponent<GameManagerScript>();
+            gameManager = GameManagerScript.Instance;
         }
         if(rickshawHealthScript == null)
         {

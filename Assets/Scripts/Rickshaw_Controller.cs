@@ -59,7 +59,7 @@ public class PlayerRickshawController : MonoBehaviour
     public LayerMask obstacleLayer;
     private CameraScript cameraScript;
     private RickshawHealth healthScript;
-    [HideInInspector] public bool gamgeStarted = false;
+    [HideInInspector] public bool gameStarted = false;
 
     private Rigidbody rb;
     private float brakeTimer = 0f;
@@ -78,7 +78,7 @@ public class PlayerRickshawController : MonoBehaviour
 
     void Update()
     {
-        if(!gamgeStarted)   return;
+        if(!gameStarted)   return;
         if (leftPressed)
             horizontalInput = Mathf.Lerp(horizontalInput, -1f, Time.deltaTime * steerSpeed);
         else if (rightPressed)
@@ -100,7 +100,7 @@ public class PlayerRickshawController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!gamgeStarted) return;
+        if (!gameStarted) return;
         ApplyForwardMovement();
         Steer();
     }
