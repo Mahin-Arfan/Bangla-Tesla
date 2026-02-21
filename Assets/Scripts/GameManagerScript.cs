@@ -60,6 +60,7 @@ public class GameManagerScript : MonoBehaviour
         public float weightIncrement;
         public float maxBonusWeight;
         public Vector3 spawnCheckSize;
+        public int prewarmPerPrefeb;
     }
 
     [Header("Vehicles")]
@@ -89,7 +90,6 @@ public class GameManagerScript : MonoBehaviour
     public float vehicleRecycleDistance = 90f;
     public float pedestrianRecycleDistance = 40f;
     public int maxActiveVehicles = 35;
-    public int prewarmPerPrefeb = 5;
     private float recycleTimer;
 
     private Dictionary<GameObject, Queue<GameObject>> prefabPool = new Dictionary<GameObject, Queue<GameObject>>();
@@ -335,7 +335,7 @@ public class GameManagerScript : MonoBehaviour
 
             for (int i = 0; i < prefabCount; i++)
             {
-                for(int j = 0; j < prewarmPerPrefeb; j++)
+                for(int j = 0; j < group.prewarmPerPrefeb; j++)
                     CreateAndEnqueue(group.prefabs[i]);
             }
         }
