@@ -86,7 +86,7 @@ public class CollisionDetector : MonoBehaviour
             }
             else
             {
-                npcVehicleController.VehicleHit(hitPoint);
+                npcVehicleController.VehicleHit(hitPoint, hitLayer);
             }
         }
         else if(healthScript != null)

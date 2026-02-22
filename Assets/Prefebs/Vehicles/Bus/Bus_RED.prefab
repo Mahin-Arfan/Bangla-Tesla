@@ -62,7 +62,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 1
   m_Constraints: 0
-  m_CollisionDetection: 3
+  m_CollisionDetection: 0
 --- !u!114 &7982696329382930976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -98,7 +98,7 @@ MonoBehaviour:
   checkInterval: 0.2
   overTakingTendency: 1
   overTakeCompleteDisctance: 4
-  randomStops: 1
+  randomStops: 0
   currentStopDecision: 0
   stopPositionX: 2.75
   stopDuration: 5

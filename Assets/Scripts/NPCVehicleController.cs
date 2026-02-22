@@ -94,6 +94,9 @@ public class NPCVehicleController : MonoBehaviour
     private float driveToTargetDot = 0f;
     private float driveToTargetCheck = 5f;
     private float initialYPosition;
+    private bool gameStartedSettingsInitialized = false;
+    private int hitCount = 0;
+    private LayerMask playerLayer;
 
     [Header("References")]
     private Vector3 driveTarget;              // main drive target
@@ -126,6 +129,7 @@ public class NPCVehicleController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        playerLayer = LayerMask.GetMask("Player");
         if (NPCCharacterScript == null)
         {
             NPCCharacterScript = GetComponentInChildren<NPCCharacterScript>();
@@ -183,6 +187,14 @@ public class NPCVehicleController : MonoBehaviour
         {
             ObstacleCheck();
             GroundCheck();
+            if(vehicleType == Type.Bike)    RotationCheck();
+            if(!gameStartedSettingsInitialized && GameManagerScript.Instance.gameStarted)
+            {
+                currentMaxSpeed = Mathf.Lerp(minSpeed, maxSpeed, GameManagerScript.Instance.progress);
+                currentStopDecision = randomStops;
+                vehicleCanBeDamaged = true;
+                gameStartedSettingsInitialized = true;
+            }
             lastCheckTime = 0f;
         }
         if (currentStopDecision)
@@ -469,10 +481,8 @@ public class NPCVehicleController : MonoBehaviour
 
     void TryOvertakeRightSide(Vector3 rightSideOverTakePosition, Vector3 leftSideOverTakePosition, bool leftSideCheck)
     {
-        // check the overtake destination first (quick boolean test using layer)
         if (!Physics.CheckBox(rightSideOverTakePosition, checkSize, Quaternion.identity))
         {
-            // compute a side-check box position for this vehicle's right side (world aligned Y=1)
             Vector3 checkPos = new Vector3(
                 transform.position.x - sideCheckDistance,
                 1f,
@@ -531,6 +541,16 @@ public class NPCVehicleController : MonoBehaviour
             // not grounded — apply simple gravity
             transform.position = new Vector3(transform.position.x, initialYPosition + 0.5f, transform.position.z);
             transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+        }
+    }
+
+    void RotationCheck()
+    {
+        if(transform.rotation.eulerAngles.z != 0)
+        {
+            Quaternion rotaion = transform.rotation;
+            rotaion.z = 0f;
+            transform.rotation = rotaion;
         }
     }
 
@@ -598,27 +618,52 @@ public class NPCVehicleController : MonoBehaviour
         leftSideCheckGizmoPos = checkPos;
     }
 
-    public void VehicleHit(Vector3 hitPoint)
+    public void VehicleHit(Vector3 hitPoint, int hitLayer)
     {
-        if (!vehicleCanBeDamaged || Time.time < lastDamageTime + damageCooldown || vehicleDamaged) return;
-        lastDamageTime = Time.time;
-        vehicleDamaged = true;
-        if(vehicleType == Type.Bike)
+        float currentTime = Time.time;
+
+        if (!vehicleCanBeDamaged || currentTime < lastDamageTime + damageCooldown || vehicleDamaged) return;
+
+        lastDamageTime = currentTime;
+
+        if (hitLayer == playerLayer || vehicleType != Type.Bike || hitCount > 0)
         {
-            rb.constraints = RigidbodyConstraints.None;
+            vehicleDamaged = true;
+
+            if (vehicleType == Type.Bike)
+            {
+                rb.constraints = RigidbodyConstraints.None;
+            }
+
+            if (NPCCharacterScript != null)
+                NPCCharacterScript.isDead = true;
+
+            Vector3 pushDirection = transform.position - hitPoint;
+            pushDirection.y += 0.5f;
+
+            rb.AddForce(pushDirection.normalized * hitForce, ForceMode.Impulse);
+
+            hitCount = 0;
         }
-        if (NPCCharacterScript != null)
-            NPCCharacterScript.isDead = true;
-        rb.AddForce(hitPoint.normalized * hitForce, ForceMode.Impulse);
-        //comment;
+        else
+        {
+            hitCount++;
+        }
+        //Comment
     }
 
     public void ResetNPC()
     {
         // Reset Rigidbody
         if (rb == null) rb = GetComponent<Rigidbody>();
+        // Reset constraints
+        rb.constraints = RigidbodyConstraints.None;
+        if (lockXRotation) rb.constraints |= RigidbodyConstraints.FreezeRotationX;
+        if (lockZRotation) rb.constraints |= RigidbodyConstraints.FreezeRotationZ;
+        if (lockYPosition) rb.constraints |= RigidbodyConstraints.FreezePositionY;
         vehicleDamaged = false;
         lastDamageTime = 0f;
+        hitCount = 0;
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         if (!reverseMechanics)
@@ -642,13 +687,8 @@ public class NPCVehicleController : MonoBehaviour
             currentMaxSpeed = maxSpeed;
             currentStopDecision = false;
             vehicleCanBeDamaged = false;
+            gameStartedSettingsInitialized = false;
         }
-
-        // Reset constraints
-        rb.constraints = RigidbodyConstraints.None;
-        if (lockXRotation) rb.constraints |= RigidbodyConstraints.FreezeRotationX;
-        if (lockZRotation) rb.constraints |= RigidbodyConstraints.FreezeRotationZ;
-        if (lockYPosition) rb.constraints |= RigidbodyConstraints.FreezePositionY;
 
         // Re-randomize speed
         speedLimit = Random.Range(minSpeed, currentMaxSpeed);
