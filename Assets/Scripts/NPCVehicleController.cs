@@ -96,7 +96,7 @@ public class NPCVehicleController : MonoBehaviour
     private float initialYPosition;
     private bool gameStartedSettingsInitialized = false;
     private int hitCount = 0;
-    private LayerMask playerLayer;
+    private int playerLayer;
 
     [Header("References")]
     private Vector3 driveTarget;              // main drive target
@@ -129,7 +129,7 @@ public class NPCVehicleController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        playerLayer = LayerMask.GetMask("Player");
+        playerLayer = LayerMask.NameToLayer("Player");
         if (NPCCharacterScript == null)
         {
             NPCCharacterScript = GetComponentInChildren<NPCCharacterScript>();
@@ -546,11 +546,12 @@ public class NPCVehicleController : MonoBehaviour
 
     void RotationCheck()
     {
-        if(transform.rotation.eulerAngles.z != 0)
+        Vector3 currentAngles = transform.rotation.eulerAngles;
+        if (Mathf.Abs(currentAngles.z) > 0.1f && Mathf.Abs(currentAngles.z) < 359.9f)
         {
-            Quaternion rotaion = transform.rotation;
-            rotaion.z = 0f;
-            transform.rotation = rotaion;
+            currentAngles.z = 0f;
+
+            transform.rotation = Quaternion.Euler(currentAngles);
         }
     }
 
@@ -625,7 +626,6 @@ public class NPCVehicleController : MonoBehaviour
         if (!vehicleCanBeDamaged || currentTime < lastDamageTime + damageCooldown || vehicleDamaged) return;
 
         lastDamageTime = currentTime;
-
         if (hitLayer == playerLayer || vehicleType != Type.Bike || hitCount > 0)
         {
             vehicleDamaged = true;
@@ -656,16 +656,19 @@ public class NPCVehicleController : MonoBehaviour
     {
         // Reset Rigidbody
         if (rb == null) rb = GetComponent<Rigidbody>();
+        rb.isKinematic = true;
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
         // Reset constraints
         rb.constraints = RigidbodyConstraints.None;
+        transform.rotation = Quaternion.Euler(0f, 180f, 0f); 
         if (lockXRotation) rb.constraints |= RigidbodyConstraints.FreezeRotationX;
         if (lockZRotation) rb.constraints |= RigidbodyConstraints.FreezeRotationZ;
         if (lockYPosition) rb.constraints |= RigidbodyConstraints.FreezePositionY;
+        rb.isKinematic = false;
         vehicleDamaged = false;
         lastDamageTime = 0f;
         hitCount = 0;
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
         if (!reverseMechanics)
         {
             vehicleBodyCollider.transform.localRotation = Quaternion.identity;
@@ -717,7 +720,6 @@ public class NPCVehicleController : MonoBehaviour
         currentAcceleration = 0f;
         isBraking = false;
         ApplyBrakes(false);
-        transform.rotation = Quaternion.Euler(0f, 180f, 0f);
     }
 
 #if UNITY_EDITOR

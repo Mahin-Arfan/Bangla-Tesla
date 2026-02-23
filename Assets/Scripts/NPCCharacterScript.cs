@@ -167,14 +167,17 @@ public class NPCCharacterScript : MonoBehaviour
             {
                 transform.rotation = Quaternion.Euler(0f, -90f, 0f);
                 crossingLeftToRight = true;
+                animator.SetInteger("RoadCrossingSide", -1);
                 raycastSideMultiplier = 1f;
             }
             else
             {
                 transform.rotation = Quaternion.Euler(0f, 90f, 0f);
                 crossingLeftToRight = false;
+                animator.SetInteger("RoadCrossingSide", 1);
                 raycastSideMultiplier = -1f;
             }
+            animator.SetBool("CrossingRoad", true);
             stateUpdated = true;
         }
         raycastTimer += Time.deltaTime;
@@ -211,11 +214,15 @@ public class NPCCharacterScript : MonoBehaviour
         {
             roadCrossing = false;
             stateUpdated = false;
+            animator.SetInteger("RoadCrossingSide", 0);
+            animator.SetBool("CrossingRoad", false);
         }
         else if (!crossingLeftToRight && transform.position.x > 7f)
         {
             roadCrossing = false;
             stateUpdated = false;
+            animator.SetInteger("RoadCrossingSide", 0);
+            animator.SetBool("CrossingRoad", false);
         }
     }
 

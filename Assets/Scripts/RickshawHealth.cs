@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class RickshawHealth : MonoBehaviour
 {
     [Header("Stats")]
+    public bool invincible = false;
     public float health = 100f;
     public float maxBattery = 100f;
     public bool isDead = false;
@@ -107,6 +108,7 @@ public class RickshawHealth : MonoBehaviour
 
     public void TakeDamage(int hitLayer, CollisionDetector.WheelPosition wheelPos)
     {
+        if(invincible || !playerRickshawController.gameStarted) return; //Temp
         if (Time.time < lastHitTime + hitCooldown || isDead) return;
 
         float damageToApply = 0f;
