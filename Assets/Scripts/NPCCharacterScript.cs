@@ -20,7 +20,6 @@ public class NPCCharacterScript : MonoBehaviour
 
     [Header("Road Cross Settings")]
     public bool roadCrossing = false;
-    public float roadCrossEnableDistance = -500f;
     public float roadCrossingProbability = 0.1f;
     public float roadCrossCheckDistance = 5f;
     public float roadCheckForwadOffset = 1f;
@@ -167,14 +166,14 @@ public class NPCCharacterScript : MonoBehaviour
             {
                 transform.rotation = Quaternion.Euler(0f, -90f, 0f);
                 crossingLeftToRight = true;
-                animator.SetInteger("RoadCrossingSide", -1);
+                animator.SetInteger("RoadCrossingSide", 1);
                 raycastSideMultiplier = 1f;
             }
             else
             {
                 transform.rotation = Quaternion.Euler(0f, 90f, 0f);
                 crossingLeftToRight = false;
-                animator.SetInteger("RoadCrossingSide", 1);
+                animator.SetInteger("RoadCrossingSide", -1);
                 raycastSideMultiplier = -1f;
             }
             animator.SetBool("CrossingRoad", true);

@@ -656,9 +656,9 @@ public class NPCVehicleController : MonoBehaviour
     {
         // Reset Rigidbody
         if (rb == null) rb = GetComponent<Rigidbody>();
-        rb.isKinematic = true;
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
+        rb.isKinematic = true;
         // Reset constraints
         rb.constraints = RigidbodyConstraints.None;
         transform.rotation = Quaternion.Euler(0f, 180f, 0f); 
