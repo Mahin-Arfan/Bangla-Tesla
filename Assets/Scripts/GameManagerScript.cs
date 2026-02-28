@@ -8,7 +8,7 @@ public class GameManagerScript : MonoBehaviour
     public static GameManagerScript Instance { get; private set; }
 
     [System.Serializable]
-    public enum Type { Truck, Bus, Car, Cng, Bike, Rickshaw, Barrier, Pedestrian}
+    public enum Type { Truck, Bus, Car, Cng, Bike, Rickshaw, Crane, Barrier, WrongSides, Pedestrian}
 
     [System.Serializable]
     public struct Road
@@ -242,27 +242,49 @@ public class GameManagerScript : MonoBehaviour
 
         bool foundFreeSpot = false;
         Vector3 spawnPos = Vector3.zero;
-        for (int i = 0; i < 6; i++)   // try 6 times max
+        if(chosenGroup.type == Type.Barrier || chosenGroup.type == Type.WrongSides)
         {
-            float spawnX = Random.Range(chosenGroup.xRange.x, chosenGroup.xRange.y);
-
-            if (gameStarted && !gameOver)
+            Debug.Log("Trying to spawn " + chosenGroup.type);
+            if (!gameStarted || gameOver) return;
+            int spawnSide = Random.value > 0.5f ? 1 : -1;
+            for (int i = 0; i < 2; i++)   // try 2 times max
             {
-                spawnPos = new Vector3(spawnX, 1f, player.transform.position.z - spawnDistance);
-            }
-            else
-            {
-                if (spawnX > 2.5f) spawnX = 2.5f;
-                spawnPos = new Vector3(spawnX, 1f, 50f);
-            }
-
-            if (!Physics.CheckBox(spawnPos, chosenGroup.spawnCheckSize, Quaternion.identity))
-            {
-                foundFreeSpot = true;
-                break;
+                spawnPos = new Vector3(5.2f * spawnSide, 1f, player.transform.position.z - spawnDistance);
+                if (!Physics.CheckBox(spawnPos, chosenGroup.spawnCheckSize, Quaternion.identity))
+                {
+                    foundFreeSpot = true;
+                    break;
+                }
+                else
+                {
+                    Debug.Log("Spot occupied for " + chosenGroup.type + " on side " + spawnSide);
+                }
+                spawnSide *= -1;
             }
         }
+        else
+        {
+            for (int i = 0; i < 6; i++)   // try 6 times max
+            {
+                float spawnX = Random.Range(chosenGroup.xRange.x, chosenGroup.xRange.y);
 
+                if (gameStarted && !gameOver)
+                {
+                    spawnPos = new Vector3(spawnX, 1f, player.transform.position.z - spawnDistance);
+                }
+                else
+                {
+                    if (spawnX > 2.5f) spawnX = 2.5f;
+                    spawnPos = new Vector3(spawnX, 1f, 50f);
+                }
+
+                if (!Physics.CheckBox(spawnPos, chosenGroup.spawnCheckSize, Quaternion.identity))
+                {
+                    foundFreeSpot = true;
+                    break;
+                }
+            }
+        }
         if (!foundFreeSpot)
         {
             return;

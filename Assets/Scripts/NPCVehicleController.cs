@@ -75,6 +75,7 @@ public class NPCVehicleController : MonoBehaviour
     public bool lockZRotation  = false;          // if true, freezes Z rotation on Rigidbody
     public bool lockYPosition = true;         // if true, freezes Y position on Rigidbody
     public bool reverseMechanics = false;
+    public bool wrongSideDriving = false;
 
     // runtime
     private Rigidbody rb;              // randomly chosen top speed (m/s)
@@ -92,22 +93,21 @@ public class NPCVehicleController : MonoBehaviour
     private Vector3 flatForward;
     private float driveToTargetDistance = 0f;
     private float driveToTargetDot = 0f;
-    private float driveToTargetCheck = 5f;
     private float initialYPosition;
     private bool gameStartedSettingsInitialized = false;
     private int hitCount = 0;
     private int playerLayer;
 
     [Header("References")]
-    private Vector3 driveTarget;              // main drive target
-    private Vector3 overtakeTarget;           // target used while overtaking
-    public NPCCharacterScript NPCCharacterScript;
     public Transform frontChecker;             // center ray origin
     public Transform frontRightChecker;        // right ray origin
     public Transform frontLeftChecker;         // left ray origin
     public Transform groundChecker;           // ground check origin
     public BoxCollider vehicleBodyCollider;    // used for sizing overtake checks
     public LayerMask vehicleLayer;             // layer mask for raycasts/CheckBox
+    private Vector3 driveTarget;              // main drive target
+    private Vector3 overtakeTarget;           // target used while overtaking
+    private NPCCharacterScript NPCCharacterScript;
 
     [Header("Wheels Setup")]
     public Wheel[] wheels;
@@ -153,7 +153,14 @@ public class NPCVehicleController : MonoBehaviour
             Vector3 requested = new Vector3(fullSize.x, 1f, fullSize.z * overTakingTendency);
             checkSize = requested * 0.5f;
         }
-        driveTarget = new Vector3(transform.position.x, transform.position.y, transform.position.z - 1000f);
+        if (!wrongSideDriving)
+        {
+            driveTarget = new Vector3(transform.position.x, transform.position.y, transform.position.z - 1000f);
+        }
+        else
+        {
+            driveTarget = new Vector3(transform.position.x, transform.position.y, transform.position.z + 1000f);
+        }
         currentDriveTarget = driveTarget;
         if (currentStopDecision)
         {
@@ -178,7 +185,6 @@ public class NPCVehicleController : MonoBehaviour
 
         lastCheckTime += Time.deltaTime;
         overTakeCheckTimer += Time.deltaTime;
-        driveToTargetCheck += Time.deltaTime;
 
         if(vehicleSpeed < 0.1f) idleTime += Time.deltaTime;
         else idleTime = 0f;
@@ -221,10 +227,6 @@ public class NPCVehicleController : MonoBehaviour
         {
             RandomStop();
         }
-        if(!isOvertaking && !stopping && driveToTargetCheck > 10f)
-        {
-            driveTarget += new Vector3(0f, 0f, -300f);
-        }
     }
 
     void FixedUpdate()
@@ -243,10 +245,6 @@ public class NPCVehicleController : MonoBehaviour
         Vector3 dirToTarget = currentDriveTarget - transform.position;
         driveToTargetDistance = dirToTarget.magnitude;
         driveToTargetDot = Vector3.Dot(transform.forward, dirToTarget.normalized);
-        if(driveToTargetCheck >= 1f && !stopping && driveToTargetDot < 0f)
-        {
-            driveTarget = new Vector3(transform.position.x, transform.position.y, transform.position.z - 1000f);
-        }
 
         vehicleSpeed = rb.linearVelocity.magnitude;
         float minimumStopDistance = isOvertaking ? 1.5f : 3f;
@@ -661,7 +659,14 @@ public class NPCVehicleController : MonoBehaviour
         rb.isKinematic = true;
         // Reset constraints
         rb.constraints = RigidbodyConstraints.None;
-        transform.rotation = Quaternion.Euler(0f, 180f, 0f); 
+        if (!wrongSideDriving)
+        {
+            transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+        }
+        else
+        {
+            transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+        }
         if (lockXRotation) rb.constraints |= RigidbodyConstraints.FreezeRotationX;
         if (lockZRotation) rb.constraints |= RigidbodyConstraints.FreezeRotationZ;
         if (lockYPosition) rb.constraints |= RigidbodyConstraints.FreezePositionY;
@@ -697,7 +702,14 @@ public class NPCVehicleController : MonoBehaviour
         speedLimit = Random.Range(minSpeed, currentMaxSpeed);
 
         // Reset drive target far ahead
-        driveTarget = new Vector3(transform.position.x, transform.position.y, transform.position.z - 1000f);
+        if (!wrongSideDriving)
+        {
+            driveTarget = new Vector3(transform.position.x, transform.position.y, transform.position.z - 1000f);
+        }
+        else
+        {
+            driveTarget = new Vector3(transform.position.x, transform.position.y, transform.position.z + 1000f);
+        }
         currentDriveTarget = driveTarget;
 
         // Reset stop system
