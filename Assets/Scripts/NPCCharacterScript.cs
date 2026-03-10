@@ -8,6 +8,7 @@ public class NPCCharacterScript : MonoBehaviour
     public bool driving = true;
     public bool walking = false;
     public bool salesman = false;
+    public bool police = false;
     public bool isDead = false;
 
     [Header("Walk Settings")]
@@ -29,6 +30,16 @@ public class NPCCharacterScript : MonoBehaviour
     private float raycastInterval = 0.2f;
     private bool cachedPathBlocked = false;
 
+    [Header("Police Settings")]
+    public float chaseDistance = 10f;
+    public float xPositionLimit = 3.4f;
+    public float xPositionOffset = 0.5f;
+    public float closestDistance = 1f;
+    public Vector3 spineRotationOffset;
+    public Transform spineTransform;
+    private bool policeChaseStart = false;
+    private Transform playerTransform;
+
     [Header("Drive Settings")]
     public int vehicleType = 0; //0: None, 1: Bike, 2: SportsBike, 3: Texi
 
@@ -45,6 +56,11 @@ public class NPCCharacterScript : MonoBehaviour
     private CollisionDetector detector;
     private BoxCollider boxCollider;
 
+    //animations hashes
+    private int policeHash = Animator.StringToHash("Police");
+    private int crossingRoadHash = Animator.StringToHash("CrossingRoad");
+    private int roadCrossingSideHash = Animator.StringToHash("RoadCrossingSide");
+
     void Awake()
     {
         animator = GetComponent<Animator>();
@@ -57,6 +73,10 @@ public class NPCCharacterScript : MonoBehaviour
         if (salesman)
         {
             salesmanParentStall = transform.parent.transform;
+        }
+        if (police)
+        {
+            playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
         }
     }
 
@@ -81,14 +101,84 @@ public class NPCCharacterScript : MonoBehaviour
                 RoadCross();
             else
                 UpdateWalking();
+        }else if (police)
+        {
+            Police();
         }
-        else if(!stateUpdated && salesman)
+        else if (!stateUpdated && salesman)
         {
             UpdateSalesman();
         }
         else if (!stateUpdated && driving)
         {
             UpdateDrivingState();
+        }
+    }
+    private void OnAnimatorIK(int layerIndex)
+    {
+        if (police && policeChaseStart && animator != null)
+        {
+            animator.SetLookAtWeight(1f, 0.6f, 0.8f, 0f, 0.5f);
+
+            animator.SetLookAtPosition(playerTransform.position);
+        }
+        else if (animator != null)
+        {
+            animator.SetLookAtWeight(0f);
+        }
+    }
+
+    void Police()
+    {
+        float zDistance = Mathf.Abs(transform.position.z - playerTransform.position.z);
+        if (zDistance <= chaseDistance)
+        {
+            if (!policeChaseStart)
+            {
+                animator.SetBool(policeHash, true);
+                policeChaseStart = true;
+            }
+            if (zDistance > closestDistance)
+            {
+                float targetX = playerTransform.position.x;
+                if (transform.position.x >= 0)
+                {
+                    targetX = Mathf.Clamp(targetX, xPositionLimit, 6f);
+                }
+                else
+                {
+                    targetX = Mathf.Clamp(targetX, -6f, -xPositionLimit);
+                }
+                float currentX = transform.position.x;
+                if (Mathf.Abs(targetX - currentX) > xPositionOffset)
+                {
+                    float newX = Mathf.MoveTowards(currentX, targetX, walkSpeed * Time.deltaTime);
+                    Vector3 newPos = transform.position;
+                    newPos.x = newX;
+                    transform.position = newPos;
+
+                    if (targetX > currentX)
+                    {
+                        animator.SetInteger(roadCrossingSideHash, 1);
+                    }
+                    else
+                    {
+                        animator.SetInteger(roadCrossingSideHash, -1);
+                    }
+                }
+                else
+                {
+                    animator.SetInteger(roadCrossingSideHash, 0);
+                }
+            }
+            else
+            {
+                if (!stateUpdated)
+                {
+                    animator.SetBool(crossingRoadHash, true);
+                    stateUpdated = true;
+                }
+            }
         }
     }
 
@@ -166,17 +256,17 @@ public class NPCCharacterScript : MonoBehaviour
             {
                 transform.rotation = Quaternion.Euler(0f, -90f, 0f);
                 crossingLeftToRight = true;
-                animator.SetInteger("RoadCrossingSide", 1);
+                animator.SetInteger(roadCrossingSideHash, 1);
                 raycastSideMultiplier = 1f;
             }
             else
             {
                 transform.rotation = Quaternion.Euler(0f, 90f, 0f);
                 crossingLeftToRight = false;
-                animator.SetInteger("RoadCrossingSide", -1);
+                animator.SetInteger(roadCrossingSideHash, -1);
                 raycastSideMultiplier = -1f;
             }
-            animator.SetBool("CrossingRoad", true);
+            animator.SetBool(crossingRoadHash, true);
             stateUpdated = true;
         }
         raycastTimer += Time.deltaTime;
@@ -213,15 +303,15 @@ public class NPCCharacterScript : MonoBehaviour
         {
             roadCrossing = false;
             stateUpdated = false;
-            animator.SetInteger("RoadCrossingSide", 0);
-            animator.SetBool("CrossingRoad", false);
+            animator.SetInteger(roadCrossingSideHash, 0);
+            animator.SetBool(crossingRoadHash, false);
         }
         else if (!crossingLeftToRight && transform.position.x > 7f)
         {
             roadCrossing = false;
             stateUpdated = false;
-            animator.SetInteger("RoadCrossingSide", 0);
-            animator.SetBool("CrossingRoad", false);
+            animator.SetInteger(roadCrossingSideHash, 0);
+            animator.SetBool(crossingRoadHash, false);
         }
     }
 
@@ -291,6 +381,19 @@ public class NPCCharacterScript : MonoBehaviour
             {
                 roadCrossing = false;
             }
+        }
+        else if(police)
+        {
+            if (detector != null)
+            {
+                detector.enabled = true;
+                detector.pedestrian = true;
+                detector.npcCharacterScript = this;
+            }
+            if (boxCollider != null) boxCollider.enabled = true;
+            if (npcTriggerCollider != null) npcTriggerCollider.enabled = true;
+            hitPoint = Vector3.zero;
+            policeChaseStart = false;
         }
         else if (salesman)
         {
