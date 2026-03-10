@@ -47,7 +47,7 @@ public class PlayerRickshawController : MonoBehaviour
     private Vector3 steerHandleLeft = new Vector3(-42f, -20f, 28f);
     private Vector3 steerHandleNeutral = new Vector3(0.733f, 0.137f, 21.114f);
     private Vector3 steerHandleRight = new Vector3(42f, 20f, 28f);
-    float fullSteerX = 3.5f;
+    float fullSteerX = 4.5f;
     float zeroSteerX = 5.3f;
     float animSteer;
     private float sideCheckTimer = 0f;
@@ -86,12 +86,41 @@ public class PlayerRickshawController : MonoBehaviour
         else
             horizontalInput = Mathf.Lerp(horizontalInput, 0f, Time.deltaTime * steerSpeed);
 
-        //float rawTilt = Input.acceleration.x;
-        //horizontalInput = Mathf.Clamp(rawTilt * tiltSensitivity, -1f, 1f);
 #if UNITY_EDITOR
-        //horizontalInput = Input.GetAxis("Horizontal");
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            BoostButtonDown();
+        }
+        if(Input.GetKeyUp(KeyCode.W))
+        {
+            BoostButtonUp();
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            BreakButtonDown();
+        }
+        if (Input.GetKeyUp(KeyCode.S))
+        {
+            BreakButtonUp();
+        }
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            LeftButtonDown();
+        }
+        if (Input.GetKeyUp(KeyCode.A))
+        {
+            LeftButtonUp();
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            RightButtonDown();
+        }
+        if (Input.GetKeyUp(KeyCode.D))
+        {
+            RightButtonUp();
+        }
+
 #endif
-        //ReadTouchInput();
         HandleBraking();
         UpdateSteerHandle(animSteer);
         sideCheckTimer += Time.deltaTime;
@@ -104,33 +133,6 @@ public class PlayerRickshawController : MonoBehaviour
         ApplyForwardMovement();
         Steer();
     }
-    /*
-    void ReadTouchInput()
-    {
-        brakePressed = false;
-        boostPressed = false;
-
-        foreach (var t in Touch.activeTouches)
-        {
-            if (t.phase == TouchPhase.Began ||
-                t.phase == TouchPhase.Moved ||
-                t.phase == TouchPhase.Stationary)
-            {
-                if (t.screenPosition.x < Screen.width * 0.5f)
-                    brakePressed = true;   // LEFT
-                else
-                    boostPressed = true;   // RIGHT
-            }
-        }
-
-#if UNITY_EDITOR
-        if (Keyboard.current.sKey.isPressed)
-            brakePressed = true;
-        if (Keyboard.current.wKey.isPressed)
-            boostPressed = true;
-#endif
-    }
-    */
     public void LeftButtonDown() { leftPressed = true; }
     public void LeftButtonUp() { leftPressed = false; }
     public void RightButtonDown() { rightPressed = true; }

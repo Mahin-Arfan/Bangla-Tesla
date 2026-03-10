@@ -392,6 +392,14 @@ public class NPCCharacterScript : MonoBehaviour
             }
             if (boxCollider != null) boxCollider.enabled = true;
             if (npcTriggerCollider != null) npcTriggerCollider.enabled = true;
+            if(transform.position.x > 0f)
+            {
+                transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+            }
+            else
+            {
+                transform.rotation = Quaternion.Euler(-90f, 180f, 0f);
+            }
             hitPoint = Vector3.zero;
             policeChaseStart = false;
         }

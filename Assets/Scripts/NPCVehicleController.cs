@@ -97,6 +97,7 @@ public class NPCVehicleController : MonoBehaviour
     private bool gameStartedSettingsInitialized = false;
     private int hitCount = 0;
     private int playerLayer;
+    private float recycleTimer = 0f;
 
     [Header("References")]
     public Transform frontChecker;             // center ray origin
@@ -108,6 +109,7 @@ public class NPCVehicleController : MonoBehaviour
     private Vector3 driveTarget;              // main drive target
     private Vector3 overtakeTarget;           // target used while overtaking
     private NPCCharacterScript NPCCharacterScript;
+    private Transform playerTransform;
 
     [Header("Wheels Setup")]
     public Wheel[] wheels;
@@ -130,6 +132,7 @@ public class NPCVehicleController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         playerLayer = LayerMask.NameToLayer("Player");
+        playerTransform = GameManagerScript.Instance.player.transform;
         if (NPCCharacterScript == null)
         {
             NPCCharacterScript = GetComponentInChildren<NPCCharacterScript>();
@@ -170,6 +173,12 @@ public class NPCVehicleController : MonoBehaviour
 
     void Update()
     {
+        recycleTimer += Time.deltaTime;
+        if (recycleTimer > 0.25f)
+        {
+            CheckIfShouldRecycle();
+            recycleTimer = 0f;
+        }
         UpdateWheelModels();
         if (vehicleDamaged) 
         {
@@ -732,6 +741,45 @@ public class NPCVehicleController : MonoBehaviour
         currentAcceleration = 0f;
         isBraking = false;
         ApplyBrakes(false);
+    }
+
+    void CheckIfShouldRecycle()
+    {
+        Vector3 playerPos = playerTransform.position;
+        Vector3 vPos = transform.position;
+
+        //Pre-game logic
+        if (!GameManagerScript.Instance.gameStarted)
+        {
+            if (idleTime > 10f)
+            {
+                GameManagerScript.Instance.RecycleSingleVehicle(gameObject);
+                return;
+            }
+            if (vPos.x > 2.5f && vPos.z > 17f)
+            {
+                GameManagerScript.Instance.RecycleSingleVehicle(gameObject);
+                return;
+            }
+        }
+
+        //Normal gameplay limits
+        bool outOfZRange = Mathf.Abs(vPos.z - playerPos.z) > GameManagerScript.Instance.vehicleRecycleDistance;
+        bool outOfYRange = vPos.y > 3f || vPos.y < -3f;
+        bool rotatedWrong = false;
+        if (wrongSideDriving)
+        {
+            rotatedWrong = Vector3.Angle(transform.forward, Vector3.back) < 100f;
+        }
+        else
+        {
+            rotatedWrong = Vector3.Angle(transform.forward, Vector3.forward) < 100f;
+        }
+        //Trigger Recycle
+        if (outOfZRange || outOfYRange || rotatedWrong)
+        {
+            GameManagerScript.Instance.RecycleSingleVehicle(gameObject);
+        }
     }
 
 #if UNITY_EDITOR

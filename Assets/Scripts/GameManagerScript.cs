@@ -161,7 +161,7 @@ public class GameManagerScript : MonoBehaviour
         recycleTimer += Time.deltaTime;
         if (recycleTimer > 0.25f)
         {
-            RecycleOldVehicles();
+            //RecycleOldVehicles(); //temp
             recycleTimer = 0f;
         }
         if (gameStarted && !gameInitiaded)
@@ -244,7 +244,6 @@ public class GameManagerScript : MonoBehaviour
         Vector3 spawnPos = Vector3.zero;
         if(chosenGroup.type == Type.Barrier || chosenGroup.type == Type.WrongSides)
         {
-            Debug.Log("Trying to spawn " + chosenGroup.type);
             if (!gameStarted || gameOver) return;
             int spawnSide = Random.value > 0.5f ? 1 : -1;
             for (int i = 0; i < 2; i++)   // try 2 times max
@@ -254,10 +253,6 @@ public class GameManagerScript : MonoBehaviour
                 {
                     foundFreeSpot = true;
                     break;
-                }
-                else
-                {
-                    Debug.Log("Spot occupied for " + chosenGroup.type + " on side " + spawnSide);
                 }
                 spawnSide *= -1;
             }
@@ -275,7 +270,7 @@ public class GameManagerScript : MonoBehaviour
                 else
                 {
                     if (spawnX > 2.5f) spawnX = 2.5f;
-                    spawnPos = new Vector3(spawnX, 1f, 50f);
+                    spawnPos = new Vector3(spawnX, 1f, 30f);
                 }
 
                 if (!Physics.CheckBox(spawnPos, chosenGroup.spawnCheckSize, Quaternion.identity))
@@ -295,6 +290,18 @@ public class GameManagerScript : MonoBehaviour
 
         GameObject vehicle = GetFromPool(chosenVehicle);
 
+        if(chosenGroup.type == Type.Barrier)
+        {
+            spawnPos.y = 0f;
+            if (spawnPos.x > 0)
+            {
+                vehicle.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
+            }
+            else
+            {
+                vehicle.transform.rotation = Quaternion.Euler(-90f, 180f, 0f);
+            }
+        }
         vehicle.transform.position = spawnPos;
         vehicle.SetActive(true);
         activeVehicles[vehicle] = chosenGroup.type;
@@ -387,7 +394,15 @@ public class GameManagerScript : MonoBehaviour
         prefabPool[prefab].Enqueue(obj);
     }
 
-
+    public void RecycleSingleVehicle(GameObject vehicleToRecycle)
+    {
+        if (activeVehicles.ContainsKey(vehicleToRecycle))
+        {
+            ReturnToPool(vehicleToRecycle);
+            activeVehicles.Remove(vehicleToRecycle);
+        }
+    }
+    /*
     void RecycleOldVehicles()
     {
         toRecycle.Clear();
@@ -456,6 +471,7 @@ public class GameManagerScript : MonoBehaviour
             activePedestrians.Remove(p);
         }
     }
+    */
 
     void ReturnToPool(GameObject obj)
     {

@@ -1957,6 +1957,7 @@ MonoBehaviour:
   driving: 1
   walking: 0
   salesman: 0
+  police: 0
   isDead: 0
   walkSpeed: 2
   detectionDistance: 1.5
@@ -1969,6 +1970,12 @@ MonoBehaviour:
   roadCrossingProbability: 0.1
   roadCrossCheckDistance: 5
   roadCheckForwadOffset: 1
+  chaseDistance: 10
+  xPositionLimit: 3.4
+  xPositionOffset: 0.5
+  closestDistance: 1
+  spineRotationOffset: {x: 0, y: 0, z: 0}
+  spineTransform: {fileID: 0}
   vehicleType: 2
   nPCVehicleController: {fileID: 935475964192472878}
   bodyColliders:
@@ -2923,7 +2930,7 @@ MonoBehaviour:
   damageCooldown: 1
   damagedStopDuration: 100
   hitForce: 1000
-  tryOvertake: 1
+  tryOvertake: 0
   frontCheckerDistance: 20
   overTakeSideClearance: 1
   overTakeSideClearanceY: 0.75
@@ -2931,7 +2938,7 @@ MonoBehaviour:
   checkInterval: 0.2
   overTakingTendency: 3
   overTakeCompleteDisctance: 3
-  randomStops: 1
+  randomStops: 0
   currentStopDecision: 0
   stopPositionX: 5
   stopDuration: 5
