@@ -174,7 +174,7 @@ public class NPCVehicleController : MonoBehaviour
     void Update()
     {
         recycleTimer += Time.deltaTime;
-        if (recycleTimer > 0.25f)
+        if (recycleTimer > 0.5f)
         {
             CheckIfShouldRecycle();
             recycleTimer = 0f;

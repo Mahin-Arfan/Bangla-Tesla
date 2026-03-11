@@ -55,6 +55,7 @@ public class NPCCharacterScript : MonoBehaviour
     private Transform salesmanParentStall;
     private CollisionDetector detector;
     private BoxCollider boxCollider;
+    private float recycleTimer = 0f;
 
     //animations hashes
     private int policeHash = Animator.StringToHash("Police");
@@ -64,7 +65,7 @@ public class NPCCharacterScript : MonoBehaviour
     void Awake()
     {
         animator = GetComponent<Animator>();
-
+        playerTransform = GameManagerScript.Instance.player.transform;
         if (!driving)
         {
             detector = GetComponent<CollisionDetector>();
@@ -73,10 +74,6 @@ public class NPCCharacterScript : MonoBehaviour
         if (salesman)
         {
             salesmanParentStall = transform.parent.transform;
-        }
-        if (police)
-        {
-            playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
         }
     }
 
@@ -87,7 +84,13 @@ public class NPCCharacterScript : MonoBehaviour
 
     void Update()
     {
-        if(rigidBodyActivated) return;
+        recycleTimer += Time.deltaTime;
+        if (recycleTimer > 0.5f && !police)
+        {
+            CheckIfShouldRecycle();
+            recycleTimer = 0f;
+        }
+        if (rigidBodyActivated) return;
 
         if(isDead && !rigidBodyActivated && vehicleType != 3)
         {
@@ -392,14 +395,7 @@ public class NPCCharacterScript : MonoBehaviour
             }
             if (boxCollider != null) boxCollider.enabled = true;
             if (npcTriggerCollider != null) npcTriggerCollider.enabled = true;
-            if(transform.position.x > 0f)
-            {
-                transform.rotation = Quaternion.Euler(90f, 0f, 0f);
-            }
-            else
-            {
-                transform.rotation = Quaternion.Euler(-90f, 180f, 0f);
-            }
+            transform.rotation = Quaternion.identity;
             hitPoint = Vector3.zero;
             policeChaseStart = false;
         }
@@ -411,6 +407,31 @@ public class NPCCharacterScript : MonoBehaviour
             if (boxCollider != null) boxCollider.enabled = true;
             if (npcTriggerCollider != null) npcTriggerCollider.enabled = true;
             hitPoint = Vector3.zero;
+        }
+    }
+
+    void CheckIfShouldRecycle()
+    {
+        Vector3 playerPos = playerTransform.position;
+        Vector3 cPos = transform.position;
+        bool outOfZRange = false;
+
+        //Pre-game logic
+        if (!GameManagerScript.Instance.gameStarted)
+        {
+            outOfZRange = Mathf.Abs(cPos.z - playerPos.z) > GameManagerScript.Instance.pedestrianRecycleDistance;
+        }
+        else
+        {
+            outOfZRange = cPos.z - playerPos.z > 5f;
+        }
+        //Trigger Recycle
+        if (outOfZRange)
+        {
+            if(salesman)
+                GameManagerScript.Instance.RecycleSinglePedestrian(salesmanParentStall.gameObject);
+            else
+                GameManagerScript.Instance.RecycleSinglePedestrian(gameObject);
         }
     }
 }

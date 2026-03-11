@@ -402,76 +402,15 @@ public class GameManagerScript : MonoBehaviour
             activeVehicles.Remove(vehicleToRecycle);
         }
     }
-    /*
-    void RecycleOldVehicles()
+
+    public void RecycleSinglePedestrian(GameObject pedestrianToRecycle)
     {
-        toRecycle.Clear();
-        Vector3 playerPos = player.transform.position;
-
-        foreach (var pair in activeVehicles) // For Vehicles
+        if (activePedestrians.ContainsKey(pedestrianToRecycle))
         {
-            GameObject v = pair.Key;
-
-            if (!v.activeSelf) continue;
-
-            Vector3 vPos = v.transform.position;
-            
-            if (!gameStarted)
-            {
-                NPCVehicleController npcScript = v.GetComponent<PooledVehicle>().controller;
-                if (npcScript != null)
-                {
-                    if (npcScript.idleTime > 10f)
-                    {
-                        toRecycle.Add(v);
-                        continue;
-                    }
-                }
-                if (vPos.x > 2.5f && vPos.z > 17f)
-                {
-                    toRecycle.Add(v);
-                    continue;
-                }
-            }
-
-            bool outOfZRange = Mathf.Abs(vPos.z - playerPos.z) > vehicleRecycleDistance;
-            bool outOfYRange = vPos.y > 3f || vPos.y < -3f;
-            bool rotatedWrong = Vector3.Angle(v.transform.forward, Vector3.forward) < 100f;
-
-            if (outOfZRange || outOfYRange || rotatedWrong)
-            {
-                toRecycle.Add(v);
-            }
-        }
-
-        foreach (GameObject v in toRecycle)
-        {
-            ReturnToPool(v);
-            activeVehicles.Remove(v);
-        }
-        toRecycle.Clear();
-
-        foreach (var pair in activePedestrians) //For Pedestrians
-        {
-            GameObject p = pair.Key;
-            if (!p.activeSelf) continue;
-
-            bool outOfZRange = Mathf.Abs(p.transform.position.z - playerPos.z) > pedestrianRecycleDistance;
-
-            if (outOfZRange)
-            {
-                toRecycle.Add(p);
-            }
-        }
-
-        // Apply Pedestrian Recycle
-        foreach (GameObject p in toRecycle)
-        {
-            ReturnToPool(p);
-            activePedestrians.Remove(p);
+            ReturnToPool(pedestrianToRecycle);
+            activePedestrians.Remove(pedestrianToRecycle);
         }
     }
-    */
 
     void ReturnToPool(GameObject obj)
     {
