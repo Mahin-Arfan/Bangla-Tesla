@@ -77,6 +77,11 @@ public class NPCVehicleController : MonoBehaviour
     public bool reverseMechanics = false;
     public bool wrongSideDriving = false;
 
+    [Header("Engine Audio")]
+    public AudioClip engineClip;
+    private AudioSource myEngineSound;
+    private float audioTriggerDistance = 35f;
+
     // runtime
     private Rigidbody rb;              // randomly chosen top speed (m/s)
     private float currentAcceleration;         // smoothed acceleration value
@@ -123,8 +128,9 @@ public class NPCVehicleController : MonoBehaviour
     private Vector3 rightSideCheckGizmoPos;
     private Vector3 leftSideCheckGizmoPos;
 
-    private void OnEnable()
+    void OnEnable()
     {
+        InvokeRepeating(nameof(HandleEngineAudio), 0.5f, 1f);
         ResetNPC();
     }
 
@@ -741,6 +747,13 @@ public class NPCVehicleController : MonoBehaviour
         currentAcceleration = 0f;
         isBraking = false;
         ApplyBrakes(false);
+
+        //Reset Audio
+        if (myEngineSound != null)
+        {
+            AudioManager.Instance.ReturnAudioSource(myEngineSound);
+            myEngineSound = null;
+        }
     }
 
     void CheckIfShouldRecycle()
@@ -753,11 +766,21 @@ public class NPCVehicleController : MonoBehaviour
         {
             if (idleTime > 10f)
             {
+                if (myEngineSound != null)
+                {
+                    AudioManager.Instance.ReturnAudioSource(myEngineSound);
+                    myEngineSound = null;
+                }
                 GameManagerScript.Instance.RecycleSingleVehicle(gameObject);
                 return;
             }
             if (vPos.x > 2.5f && vPos.z > 17f)
             {
+                if (myEngineSound != null)
+                {
+                    AudioManager.Instance.ReturnAudioSource(myEngineSound);
+                    myEngineSound = null;
+                }
                 GameManagerScript.Instance.RecycleSingleVehicle(gameObject);
                 return;
             }
@@ -778,7 +801,29 @@ public class NPCVehicleController : MonoBehaviour
         //Trigger Recycle
         if (outOfZRange || outOfYRange || rotatedWrong)
         {
+            if (myEngineSound != null)
+            {
+                AudioManager.Instance.ReturnAudioSource(myEngineSound);
+                myEngineSound = null;
+            }
             GameManagerScript.Instance.RecycleSingleVehicle(gameObject);
+        }
+    }
+
+    void HandleEngineAudio()
+    {
+        // Distance Check
+        float zDistance = Mathf.Abs(transform.position.z - playerTransform.position.z);
+
+        // Request sound if close enough
+        if (zDistance <= audioTriggerDistance && myEngineSound == null)
+        {
+            myEngineSound = AudioManager.Instance.RequestEngineAudio(engineClip, transform);
+        }
+        else if (zDistance > audioTriggerDistance && myEngineSound != null)
+        {
+            AudioManager.Instance.ReturnAudioSource(myEngineSound);
+            myEngineSound = null;
         }
     }
 

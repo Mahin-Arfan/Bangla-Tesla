@@ -1957,6 +1957,7 @@ MonoBehaviour:
   driving: 1
   walking: 0
   salesman: 0
+  police: 0
   isDead: 0
   walkSpeed: 2
   detectionDistance: 1.5
@@ -1966,10 +1967,15 @@ MonoBehaviour:
   hitForce: 150
   hitPoint: {x: 0, y: 0, z: 0}
   roadCrossing: 0
-  roadCrossEnableDistance: -500
   roadCrossingProbability: 0.1
   roadCrossCheckDistance: 5
   roadCheckForwadOffset: 1
+  chaseDistance: 10
+  xPositionLimit: 3.4
+  xPositionOffset: 0.5
+  closestDistance: 1
+  spineRotationOffset: {x: 0, y: 0, z: 0}
+  spineTransform: {fileID: 0}
   vehicleType: 2
   nPCVehicleController: {fileID: 935475964192472878}
   bodyColliders:
@@ -2944,7 +2950,8 @@ MonoBehaviour:
   lockZRotation: 1
   lockYPosition: 0
   reverseMechanics: 0
-  NPCCharacterScript: {fileID: 0}
+  wrongSideDriving: 0
+  engineClip: {fileID: 8300000, guid: 125a98fad3264fb47b739755b414af0d, type: 3}
   frontChecker: {fileID: 4004249463670927986}
   frontRightChecker: {fileID: 4569156283574617839}
   frontLeftChecker: {fileID: 9080988606022894807}
