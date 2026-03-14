@@ -79,6 +79,8 @@ public class NPCVehicleController : MonoBehaviour
 
     [Header("Engine Audio")]
     public AudioClip engineClip;
+    public float minPitch = 0.8f;
+    public float maxPitch = 1.2f;
     private AudioSource myEngineSound;
     private float audioTriggerDistance = 35f;
 
@@ -133,7 +135,15 @@ public class NPCVehicleController : MonoBehaviour
         InvokeRepeating(nameof(HandleEngineAudio), 0.5f, 1f);
         ResetNPC();
     }
-
+    private void OnDisable()
+    {
+        CancelInvoke(nameof(HandleEngineAudio));
+        if (myEngineSound != null)
+        {
+            AudioManager.Instance.ReturnAudioSource(myEngineSound);
+            myEngineSound = null;
+        }
+    }
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -185,6 +195,7 @@ public class NPCVehicleController : MonoBehaviour
             CheckIfShouldRecycle();
             recycleTimer = 0f;
         }
+        if (myEngineSound != null)  HandleEngineAudioPitch();
         UpdateWheelModels();
         if (vehicleDamaged) 
         {
@@ -766,21 +777,11 @@ public class NPCVehicleController : MonoBehaviour
         {
             if (idleTime > 10f)
             {
-                if (myEngineSound != null)
-                {
-                    AudioManager.Instance.ReturnAudioSource(myEngineSound);
-                    myEngineSound = null;
-                }
                 GameManagerScript.Instance.RecycleSingleVehicle(gameObject);
                 return;
             }
             if (vPos.x > 2.5f && vPos.z > 17f)
             {
-                if (myEngineSound != null)
-                {
-                    AudioManager.Instance.ReturnAudioSource(myEngineSound);
-                    myEngineSound = null;
-                }
                 GameManagerScript.Instance.RecycleSingleVehicle(gameObject);
                 return;
             }
@@ -801,11 +802,6 @@ public class NPCVehicleController : MonoBehaviour
         //Trigger Recycle
         if (outOfZRange || outOfYRange || rotatedWrong)
         {
-            if (myEngineSound != null)
-            {
-                AudioManager.Instance.ReturnAudioSource(myEngineSound);
-                myEngineSound = null;
-            }
             GameManagerScript.Instance.RecycleSingleVehicle(gameObject);
         }
     }
@@ -825,6 +821,12 @@ public class NPCVehicleController : MonoBehaviour
             AudioManager.Instance.ReturnAudioSource(myEngineSound);
             myEngineSound = null;
         }
+    }
+
+    void HandleEngineAudioPitch()
+    {
+        float speedPercentage = Mathf.InverseLerp(minSpeed, speedLimit, vehicleSpeed);
+        myEngineSound.pitch = Mathf.Lerp(minPitch, maxPitch, speedPercentage);
     }
 
 #if UNITY_EDITOR
