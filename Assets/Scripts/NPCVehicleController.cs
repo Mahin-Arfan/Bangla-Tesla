@@ -82,7 +82,7 @@ public class NPCVehicleController : MonoBehaviour
     public float minPitch = 0.8f;
     public float maxPitch = 1.2f;
     private AudioSource myEngineSound;
-    private float audioTriggerDistance = 35f;
+    private float audioTriggerDistance;
 
     // runtime
     private Rigidbody rb;              // randomly chosen top speed (m/s)
@@ -135,20 +135,16 @@ public class NPCVehicleController : MonoBehaviour
         InvokeRepeating(nameof(HandleEngineAudio), 0.5f, 1f);
         ResetNPC();
     }
-    private void OnDisable()
+    void OnDisable()
     {
         CancelInvoke(nameof(HandleEngineAudio));
-        if (myEngineSound != null)
-        {
-            AudioManager.Instance.ReturnAudioSource(myEngineSound);
-            myEngineSound = null;
-        }
     }
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         playerLayer = LayerMask.NameToLayer("Player");
         playerTransform = GameManagerScript.Instance.player.transform;
+        audioTriggerDistance = AudioManager.Instance.audioTriggerDistance;
         if (NPCCharacterScript == null)
         {
             NPCCharacterScript = GetComponentInChildren<NPCCharacterScript>();
@@ -775,13 +771,9 @@ public class NPCVehicleController : MonoBehaviour
         //Pre-game logic
         if (!GameManagerScript.Instance.gameStarted)
         {
-            if (idleTime > 10f)
+            if (idleTime > 10f || (vPos.x > 2.5f && vPos.z > 17f))
             {
-                GameManagerScript.Instance.RecycleSingleVehicle(gameObject);
-                return;
-            }
-            if (vPos.x > 2.5f && vPos.z > 17f)
-            {
+                ReleaseEngineAudio();
                 GameManagerScript.Instance.RecycleSingleVehicle(gameObject);
                 return;
             }
@@ -802,6 +794,7 @@ public class NPCVehicleController : MonoBehaviour
         //Trigger Recycle
         if (outOfZRange || outOfYRange || rotatedWrong)
         {
+            ReleaseEngineAudio();
             GameManagerScript.Instance.RecycleSingleVehicle(gameObject);
         }
     }
@@ -825,8 +818,16 @@ public class NPCVehicleController : MonoBehaviour
 
     void HandleEngineAudioPitch()
     {
-        float speedPercentage = Mathf.InverseLerp(minSpeed, speedLimit, vehicleSpeed);
+        float speedPercentage = Mathf.InverseLerp(minSpeed, maxSpeed, vehicleSpeed);
         myEngineSound.pitch = Mathf.Lerp(minPitch, maxPitch, speedPercentage);
+    }
+    void ReleaseEngineAudio()
+    {
+        if (myEngineSound != null && AudioManager.Instance != null)
+        {
+            AudioManager.Instance.ReturnAudioSource(myEngineSound);
+            myEngineSound = null;
+        }
     }
 
 #if UNITY_EDITOR

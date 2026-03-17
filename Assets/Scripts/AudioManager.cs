@@ -10,9 +10,11 @@ public class AudioManager : MonoBehaviour
     public int poolSize = 15;
     private List<AudioSource> audioPool = new List<AudioSource>();
 
-    [Header("Crash Throttling")]
+    [Header("Sound Settings")]
     [Tooltip("Prevents multiple loud crashes playing on the exact same frame")]
+    public float audioTriggerDistance = 20f;
     public float crashCooldown = 0.2f;
+    public float sourceMaxDistance = 15f;
     private float lastCrashTime;
 
     void Awake()
@@ -41,7 +43,7 @@ public class AudioManager : MonoBehaviour
             source.spatialBlend = 1f;
             source.rolloffMode = AudioRolloffMode.Linear;
             source.minDistance = 0.5f;
-            source.maxDistance = 10f;
+            source.maxDistance = sourceMaxDistance;
 
             audioPool.Add(source);
         }
