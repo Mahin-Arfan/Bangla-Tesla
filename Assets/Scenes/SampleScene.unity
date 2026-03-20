@@ -1120,7 +1120,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poolSize: 15
+  audioTriggerDistance: 20
   crashCooldown: 0.2
+  sourceMaxDistance: 15
 --- !u!1001 &1335700157
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4349,6 +4351,10 @@ PrefabInstance:
     - target: {fileID: 1307587833961996349, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
       propertyPath: vehicleGroups.Array.data[3].maxBonusWeight
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1307587833961996349, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
+      propertyPath: vehicleGroups.Array.data[5].maxBonusWeight
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1307587833961996349, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
       propertyPath: vehicleGroups.Array.data[6].maxBonusWeight

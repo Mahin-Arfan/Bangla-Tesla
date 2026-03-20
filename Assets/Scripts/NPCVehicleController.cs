@@ -79,6 +79,8 @@ public class NPCVehicleController : MonoBehaviour
 
     [Header("Engine Audio")]
     public AudioClip engineClip;
+    [Range(0, 100)]
+    public float volume = 100f;
     public float minPitch = 0.8f;
     public float maxPitch = 1.2f;
     private AudioSource myEngineSound;

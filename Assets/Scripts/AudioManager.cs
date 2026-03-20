@@ -58,7 +58,7 @@ public class AudioManager : MonoBehaviour
         return null;
     }
 
-    public void Play2DCrash(AudioClip clip, Vector3 position)
+    public void PlayCrash(AudioClip clip, Vector3 position)
     {
         if (clip == null || Time.time < lastCrashTime + crashCooldown) return;
 
