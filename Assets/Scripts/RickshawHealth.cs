@@ -61,11 +61,16 @@ public class RickshawHealth : MonoBehaviour
     private Rigidbody baseRigidbody;
     private Rigidbody leftWheelRigidbody;
     private Rigidbody rightWheelRigidbody;
+    private Rigidbody rb;
+    int pedestrianHitScore = 150;
+    int bikeHitScore = 100;
+    int vehicleHitScore = 50;
 
     void Start()
     {
         gameManagerScript = GameManagerScript.Instance;
         cameraScript = GetComponent<CameraScript>();
+        rb = GetComponent<Rigidbody>();
         playerRickshawController = GetComponent<PlayerRickshawController>();
         frontWheelBoxCollider = frontWheelCollider.GetComponent<BoxCollider>();
         baseBoxCollider = baseCollider.GetComponent<BoxCollider>();
@@ -79,6 +84,9 @@ public class RickshawHealth : MonoBehaviour
         rightWheelRigidbody = rightWheelTransform.GetComponent<Rigidbody>();
         currentBattery = maxBattery;
         drainCoefficient = maxBattery / initialRangeInMeters;
+        pedestrianHitScore = gameManagerScript.pedestrianHitScore;
+        bikeHitScore = gameManagerScript.bikeHitScore;
+        vehicleHitScore = gameManagerScript.vehicleHitScore;
     }
 
     void Update()
@@ -108,9 +116,10 @@ public class RickshawHealth : MonoBehaviour
 
     public void TakeDamage(int hitLayer, CollisionDetector.WheelPosition wheelPos)
     {
-        if(invincible || !playerRickshawController.gameStarted) return; //Temp
-        if (Time.time < lastHitTime + hitCooldown || isDead) return;
+        if(invincible) return; //Temp
+        if (Time.time < lastHitTime + hitCooldown || isDead || !playerRickshawController.gameStarted) return;
 
+        AudioManager.Instance.PlayCrash(transform.position);
         float damageToApply = 0f;
 
         if (wheelPos == CollisionDetector.WheelPosition.Front)
@@ -118,14 +127,17 @@ public class RickshawHealth : MonoBehaviour
             if (((1 << hitLayer) & pedestrianLayer) != 0)
             {
                 damageToApply = 20f;
+                gameManagerScript.AddScore(pedestrianHitScore);
             }
             else if (((1 << hitLayer) & BikeLayer) != 0)
             {
                 damageToApply = 50f;
+                gameManagerScript.AddScore(bikeHitScore);
             }
             else
             {
                 damageToApply = 100f;
+                gameManagerScript.AddScore(vehicleHitScore);
             }
         }
         else
@@ -133,10 +145,17 @@ public class RickshawHealth : MonoBehaviour
             if (((1 << hitLayer) & pedestrianLayer) != 0)
             {
                 damageToApply = 10f;
+                gameManagerScript.AddScore(pedestrianHitScore);
+            }
+            else if (((1 << hitLayer) & BikeLayer) != 0)
+            {
+                damageToApply = 15f;
+                gameManagerScript.AddScore(bikeHitScore);
             }
             else
             {
                 damageToApply = 20f;
+                gameManagerScript.AddScore(vehicleHitScore);
             }
 
             if (wheelPos == CollisionDetector.WheelPosition.Left)
@@ -150,8 +169,6 @@ public class RickshawHealth : MonoBehaviour
                 rightWheelHealth -= damageToApply;
             }
         }
-        Debug.Log("Damage Applied: " + damageToApply);
-
         health -= damageToApply;
         lastHitTime = Time.time;
 
@@ -225,6 +242,9 @@ public class RickshawHealth : MonoBehaviour
     void Die()
     {
         isDead = true;
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.isKinematic = true;
         gameManagerScript.gameOver = true;
         colliders.SetActive(false);
         playerRickshawController.enabled = false;

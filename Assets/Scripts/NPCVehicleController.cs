@@ -39,6 +39,8 @@ public class NPCVehicleController : MonoBehaviour
     public float damageCooldown = 1f;
     public float damagedStopDuration = 0f;
     public float hitForce = 500f;
+    public GameObject bikeCollider;
+    public GameObject bikeDeadCollider;
 
     [Header("Obstacle & Overtake")]
     public bool tryOvertake = true;
@@ -79,8 +81,6 @@ public class NPCVehicleController : MonoBehaviour
 
     [Header("Engine Audio")]
     public AudioClip engineClip;
-    [Range(0, 100)]
-    public float volume = 100f;
     public float minPitch = 0.8f;
     public float maxPitch = 1.2f;
     private AudioSource myEngineSound;
@@ -107,6 +107,7 @@ public class NPCVehicleController : MonoBehaviour
     private int hitCount = 0;
     private int playerLayer;
     private float recycleTimer = 0f;
+    private float distanceToPlayer = 0f;
 
     [Header("References")]
     public Transform frontChecker;             // center ray origin
@@ -646,7 +647,7 @@ public class NPCVehicleController : MonoBehaviour
         float currentTime = Time.time;
 
         if (!vehicleCanBeDamaged || currentTime < lastDamageTime + damageCooldown || vehicleDamaged) return;
-
+        AudioManager.Instance.PlayCrash(transform.position);
         lastDamageTime = currentTime;
         if (hitLayer == playerLayer || vehicleType != Type.Bike || hitCount > 0)
         {
@@ -655,6 +656,11 @@ public class NPCVehicleController : MonoBehaviour
             if (vehicleType == Type.Bike)
             {
                 rb.constraints = RigidbodyConstraints.None;
+                if(bikeDeadCollider != null && bikeCollider != null)
+                {
+                    bikeCollider.SetActive(false);
+                    bikeDeadCollider.SetActive(true);
+                }
             }
 
             if (NPCCharacterScript != null)
@@ -681,6 +687,12 @@ public class NPCVehicleController : MonoBehaviour
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         rb.isKinematic = true;
+        if (bikeCollider != null && bikeDeadCollider != null)
+        {
+            bikeCollider.SetActive(true);
+            bikeDeadCollider.SetActive(false);
+        }
+
         // Reset constraints
         rb.constraints = RigidbodyConstraints.None;
         if (!wrongSideDriving)
@@ -756,13 +768,6 @@ public class NPCVehicleController : MonoBehaviour
         currentAcceleration = 0f;
         isBraking = false;
         ApplyBrakes(false);
-
-        //Reset Audio
-        if (myEngineSound != null)
-        {
-            AudioManager.Instance.ReturnAudioSource(myEngineSound);
-            myEngineSound = null;
-        }
     }
 
     void CheckIfShouldRecycle()
@@ -782,7 +787,8 @@ public class NPCVehicleController : MonoBehaviour
         }
 
         //Normal gameplay limits
-        bool outOfZRange = Mathf.Abs(vPos.z - playerPos.z) > GameManagerScript.Instance.vehicleRecycleDistance;
+        distanceToPlayer = Mathf.Abs(vPos.z - playerPos.z);
+        bool outOfZRange = distanceToPlayer > GameManagerScript.Instance.vehicleRecycleDistance;
         bool outOfYRange = vPos.y > 3f || vPos.y < -3f;
         bool rotatedWrong = false;
         if (wrongSideDriving)
@@ -803,15 +809,12 @@ public class NPCVehicleController : MonoBehaviour
 
     void HandleEngineAudio()
     {
-        // Distance Check
-        float zDistance = Mathf.Abs(transform.position.z - playerTransform.position.z);
-
         // Request sound if close enough
-        if (zDistance <= audioTriggerDistance && myEngineSound == null)
+        if (distanceToPlayer <= audioTriggerDistance && myEngineSound == null)
         {
             myEngineSound = AudioManager.Instance.RequestEngineAudio(engineClip, transform);
         }
-        else if (zDistance > audioTriggerDistance && myEngineSound != null)
+        else if (distanceToPlayer > audioTriggerDistance && myEngineSound != null)
         {
             AudioManager.Instance.ReturnAudioSource(myEngineSound);
             myEngineSound = null;

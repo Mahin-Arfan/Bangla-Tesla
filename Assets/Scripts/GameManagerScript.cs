@@ -26,12 +26,14 @@ public class GameManagerScript : MonoBehaviour
 
     [Header("Game Settings")]
     public int score = 0;
+    public int highScore = 0;
     public float maxDificultyScore = 1000f;
+    public int pedestrianHitScore = 150;
+    public int vehicleHitScore = 50;
+    public int bikeHitScore = 100;
     [HideInInspector] public float progress = 0f;
     public bool gameStarted = false;
     public bool gameOver = false;
-    private bool gameInitiaded = false;
-    private bool gameOverInitiaded = false;
 
     [Header("Road Settings")]
     public Road[] roads;
@@ -101,6 +103,8 @@ public class GameManagerScript : MonoBehaviour
     public GameObject player;
     private PlayerRickshawController playerController;
     private UIScript uIScript;
+    private bool gameInitiaded = false;
+    private bool gameOverInitiaded = false;
     //temp
     public Vector3 gizmosSpawnPos;
     public Vector3 gizmosSpawnSize;
@@ -147,13 +151,17 @@ public class GameManagerScript : MonoBehaviour
         vehicleGroupIndex = new int[vehicleGroups.Length];
         for (int i = 0; i < vehicleGroupIndex.Length; i++)
             vehicleGroupIndex[i] = 0;
-
+        highScore = PlayerPrefs.GetInt("HighScore", 0);
         PrewarmPool();
     }
 
     void Update()
     {
-        score = (int)Mathf.Abs(player.transform.position.z);
+        score = (int)Mathf.Abs(player.transform.position.z); 
+        if (score > highScore)
+        {
+            highScore = score;
+        }
         UpdateDifficulty();
         HandleRoadSpawning();
         HandleVehicleSpawning();
@@ -171,6 +179,10 @@ public class GameManagerScript : MonoBehaviour
         if(gameOver && !gameOverInitiaded)
         {
             GameOver();
+        }
+        if (uIScript != null)
+        {
+            uIScript.UpdateScoreUI(score, highScore);
         }
     }
 
@@ -494,6 +506,12 @@ public class GameManagerScript : MonoBehaviour
         spawnRate = Mathf.Lerp(startSpawnRate, maxSpawnRate, progress);
     }
 
+    public void AddScore(int amount)
+    {
+        score += amount;
+        uIScript.SpawnFloatingScore(amount);
+    }
+
     void StartGame()
     {
         playerController.gameStarted = true;
@@ -503,7 +521,9 @@ public class GameManagerScript : MonoBehaviour
     void GameOver()
     {
         gameOverInitiaded = true;
-        uIScript.endMenuUI.SetActive(true);
+        PlayerPrefs.SetInt("HighScore", highScore);
+        PlayerPrefs.Save();
+        uIScript.GameOver();
     }
 
 #if UNITY_EDITOR

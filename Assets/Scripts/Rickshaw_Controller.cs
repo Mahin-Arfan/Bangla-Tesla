@@ -52,6 +52,11 @@ public class PlayerRickshawController : MonoBehaviour
     float animSteer;
     private float sideCheckTimer = 0f;
 
+    [Header("Engine Sound")]
+    public float minPitch = 0f;
+    public float maxPitch = 2f;
+    private AudioSource rickshawAudioSource;
+
     [Header("References")]
     public Animator rickshawManAnimator;
     public Transform rickshawSteerHandle;
@@ -73,6 +78,7 @@ public class PlayerRickshawController : MonoBehaviour
         rb.constraints |= RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         cameraScript = GetComponent<CameraScript>();
         healthScript = GetComponent<RickshawHealth>();
+        rickshawAudioSource = GetComponent<AudioSource>();
         baseSpeed = startSpeed;
     }
 
@@ -123,6 +129,7 @@ public class PlayerRickshawController : MonoBehaviour
 #endif
         HandleBraking();
         UpdateSteerHandle(animSteer);
+        HandleEngineSound();
         sideCheckTimer += Time.deltaTime;
         damageWobbleTimer += Time.deltaTime;
     }
@@ -327,5 +334,13 @@ public class PlayerRickshawController : MonoBehaviour
         );
 
         rickshawManAnimator.SetFloat("Steer", animSteer);
+    }
+
+    void HandleEngineSound()
+    {
+        if (rickshawAudioSource == null) return;
+
+        float speedPercentage = Mathf.InverseLerp(0f, maxSpeed, currentSpeed);
+        rickshawAudioSource.pitch = Mathf.Lerp(minPitch, maxPitch, speedPercentage);
     }
 }

@@ -1292,12 +1292,9 @@ GameObject:
   - component: {fileID: 4069152233791042187}
   - component: {fileID: 361886519837801121}
   - component: {fileID: 3145953014449129997}
-  - component: {fileID: 7641619893088450844}
-  - component: {fileID: 9073103433646968074}
-  - component: {fileID: 4488351698343885976}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Bike
-  m_TagString: Vehicle
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1370,69 +1367,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &7641619893088450844
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3724972210809972721}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.7, y: 1.0136201, z: 2.0405369}
-  m_Center: {x: 0, y: 0.63322484, z: -0.0014514923}
---- !u!65 &9073103433646968074
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3724972210809972721}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.65, y: 0.95, z: 1.95}
-  m_Center: {x: 0, y: 0.63322484, z: -0.0014514923}
---- !u!114 &4488351698343885976
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3724972210809972721}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a22abb55ff7efd4e9f121dcbf9f1e71, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isNPC: 1
-  pedestrian: 0
-  position: 0
-  healthScript: {fileID: 0}
-  npcVehicleController: {fileID: 935475964192472878}
-  obstacleLayer:
-    serializedVersion: 2
-    m_Bits: 712
-  npcCharacterScript: {fileID: 0}
 --- !u!1 &3781293364185895710
 GameObject:
   m_ObjectHideFlags: 0
@@ -2082,6 +2016,103 @@ Transform:
   - {fileID: 5666066950594462242}
   m_Father: {fileID: 7728913335703548547}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5686381353433826591
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3523084892970917531}
+  - component: {fileID: 6434083018104798881}
+  - component: {fileID: 8784927211629505057}
+  - component: {fileID: 2897260647269804004}
+  m_Layer: 9
+  m_Name: BikeCollider
+  m_TagString: Vehicle
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3523084892970917531
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5686381353433826591}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3015924137691194794}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &6434083018104798881
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5686381353433826591}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.7, y: 1.0136201, z: 2.0405369}
+  m_Center: {x: 0, y: 0.63322484, z: -0.0014514923}
+--- !u!65 &8784927211629505057
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5686381353433826591}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.65, y: 0.95, z: 1.95}
+  m_Center: {x: 0, y: 0.63322484, z: -0.0014514923}
+--- !u!114 &2897260647269804004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5686381353433826591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a22abb55ff7efd4e9f121dcbf9f1e71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isNPC: 1
+  pedestrian: 0
+  position: 0
+  healthScript: {fileID: 0}
+  npcVehicleController: {fileID: 935475964192472878}
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 712
+  npcCharacterScript: {fileID: 0}
 --- !u!1 &5721916445270953620
 GameObject:
   m_ObjectHideFlags: 0
@@ -2145,6 +2176,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 3523084892970917531}
+  - {fileID: 7594455874111861934}
   - {fileID: 4069152233791042187}
   - {fileID: 5631714260527895351}
   - {fileID: 9009012080238593778}
@@ -2206,6 +2239,8 @@ MonoBehaviour:
   damageCooldown: 1
   damagedStopDuration: 100
   hitForce: 1000
+  bikeCollider: {fileID: 5686381353433826591}
+  bikeDeadCollider: {fileID: 9068910162651727814}
   tryOvertake: 1
   frontCheckerDistance: 20
   overTakeSideClearance: 1
@@ -2214,7 +2249,7 @@ MonoBehaviour:
   checkInterval: 0.2
   overTakingTendency: 3
   overTakeCompleteDisctance: 3
-  randomStops: 1
+  randomStops: 0
   currentStopDecision: 0
   stopPositionX: 5
   stopDuration: 5
@@ -2228,14 +2263,13 @@ MonoBehaviour:
   reverseMechanics: 0
   wrongSideDriving: 0
   engineClip: {fileID: 8300000, guid: b42a17649c9614a4fa6413dd931a21bf, type: 3}
-  volume: 100
   minPitch: 1
   maxPitch: 2
   frontChecker: {fileID: 4004249463670927986}
   frontRightChecker: {fileID: 4569156283574617839}
   frontLeftChecker: {fileID: 9080988606022894807}
   groundChecker: {fileID: 3783264657193705764}
-  vehicleBodyCollider: {fileID: 7641619893088450844}
+  vehicleBodyCollider: {fileID: 6434083018104798881}
   vehicleLayer:
     serializedVersion: 2
     m_Bits: 840
@@ -3974,6 +4008,7 @@ MonoBehaviour:
   walking: 0
   salesman: 0
   police: 0
+  male: 1
   isDead: 0
   walkSpeed: 2
   detectionDistance: 1.5
@@ -4249,6 +4284,59 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5260004728554330525}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &9068910162651727814
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7594455874111861934}
+  - component: {fileID: 8845637047698295790}
+  m_Layer: 10
+  m_Name: BikeDeadCollider
+  m_TagString: Vehicle
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7594455874111861934
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9068910162651727814}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3015924137691194794}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &8845637047698295790
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9068910162651727814}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.7, y: 1.0136201, z: 2.0405369}
+  m_Center: {x: 0, y: 0.63322484, z: -0.0014514923}
 --- !u!1 &9154185469008812954
 GameObject:
   m_ObjectHideFlags: 0

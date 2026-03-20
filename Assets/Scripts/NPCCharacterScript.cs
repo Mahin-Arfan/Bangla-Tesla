@@ -9,6 +9,7 @@ public class NPCCharacterScript : MonoBehaviour
     public bool walking = false;
     public bool salesman = false;
     public bool police = false;
+    public bool male = true;
     public bool isDead = false;
 
     [Header("Walk Settings")]
@@ -55,6 +56,7 @@ public class NPCCharacterScript : MonoBehaviour
     private Transform salesmanParentStall;
     private CollisionDetector detector;
     private BoxCollider boxCollider;
+    private AudioSource deadAudioSource;
     private float recycleTimer = 0f;
 
     //animations hashes
@@ -85,7 +87,7 @@ public class NPCCharacterScript : MonoBehaviour
     void Update()
     {
         recycleTimer += Time.deltaTime;
-        if (recycleTimer > 0.5f && !police)
+        if (recycleTimer > 0.5f && !police && !driving)
         {
             CheckIfShouldRecycle();
             recycleTimer = 0f;
@@ -321,6 +323,12 @@ public class NPCCharacterScript : MonoBehaviour
     void RigidBodyActive()
     {
         animator.enabled = false;
+        bool shouldPlayDeadAudio = Mathf.Abs(transform.position.z - playerTransform.position.z) < AudioManager.Instance.audioTriggerDistance;
+        if (shouldPlayDeadAudio)
+        {
+            deadAudioSource = AudioManager.Instance.RequestDeadVoiceClip(transform.position, male);
+        }
+
         foreach (var col in bodyColliders)
         {
             col.enabled = true;
@@ -432,6 +440,12 @@ public class NPCCharacterScript : MonoBehaviour
                 GameManagerScript.Instance.RecycleSinglePedestrian(salesmanParentStall.gameObject);
             else
                 GameManagerScript.Instance.RecycleSinglePedestrian(gameObject);
+
+            if (deadAudioSource != null && AudioManager.Instance != null)
+            {
+                AudioManager.Instance.ReturnAudioSource(deadAudioSource);
+                deadAudioSource = null;
+            }
         }
     }
 }

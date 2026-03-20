@@ -12,10 +12,28 @@ public class AudioManager : MonoBehaviour
 
     [Header("Sound Settings")]
     [Tooltip("Prevents multiple loud crashes playing on the exact same frame")]
+    [Range(0, 1)]
+    public float engineVolume = 0.5f;
+    [Range(0, 1)]
+    public float crashVolume = 1f;
+    [Range(0, 1)]
+    public float deadVolume = 1f;
+    [Range(0, 1)]
+    public float environmentVolume = 0.5f;
     public float audioTriggerDistance = 20f;
-    public float crashCooldown = 0.2f;
+    public float crashCooldown = 0.5f;
     public float sourceMaxDistance = 15f;
     private float lastCrashTime;
+    private int deadVoiceIndexMale = 0;
+    private int deadVoiceIndexFemale = 0;
+    private int crashClipIndex = 0;
+
+    [Header("Audio Clips")]
+    public AudioClip[] crashClips;
+    public AudioClip[] maleDeadVoiceClips;
+    public AudioClip[] femaleDeadVoiceClips;
+    public AudioClip[] stallClips;
+    public AudioClip environmentClip;
 
     void Awake()
     {
@@ -42,11 +60,12 @@ public class AudioManager : MonoBehaviour
             source.playOnAwake = false;
             source.spatialBlend = 1f;
             source.rolloffMode = AudioRolloffMode.Linear;
-            source.minDistance = 0.5f;
+            source.minDistance = 2f;
             source.maxDistance = sourceMaxDistance;
 
             audioPool.Add(source);
         }
+        Play2DEnvironment(environmentClip);
     }
 
     private AudioSource GetFreeSource()
@@ -58,9 +77,9 @@ public class AudioManager : MonoBehaviour
         return null;
     }
 
-    public void PlayCrash(AudioClip clip, Vector3 position)
+    public void PlayCrash(Vector3 position)
     {
-        if (clip == null || Time.time < lastCrashTime + crashCooldown) return;
+        if (Time.time < lastCrashTime + crashCooldown) return;
 
         AudioSource source = GetFreeSource();
         if (source != null)
@@ -68,14 +87,56 @@ public class AudioManager : MonoBehaviour
             lastCrashTime = Time.time;
             source.transform.SetParent(transform);
             source.transform.position = position;
-            source.spatialBlend = 1f;
             source.loop = false;
-            source.clip = clip;
+            source.volume = crashVolume;
+            source.pitch = 1f;
+            source.clip = crashClips[crashClipIndex];
+            crashClipIndex++;
+            if (crashClipIndex >= crashClips.Length)
+            {
+                crashClipIndex = 0;
+            }
             source.Play();
         }
     }
 
-    public void Play3DVoice(AudioClip clip, Vector3 position)
+    public AudioSource RequestDeadVoiceClip(Vector3 position, bool male)
+    {
+        AudioSource source = GetFreeSource();
+        if (source != null)
+        {
+            source.transform.SetParent(transform);
+            source.transform.position = position;
+            source.loop = false;
+            source.volume = deadVolume;
+            source.pitch = 1f;
+            if (male)
+            {
+                AudioClip clip = maleDeadVoiceClips[deadVoiceIndexMale];
+                source.clip = clip;
+                deadVoiceIndexMale++;
+                if (deadVoiceIndexMale >= maleDeadVoiceClips.Length)
+                {
+                    deadVoiceIndexMale = 0;
+                }
+            }
+            else
+            {
+                AudioClip clip = femaleDeadVoiceClips[deadVoiceIndexFemale];
+                source.clip = clip;
+                deadVoiceIndexFemale++;
+                if (deadVoiceIndexFemale >= femaleDeadVoiceClips.Length)
+                {
+                    deadVoiceIndexFemale = 0;
+                }
+            }
+            source.Play();
+            return source;
+        }
+        return null;
+    }
+
+    public void Play3DVoice(AudioClip clip, Vector3 position) //for stalls & specialRoadAudio
     {
         if (clip == null) return;
 
@@ -84,14 +145,30 @@ public class AudioManager : MonoBehaviour
         {
             source.transform.SetParent(transform);
             source.transform.position = position;
-            source.spatialBlend = 1f;
             source.loop = false;
             source.clip = clip;
+            source.pitch = 1f;
             source.Play();
         }
     }
 
-    // 3. Hand an AudioSource to a Vehicle for its engine
+    public void Play2DEnvironment(AudioClip clip)
+    {
+        if (clip == null) return;
+
+        AudioSource source = GetFreeSource();
+        if (source != null)
+        {
+            source.transform.SetParent(transform);
+            source.spatialBlend = 0f; // Force to 2D
+            source.loop = true;
+            source.clip = clip;
+            source.volume = environmentVolume;
+            source.pitch = 1f;
+            source.Play();
+        }
+    }
+
     public AudioSource RequestEngineAudio(AudioClip clip, Transform parentTransform)
     {
         if (clip == null) return null;
@@ -101,8 +178,8 @@ public class AudioManager : MonoBehaviour
         {
             source.transform.SetParent(parentTransform);
             source.transform.localPosition = Vector3.zero;
-            source.spatialBlend = 1f;
             source.loop = true;
+            source.volume = engineVolume;
             source.clip = clip;
             source.Play();
 
@@ -117,6 +194,7 @@ public class AudioManager : MonoBehaviour
         {
             source.Stop();
             source.transform.SetParent(transform);
+            source.pitch = 1f;
             source.clip = null;
         }
     }
