@@ -20,6 +20,8 @@ public class AudioManager : MonoBehaviour
     public float deadVolume = 1f;
     [Range(0, 1)]
     public float environmentVolume = 0.5f;
+    [Range(0, 1)]
+    public float musicVolume = 0.75f;
     public float audioTriggerDistance = 20f;
     public float crashCooldown = 0.5f;
     public float sourceMaxDistance = 15f;
@@ -34,6 +36,7 @@ public class AudioManager : MonoBehaviour
     public AudioClip[] femaleDeadVoiceClips;
     public AudioClip[] stallClips;
     public AudioClip environmentClip;
+    public AudioClip music;
 
     void Awake()
     {
@@ -65,7 +68,8 @@ public class AudioManager : MonoBehaviour
 
             audioPool.Add(source);
         }
-        Play2DEnvironment(environmentClip);
+        Play2DEnvironment(environmentClip, environmentVolume);
+        Play2DEnvironment(music, musicVolume);
     }
 
     private AudioSource GetFreeSource()
@@ -152,7 +156,7 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    public void Play2DEnvironment(AudioClip clip)
+    public void Play2DEnvironment(AudioClip clip, float volume)
     {
         if (clip == null) return;
 
@@ -163,7 +167,7 @@ public class AudioManager : MonoBehaviour
             source.spatialBlend = 0f; // Force to 2D
             source.loop = true;
             source.clip = clip;
-            source.volume = environmentVolume;
+            source.volume = volume;
             source.pitch = 1f;
             source.Play();
         }

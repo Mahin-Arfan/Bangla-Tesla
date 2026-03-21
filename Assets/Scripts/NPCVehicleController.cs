@@ -39,8 +39,6 @@ public class NPCVehicleController : MonoBehaviour
     public float damageCooldown = 1f;
     public float damagedStopDuration = 0f;
     public float hitForce = 500f;
-    public GameObject bikeCollider;
-    public GameObject bikeDeadCollider;
 
     [Header("Obstacle & Overtake")]
     public bool tryOvertake = true;
@@ -656,11 +654,6 @@ public class NPCVehicleController : MonoBehaviour
             if (vehicleType == Type.Bike)
             {
                 rb.constraints = RigidbodyConstraints.None;
-                if(bikeDeadCollider != null && bikeCollider != null)
-                {
-                    bikeCollider.SetActive(false);
-                    bikeDeadCollider.SetActive(true);
-                }
             }
 
             if (NPCCharacterScript != null)
@@ -687,11 +680,6 @@ public class NPCVehicleController : MonoBehaviour
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         rb.isKinematic = true;
-        if (bikeCollider != null && bikeDeadCollider != null)
-        {
-            bikeCollider.SetActive(true);
-            bikeDeadCollider.SetActive(false);
-        }
 
         // Reset constraints
         rb.constraints = RigidbodyConstraints.None;

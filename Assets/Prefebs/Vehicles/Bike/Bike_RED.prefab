@@ -170,7 +170,8 @@ GameObject:
   - component: {fileID: 45130607935683417}
   - component: {fileID: 962506002037570026}
   - component: {fileID: 8913539437683554040}
-  m_Layer: 0
+  - component: {fileID: 4677267929452571165}
+  m_Layer: 10
   m_Name: Bike.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -245,6 +246,27 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &4677267929452571165
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206671678937207870}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.35, y: 0.7, z: 1.5}
+  m_Center: {x: -0.00021240115, y: 0.5403209, z: -0.09289408}
 --- !u!1 &412576978407806736
 GameObject:
   m_ObjectHideFlags: 0
@@ -449,7 +471,7 @@ GameObject:
   m_Component:
   - component: {fileID: 814012499520082403}
   - component: {fileID: 6893965990081327385}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Rear Wheel.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -715,7 +737,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8952507999782874670}
   - component: {fileID: 6309830838998865867}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Front Wheel.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2123,7 +2145,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4699579531390762933}
-  - component: {fileID: 7703739268530753614}
   - component: {fileID: 7831419157595718540}
   - component: {fileID: 870409943545508439}
   m_Layer: 9
@@ -2148,27 +2169,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2707965806009519835}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &7703739268530753614
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4453119290372267776}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.55, y: 0.7390022, z: 1.75}
-  m_Center: {x: -0.00021240115, y: 0.5596993, z: -0.09289408}
 --- !u!65 &7831419157595718540
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4181,7 +4181,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4699579531390762933}
-  - {fileID: 738833750065118132}
   - {fileID: 45130607935683417}
   - {fileID: 7669141226008368052}
   - {fileID: 9025621597569393897}
@@ -4243,8 +4242,6 @@ MonoBehaviour:
   damageCooldown: 1
   damagedStopDuration: 100
   hitForce: 1000
-  bikeCollider: {fileID: 4453119290372267776}
-  bikeDeadCollider: {fileID: 9194824049127316829}
   tryOvertake: 1
   frontCheckerDistance: 20
   overTakeSideClearance: 1
@@ -4273,7 +4270,7 @@ MonoBehaviour:
   frontRightChecker: {fileID: 1648961669282363461}
   frontLeftChecker: {fileID: 7722520459673904897}
   groundChecker: {fileID: 8816652618867202241}
-  vehicleBodyCollider: {fileID: 7703739268530753614}
+  vehicleBodyCollider: {fileID: 7831419157595718540}
   vehicleLayer:
     serializedVersion: 2
     m_Bits: 840
@@ -4384,59 +4381,6 @@ Transform:
   - {fileID: 7036033121179376765}
   m_Father: {fileID: 512357071286394485}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &9194824049127316829
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 738833750065118132}
-  - component: {fileID: 4583809518248349155}
-  m_Layer: 10
-  m_Name: BikeDead
-  m_TagString: Vehicle
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &738833750065118132
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9194824049127316829}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.000072956085, y: -0.0054706186, z: 0.12310696}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2707965806009519835}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &4583809518248349155
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9194824049127316829}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.55, y: 0.7390022, z: 1.75}
-  m_Center: {x: -0.00021240115, y: 0.5596993, z: -0.09289408}
 --- !u!1 &9214845074207621021
 GameObject:
   m_ObjectHideFlags: 0

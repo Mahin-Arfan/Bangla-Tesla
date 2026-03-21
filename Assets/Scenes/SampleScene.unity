@@ -1900,6 +1900,7 @@ MonoBehaviour:
   crashVolume: 1
   deadVolume: 1
   environmentVolume: 0.25
+  musicVolume: 0.25
   audioTriggerDistance: 20
   crashCooldown: 0.5
   sourceMaxDistance: 20
@@ -1924,6 +1925,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 1a55de2cdec19b4448ca8e524f757290, type: 3}
   stallClips: []
   environmentClip: {fileID: 8300000, guid: b7a1a63ac6ad79c4b8dd6b914b653c57, type: 3}
+  music: {fileID: 8300000, guid: 34a1b13e0245936449e65b37277f35e6, type: 3}
 --- !u!1001 &1335700157
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5220,7 +5222,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1307587833961996349, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
       propertyPath: startSpawnRate
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1307587833961996349, guid: de4848adeb9a2a246a581d2dfabcda0e, type: 3}
       propertyPath: prewarmPerPrefeb
