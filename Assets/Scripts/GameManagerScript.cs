@@ -76,6 +76,7 @@ public class GameManagerScript : MonoBehaviour
     public Vector3 spawnLocation;
     public float baseSpawnTime = 3f;
     public float spawnDistance = 80f;
+    public float menuSpawnPositionZ = 20f;
     public float spawnTimer;
 
     [Header("Pedestrians")]
@@ -101,6 +102,9 @@ public class GameManagerScript : MonoBehaviour
 
     [Header("References")]
     public GameObject player;
+    public Animator cameraAnimator;
+    public Animator rickshawManAnimator;
+    public Transform cam;
     private PlayerRickshawController playerController;
     private UIScript uIScript;
     private bool gameInitiaded = false;
@@ -254,13 +258,14 @@ public class GameManagerScript : MonoBehaviour
 
         bool foundFreeSpot = false;
         Vector3 spawnPos = Vector3.zero;
-        if(chosenGroup.type == Type.Barrier || chosenGroup.type == Type.WrongSides)
+        float playerZ = player.transform.position.z;
+        if (chosenGroup.type == Type.Barrier || chosenGroup.type == Type.WrongSides)
         {
             if (!gameStarted || gameOver) return;
             int spawnSide = Random.value > 0.5f ? 1 : -1;
             for (int i = 0; i < 2; i++)   // try 2 times max
             {
-                spawnPos = new Vector3(5.2f * spawnSide, 1f, player.transform.position.z - spawnDistance);
+                spawnPos = new Vector3(5.2f * spawnSide, 1f, playerZ - spawnDistance);
                 if (!Physics.CheckBox(spawnPos, chosenGroup.spawnCheckSize, Quaternion.identity))
                 {
                     foundFreeSpot = true;
@@ -277,12 +282,12 @@ public class GameManagerScript : MonoBehaviour
 
                 if (gameStarted && !gameOver)
                 {
-                    spawnPos = new Vector3(spawnX, 1f, player.transform.position.z - spawnDistance);
+                    spawnPos = new Vector3(spawnX, 1f, playerZ - spawnDistance);
                 }
                 else
                 {
                     if (spawnX > 2.5f) spawnX = 2.5f;
-                    spawnPos = new Vector3(spawnX, 1f, 30f);
+                    spawnPos = new Vector3(spawnX, 1f, playerZ + menuSpawnPositionZ);
                 }
 
                 if (!Physics.CheckBox(spawnPos, chosenGroup.spawnCheckSize, Quaternion.identity))

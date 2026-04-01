@@ -671,6 +671,8 @@ public class NPCVehicleController : MonoBehaviour
             hitCount++;
         }
         //Comment
+        if(vehicleType != Type.Bike)
+            AudioManager.Instance.RequestDialogueVoiceClip(transform.position);
     }
 
     public void ResetNPC()
@@ -705,6 +707,19 @@ public class NPCVehicleController : MonoBehaviour
         else
         {
             vehicleBodyCollider.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+        }
+
+        //wheel Reset
+        for(int i = 0; i < wheels.Length; i++)
+        {
+            if (wheels[i].wheelCollider != null)
+            {
+                wheels[i].wheelCollider.steerAngle = 0f;
+                wheels[i].wheelCollider.motorTorque = 0f;
+                wheels[i].wheelCollider.brakeTorque = 0f;
+                wheels[i].wheelCollider.enabled = false;
+                wheels[i].wheelCollider.enabled = true;
+            }
         }
 
         //Reset Settings based on game state

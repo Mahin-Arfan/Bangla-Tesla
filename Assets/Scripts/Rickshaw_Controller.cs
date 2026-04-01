@@ -93,6 +93,7 @@ public class PlayerRickshawController : MonoBehaviour
             horizontalInput = Mathf.Lerp(horizontalInput, 0f, Time.deltaTime * steerSpeed);
 
 #if UNITY_EDITOR
+        /*
         if (Input.GetKeyDown(KeyCode.W))
         {
             BoostButtonDown();
@@ -125,7 +126,7 @@ public class PlayerRickshawController : MonoBehaviour
         {
             RightButtonUp();
         }
-
+        */
 #endif
         HandleBraking();
         UpdateSteerHandle(animSteer);
@@ -342,5 +343,6 @@ public class PlayerRickshawController : MonoBehaviour
 
         float speedPercentage = Mathf.InverseLerp(0f, maxSpeed, currentSpeed);
         rickshawAudioSource.pitch = Mathf.Lerp(minPitch, maxPitch, speedPercentage);
+        cameraScript.SetSpeedMultiplier(speedPercentage);
     }
 }

@@ -24,10 +24,22 @@ public class UIScript : MonoBehaviour
 
     public void PlayGame()
     {
+        if(GameManagerScript.Instance.cameraAnimator != null && GameManagerScript.Instance.rickshawManAnimator != null) 
+        {
+            GameManagerScript.Instance.cameraAnimator.enabled = true;
+            GameManagerScript.Instance.rickshawManAnimator.SetTrigger("Start");
+        }
         mainMenuUI.SetActive(false);
+        Invoke("StartGame", 1.5f);
+    }
+
+    void StartGame()
+    {
+        GameManagerScript.Instance.cam.SetParent(null);
         inputUI.SetActive(true);
         gameManagerScript.gameStarted = true;
     }
+
     public void UpdateScoreUI(int currentScore, int currentHighScore)
     {
         if (scoreText != null)

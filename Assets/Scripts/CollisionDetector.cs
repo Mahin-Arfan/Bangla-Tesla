@@ -21,6 +21,7 @@ public class CollisionDetector : MonoBehaviour
     [HideInInspector] public NPCCharacterScript npcCharacterScript;
     private float onTriggerEnterTime = 0f;
     private float onTriggerStayTime = 0f;
+    private float hitCooldown = 0.75f;
 
     void Awake()
     {
@@ -32,7 +33,7 @@ public class CollisionDetector : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (Time.time < onTriggerEnterTime + 0.5f) return;
+        if (Time.time < onTriggerEnterTime + hitCooldown) return;
 
         if (((1 << other.gameObject.layer) & obstacleLayer) != 0)
         {
@@ -43,7 +44,7 @@ public class CollisionDetector : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (Time.time < onTriggerEnterTime + 0.5f || Time.time < onTriggerStayTime + 0.5f)
+        if (Time.time < onTriggerEnterTime + hitCooldown || Time.time < onTriggerStayTime + hitCooldown)
         {
             return;
         }
