@@ -343,9 +343,9 @@ public class NPCCharacterScript : MonoBehaviour
             detector.enabled = false;
             if(npcTriggerCollider != null)
                 npcTriggerCollider.enabled = false;
-            if(hitPoint != Vector3.zero)
-                bodyRigidBodies[0].AddForce(hitPoint.normalized * hitForce, ForceMode.Impulse);
         }
+        if (hitPoint != Vector3.zero)
+            bodyRigidBodies[0].AddForce(hitPoint.normalized * hitForce, ForceMode.Impulse);
     }
 
     public void ResetNPC()

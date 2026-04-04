@@ -29,7 +29,7 @@ public class AudioManager : MonoBehaviour
     public float sourceMaxDistance = 15f;
     private float lastCrashTime;
     private int deadVoiceIndexMale = 0;
-    private int galiVoiceIndexMale = 0;
+    private int lastChosenGaliIndex = 0;
     private int deadVoiceIndexFemale = 0;
     private int crashClipIndex = 0;
 
@@ -210,13 +210,14 @@ public class AudioManager : MonoBehaviour
             source.volume = dialogueVolume;
             source.pitch = 1f;
             source.spatialBlend = 1f;
-            AudioClip clip = galiVoiceClips[galiVoiceIndexMale];
-            source.clip = clip;
-            galiVoiceIndexMale++;
-            if (galiVoiceIndexMale >= galiVoiceClips.Length)
+            int galiIndex = Random.Range(0, galiVoiceClips.Length);
+            if(lastChosenGaliIndex == galiIndex)
             {
-                galiVoiceIndexMale = 0;
+                galiIndex = (galiIndex + 1) % galiVoiceClips.Length;
             }
+            lastChosenGaliIndex = galiIndex;
+            AudioClip clip = galiVoiceClips[galiIndex];
+            source.clip = clip;
             source.Play();
         }
     }

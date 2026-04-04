@@ -116,7 +116,7 @@ public class NPCVehicleController : MonoBehaviour
     public LayerMask vehicleLayer;             // layer mask for raycasts/CheckBox
     private Vector3 driveTarget;              // main drive target
     private Vector3 overtakeTarget;           // target used while overtaking
-    private NPCCharacterScript NPCCharacterScript;
+    private NPCCharacterScript nPCCharacterScript;
     private Transform playerTransform;
 
     [Header("Wheels Setup")]
@@ -130,6 +130,9 @@ public class NPCVehicleController : MonoBehaviour
     private Vector3 hitPos;
     private Vector3 rightSideCheckGizmoPos;
     private Vector3 leftSideCheckGizmoPos;
+    private Vector3 debugHitPoint;
+    private Vector3 debugPushDirection;
+    private bool showDebug;
 
     void OnEnable()
     {
@@ -146,9 +149,9 @@ public class NPCVehicleController : MonoBehaviour
         playerLayer = LayerMask.NameToLayer("Player");
         playerTransform = GameManagerScript.Instance.player.transform;
         audioTriggerDistance = AudioManager.Instance.audioTriggerDistance;
-        if (NPCCharacterScript == null)
+        if (nPCCharacterScript == null)
         {
-            NPCCharacterScript = GetComponentInChildren<NPCCharacterScript>();
+            nPCCharacterScript = GetComponentInChildren<NPCCharacterScript>();
         }
         if (lockXRotation) rb.constraints |= RigidbodyConstraints.FreezeRotationX;
         if(lockYPosition) rb.constraints |= RigidbodyConstraints.FreezePositionY;
@@ -655,12 +658,20 @@ public class NPCVehicleController : MonoBehaviour
             {
                 rb.constraints = RigidbodyConstraints.None;
             }
-
-            if (NPCCharacterScript != null)
-                NPCCharacterScript.isDead = true;
-
             Vector3 pushDirection = transform.position - hitPoint;
             pushDirection.y += 0.5f;
+
+
+            if (nPCCharacterScript != null)
+            {
+                nPCCharacterScript.hitPoint = pushDirection;
+                nPCCharacterScript.isDead = true;
+            }
+
+            //store for gizmos temp
+            debugHitPoint = hitPoint;
+            debugPushDirection = pushDirection;
+            showDebug = true;
 
             rb.AddForce(pushDirection.normalized * hitForce, ForceMode.Impulse);
 
@@ -794,7 +805,11 @@ public class NPCVehicleController : MonoBehaviour
         bool outOfZRange = distanceToPlayer > GameManagerScript.Instance.vehicleRecycleDistance;
         bool outOfYRange = vPos.y > 3f || vPos.y < -3f;
         bool rotatedWrong = false;
-        if (wrongSideDriving)
+        if(vehicleType == Type.Bike && vehicleDamaged)
+        {
+            rotatedWrong = false;
+        }
+        else if(wrongSideDriving)
         {
             rotatedWrong = Vector3.Angle(transform.forward, Vector3.back) < 100f;
         }
@@ -904,6 +919,27 @@ public class NPCVehicleController : MonoBehaviour
         Gizmos.DrawWireCube(Vector3.zero, checkSize * 2f);
 
         Gizmos.matrix = Matrix4x4.identity;
+
+        if (!showDebug) return;
+
+        // Hit point (where impact happened)
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawSphere(debugHitPoint, 0.2f);
+
+        // Force direction
+        Gizmos.color = Color.red;
+        Vector3 start = debugHitPoint;
+        Vector3 dir = debugPushDirection.normalized * 2f;
+        Vector3 end = start + dir;
+
+        Gizmos.DrawLine(start, end);
+
+        // Arrow head
+        Vector3 right = Quaternion.LookRotation(dir) * Quaternion.Euler(0, 160, 0) * Vector3.forward;
+        Vector3 left = Quaternion.LookRotation(dir) * Quaternion.Euler(0, -160, 0) * Vector3.forward;
+
+        Gizmos.DrawLine(end, end + right * 0.4f);
+        Gizmos.DrawLine(end, end + left * 0.4f);
     }
 #endif
 }
