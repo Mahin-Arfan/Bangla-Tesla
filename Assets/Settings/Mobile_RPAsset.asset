@@ -22,11 +22,11 @@ MonoBehaviour:
   m_RequireDepthTexture: 0
   m_RequireOpaqueTexture: 0
   m_OpaqueDownsampling: 0
-  m_SupportsTerrainHoles: 1
-  m_SupportsHDR: 1
+  m_SupportsTerrainHoles: 0
+  m_SupportsHDR: 0
   m_HDRColorBufferPrecision: 0
   m_MSAA: 1
-  m_RenderScale: 0.8
+  m_RenderScale: 0.65
   m_UpscalingFilter: 3
   m_FsrOverrideSharpness: 0
   m_FsrSharpness: 0.92
@@ -44,15 +44,15 @@ MonoBehaviour:
   m_MainLightRenderingMode: 1
   m_MainLightShadowsSupported: 1
   m_MainLightShadowmapResolution: 1024
-  m_AdditionalLightsRenderingMode: 1
+  m_AdditionalLightsRenderingMode: 0
   m_AdditionalLightsPerObjectLimit: 4
   m_AdditionalLightShadowsSupported: 0
   m_AdditionalLightsShadowmapResolution: 2048
   m_AdditionalLightsShadowResolutionTierLow: 256
   m_AdditionalLightsShadowResolutionTierMedium: 512
   m_AdditionalLightsShadowResolutionTierHigh: 1024
-  m_ReflectionProbeBlending: 1
-  m_ReflectionProbeBoxProjection: 1
+  m_ReflectionProbeBlending: 0
+  m_ReflectionProbeBoxProjection: 0
   m_ShadowDistance: 30
   m_ShadowCascadeCount: 1
   m_Cascade2Split: 0.25
@@ -65,7 +65,7 @@ MonoBehaviour:
   m_SoftShadowsSupported: 0
   m_ConservativeEnclosingSphere: 1
   m_NumIterationsEnclosingSphere: 64
-  m_SoftShadowQuality: 2
+  m_SoftShadowQuality: 1
   m_AdditionalLightsCookieResolution: 1024
   m_AdditionalLightsCookieFormat: 1
   m_UseSRPBatcher: 1
@@ -91,7 +91,7 @@ MonoBehaviour:
   m_MaxPixelLights: 0
   m_ShadowAtlasResolution: 256
   m_VolumeFrameworkUpdateMode: 0
-  m_VolumeProfile: {fileID: 11400000, guid: 10fc4df2da32a41aaa32d77bc913491c, type: 2}
+  m_VolumeProfile: {fileID: 11400000, guid: 97c654293a9e99c4f89397fb5d43f861, type: 2}
   apvScenesData:
     obsoleteSceneBounds:
       m_Keys: []
@@ -129,8 +129,8 @@ MonoBehaviour:
   m_PrefilterScreenCoord: 1
   m_PrefilterNativeRenderPass: 1
   m_PrefilterUseLegacyLightmaps: 0
-  m_PrefilterReflectionProbeBlending: 0
-  m_PrefilterReflectionProbeBoxProjection: 0
+  m_PrefilterReflectionProbeBlending: 1
+  m_PrefilterReflectionProbeBoxProjection: 1
   m_ShaderVariantLogLevel: 0
   m_ShadowCascades: 0
   m_Textures:
