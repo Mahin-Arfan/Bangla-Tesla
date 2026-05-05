@@ -1,91 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &91443043366877923
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8100103652771053004}
-  - component: {fileID: 312969648170865015}
-  - component: {fileID: 1886207505747068015}
-  m_Layer: 0
-  m_Name: PillarsL
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8100103652771053004
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 91443043366877923}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.000000029802326, y: -0.000000014901163, z: -0.37149575, w: 0.92843467}
-  m_LocalPosition: {x: 0.18928985, y: 0.093491964, z: 0.012809572}
-  m_LocalScale: {x: 0.009999999, y: 0.009999998, z: 0.009999999}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 6450354034212497676}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &312969648170865015
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 91443043366877923}
-  m_Mesh: {fileID: 1647787795496215086, guid: 9663da1d4abbc1843acfae75fd70b26b, type: 3}
---- !u!23 &1886207505747068015
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 91443043366877923}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 07d8f3e6d2edf1e4592ec17e2ff896ac, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &1064436976813416257
 GameObject:
   m_ObjectHideFlags: 0
@@ -329,7 +243,7 @@ Transform:
   m_GameObject: {fileID: 2015257756646778848}
   serializedVersion: 2
   m_LocalRotation: {x: 0.000000119209275, y: -0, z: 0.45157036, w: 0.89223546}
-  m_LocalPosition: {x: -0.13993973, y: 0.06730514, z: 0.0128095625}
+  m_LocalPosition: {x: -0.13993973, y: 0.1115, z: 0.0128}
   m_LocalScale: {x: 0.009999998, y: 0.009999999, z: 0.009999998}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -555,7 +469,7 @@ Transform:
   m_GameObject: {fileID: 3165845325094164968}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.059353635, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.01, y: 0.009999999, z: 0.009999999}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -808,7 +722,6 @@ Transform:
   - {fileID: 9064739945078536623}
   - {fileID: 5712374554589350713}
   - {fileID: 2975917135307814147}
-  - {fileID: 8100103652771053004}
   - {fileID: 7506334946693542667}
   - {fileID: 4614300405012181491}
   m_Father: {fileID: 0}
@@ -1468,7 +1381,7 @@ Transform:
   m_GameObject: {fileID: 7509695063806127103}
   serializedVersion: 2
   m_LocalRotation: {x: 0.06324435, y: 0.70427287, z: 0.70427275, w: 0.06324434}
-  m_LocalPosition: {x: 0.111772954, y: 0.42060667, z: 0.009771423}
+  m_LocalPosition: {x: 0.111772954, y: 0.48, z: 0.009771423}
   m_LocalScale: {x: 0.019817067, y: 0.019817062, z: 0.019817064}
   m_ConstrainProportionsScale: 0
   m_Children: []
