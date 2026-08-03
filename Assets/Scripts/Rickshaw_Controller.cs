@@ -1,32 +1,33 @@
 ﻿using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.EnhancedTouch;
-using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
-using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 
 [RequireComponent(typeof(Rigidbody), typeof(BoxCollider))]
 public class PlayerRickshawController : MonoBehaviour
 {
     [Header("Speed Settings")]
-    [HideInInspector] public float baseSpeed = 8f;         // always moves forward
+    [HideInInspector] public float baseSpeed = 8f;
     public float startSpeed = 8f;
-    public float maxSpeed = 20f;        // maximum speed limit
-    public float boostSpeed = 5f;        // extra speed
-    public float acceleration = 4f;      // smooth speed change
+    public float maxSpeed = 20f;        //maximum speed limit
+    public float boostSpeed = 5f;
+    public float acceleration = 4f;
     public float currentSpeed;
-    private bool boostPressed = false;
     [HideInInspector] public bool outOfBattery = false;
 
     [Header("Brake Settings")]
-    public float breakDeceleration = 5f;
+    public float brakeDeceleration = 5f;
     public float brakeForce = 10f;
-    public float maxBrakeTime = 1f;      // how long brakes works
-    public float brakeCooldown = 2f;     // cooldown after brake
     private bool brakePressed = false;
+    public bool isBrakeFailed = false;
+    public float brakeMeter = 0f;
+    public float maxBrakeMeter = 100f;
+    public float meterIncreaseRate = 30f;
+    public float meterDecreaseRate = 15f; 
 
     [Header("Steering Settings")]
-    public float tiltSensitivity = 2.0f;
+    public float tiltSensitivity = 1.5f;
     public float steerSpeed = 5f;
+    // Influence multipliers for additional accelerometer axes
+    public float yTiltInfluence = 0.2f;
+    public float zTiltInfluence = 0.0f;
     public float maxTurnAngle = 45f;
     public float sideCheckDistance = 1f;
     public float sideCheckInterval = 0.2f;
@@ -38,9 +39,9 @@ public class PlayerRickshawController : MonoBehaviour
     bool rightBlocked = false;
 
     [Header("Damage Effects")]
-    public float maxDamagePullAngle = 5f; // The pull rotation
-    public float damageWobbleSpeed = 15f;  // How fast it shakes
-    public float damageWobbleAmount = 2f;  // How violent the shake is
+    public float maxDamagePullAngle = 5f;
+    public float damageWobbleSpeed = 15f;
+    public float damageWobbleAmount = 2f;
     float damageBias = 0f;
     float damageWobbleTimer = 0f;
 
@@ -64,11 +65,11 @@ public class PlayerRickshawController : MonoBehaviour
     public LayerMask obstacleLayer;
     private CameraScript cameraScript;
     private RickshawHealth healthScript;
+    private UIScript uiScript;
+    private GameManagerScript gameManager;
     [HideInInspector] public bool gameStarted = false;
 
     private Rigidbody rb;
-    private float brakeTimer = 0f;
-    private float brakeCooldownTimer = 0f;
     private bool isBraking = false;
     public float horizontalInput;
 
@@ -78,59 +79,21 @@ public class PlayerRickshawController : MonoBehaviour
         rb.constraints |= RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         cameraScript = GetComponent<CameraScript>();
         healthScript = GetComponent<RickshawHealth>();
+        gameManager = GameManagerScript.Instance;
         rickshawAudioSource = GetComponent<AudioSource>();
+        uiScript = GameObject.FindWithTag("GameController").GetComponent<UIScript>();
         baseSpeed = startSpeed;
     }
 
     void Update()
     {
         if(!gameStarted)   return;
-        if (leftPressed)
-            horizontalInput = Mathf.Lerp(horizontalInput, -1f, Time.deltaTime * steerSpeed);
-        else if (rightPressed)
-            horizontalInput = Mathf.Lerp(horizontalInput, 1f, Time.deltaTime * steerSpeed);
-        else
-            horizontalInput = Mathf.Lerp(horizontalInput, 0f, Time.deltaTime * steerSpeed);
 
-#if UNITY_EDITOR
-        /*
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            BoostButtonDown();
-        }
-        if(Input.GetKeyUp(KeyCode.W))
-        {
-            BoostButtonUp();
-        }
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            BreakButtonDown();
-        }
-        if (Input.GetKeyUp(KeyCode.S))
-        {
-            BreakButtonUp();
-        }
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            LeftButtonDown();
-        }
-        if (Input.GetKeyUp(KeyCode.A))
-        {
-            LeftButtonUp();
-        }
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            RightButtonDown();
-        }
-        if (Input.GetKeyUp(KeyCode.D))
-        {
-            RightButtonUp();
-        }
-        */
-#endif
+        HandleSteeringInput();
         HandleBraking();
         UpdateSteerHandle(animSteer);
         HandleEngineSound();
+        UpdateSpeedMeterUI();
         sideCheckTimer += Time.deltaTime;
         damageWobbleTimer += Time.deltaTime;
     }
@@ -141,28 +104,18 @@ public class PlayerRickshawController : MonoBehaviour
         ApplyForwardMovement();
         Steer();
     }
-    public void LeftButtonDown() { leftPressed = true; }
-    public void LeftButtonUp() { leftPressed = false; }
-    public void RightButtonDown() { rightPressed = true; }
-    public void RightButtonUp() { rightPressed = false; }
-    public void BoostButtonUp() { boostPressed = false; }
-    public void BoostButtonDown() { boostPressed = true; }
-    public void BreakButtonUp() { brakePressed = false; }
-    public void BreakButtonDown() { brakePressed = true; }
-
-
     void Steer()
     {
-        // INPUT
+        //input
         float steerInput = Mathf.Clamp(horizontalInput, -1f, 1f);
         float posX = transform.position.x;
         float absX = Mathf.Abs(posX);
 
-        //PositionCheck
+        //position Check
         if(posX < -5.6) transform.position = new Vector3(-5.6f, transform.position.y, transform.position.z);
         if(posX > 5.6) transform.position = new Vector3(5.6f, transform.position.y, transform.position.z);
 
-        //Side Check
+        //side Check
         if (sideCheckTimer >= sideCheckInterval)
         {
             rightBlocked = Physics.Raycast(turnCheck.position, turnCheck.right, turnCheckDistance, obstacleLayer);
@@ -170,11 +123,10 @@ public class PlayerRickshawController : MonoBehaviour
             sideCheckTimer = 0f;
         }
 
-        // Block steering only toward obstacle
+        //Block steering toward obstacle
         if (steerInput > 0f && rightBlocked) steerInput = 0f;
         if (steerInput < 0f && leftBlocked) steerInput = 0f;
 
-        // POSITION-BASED STEER LIMIT
         float steerMultiplier = 1f;
 
         if (absX > fullSteerX)
@@ -216,7 +168,7 @@ public class PlayerRickshawController : MonoBehaviour
         }
 
 
-        // ROTATION (PHYSICS)
+        //ROTATION
         float targetY = 180f + (finalSteer * maxTurnAngle) + damageBias;
         Quaternion targetRot = Quaternion.Euler(0f, targetY, 0f);
 
@@ -234,7 +186,6 @@ public class PlayerRickshawController : MonoBehaviour
             )
         );
 
-        // VISUAL + ANIMATION STEERING
         float deltaFromForward =
             Mathf.Abs(Mathf.DeltaAngle(180f, rb.rotation.eulerAngles.y));
 
@@ -262,13 +213,13 @@ public class PlayerRickshawController : MonoBehaviour
 
         if (isBraking)
         {
-            float brakingSpeed = baseSpeed - breakDeceleration;
+            float brakingSpeed = baseSpeed - brakeDeceleration;
             currentSpeed = Mathf.Lerp(currentSpeed, brakingSpeed, brakeForce * Time.fixedDeltaTime);
         }
         else
         {
             float targetSpeed = baseSpeed;
-            if (boostPressed) targetSpeed += boostSpeed;
+            if (InputManager.Instance.boostPressed) targetSpeed += boostSpeed;
             currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, acceleration * Time.fixedDeltaTime);
         }
 
@@ -278,25 +229,95 @@ public class PlayerRickshawController : MonoBehaviour
 
     void HandleBraking()
     {
-        if (brakeCooldownTimer > 0f)
-            brakeCooldownTimer -= Time.deltaTime;
-
-        if (brakePressed && brakeCooldownTimer <= 0f)
+        if (isBrakeFailed)
         {
-            isBraking = true;
-            brakeTimer += Time.deltaTime;
+            if (isBraking) isBraking = false;
+            return;
+        }
 
-            if (brakeTimer >= maxBrakeTime)
+        brakePressed = InputManager.Instance.brakePressed;
+
+        if (!brakePressed)
+        {
+            if(isBraking) isBraking = false;
+            if (brakeMeter > 0f)
             {
-                isBraking = false;
-                brakeCooldownTimer = brakeCooldown;
+                brakeMeter -= meterDecreaseRate * Time.deltaTime;
             }
         }
         else
         {
-            isBraking = false;
-            brakeTimer = 0f;
+            if (!isBraking) isBraking = true;
+            brakeMeter += meterIncreaseRate * Time.deltaTime;
+
+            if (brakeMeter >= maxBrakeMeter)
+            {
+                brakeMeter = maxBrakeMeter;
+                isBrakeFailed = true;
+                isBraking = false;
+            }
         }
+
+        uiScript.BrakeMeterUIUpdate(brakeMeter, isBraking, isBrakeFailed);
+    }
+
+    void HandleSteeringInput()
+    {
+        if (gameManager.tiltSteeringControl)
+        {
+            Vector3 accel = Input.acceleration;
+            float combined = accel.x + accel.y * yTiltInfluence + accel.z * zTiltInfluence;
+            float targetTilt = combined * tiltSensitivity;
+            targetTilt = Mathf.Clamp(targetTilt, -1f, 1f);
+            horizontalInput = Mathf.Lerp(horizontalInput, targetTilt, Time.deltaTime * steerSpeed);
+        }
+        else
+        {
+            leftPressed = InputManager.Instance.leftPressed;
+            rightPressed = InputManager.Instance.rightPressed;
+            if (leftPressed)
+                horizontalInput = Mathf.Lerp(horizontalInput, -1f, Time.deltaTime * steerSpeed);
+            else if (rightPressed)
+                horizontalInput = Mathf.Lerp(horizontalInput, 1f, Time.deltaTime * steerSpeed);
+            else
+                horizontalInput = Mathf.Lerp(horizontalInput, 0f, Time.deltaTime * steerSpeed);
+        }
+#if UNITY_EDITOR //KeyboardControl
+        /*
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            BoostButtonDown();
+        }
+        if(Input.GetKeyUp(KeyCode.W))
+        {
+            BoostButtonUp();
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            BreakButtonDown();
+        }
+        if (Input.GetKeyUp(KeyCode.S))
+        {
+            BreakButtonUp();
+        }
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            LeftButtonDown();
+        }
+        if (Input.GetKeyUp(KeyCode.A))
+        {
+            LeftButtonUp();
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            RightButtonDown();
+        }
+        if (Input.GetKeyUp(KeyCode.D))
+        {
+            RightButtonUp();
+        }
+        */
+#endif
     }
 
     void UpdateSteerHandle(float steer)
@@ -344,5 +365,13 @@ public class PlayerRickshawController : MonoBehaviour
         float speedPercentage = Mathf.InverseLerp(0f, maxSpeed, currentSpeed);
         rickshawAudioSource.pitch = Mathf.Lerp(minPitch, maxPitch, speedPercentage);
         cameraScript.SetSpeedMultiplier(speedPercentage);
+    }
+
+    void UpdateSpeedMeterUI()
+    {
+        if (uiScript != null)
+        {
+            uiScript.UpdateSpeedUI((int)currentSpeed);
+        }
     }
 }

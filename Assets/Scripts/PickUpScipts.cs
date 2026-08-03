@@ -1,5 +1,5 @@
+using DG.Tweening;
 using UnityEngine;
-using UnityEngine.SocialPlatforms.Impl;
 
 public class PickUpScipts : MonoBehaviour
 {
@@ -14,12 +14,17 @@ public class PickUpScipts : MonoBehaviour
     private LayerMask playerLayer;
     private float onTriggerEnterTime = 0f;
     private float positionCheckTimer = 0f;
-    private float distanceProgress = 0f;
+
+    [Header("PickUp Rotation Settings")]
+    [SerializeField]
+    private float rotationSpeed = 1f;
+    [SerializeField]
+    private Vector3 rotationVector = new Vector3(0f, 360f, 0f);
 
     [Header("References")]
-    public RickshawHealth rickshawHealthScript;
+    private RickshawHealth rickshawHealthScript;
     private GameManagerScript gameManager;
-    private Transform rickshawTransform;
+    public Transform rickshawTransform;
 
     void Start()
     {
@@ -29,10 +34,11 @@ public class PickUpScipts : MonoBehaviour
         }
         if(rickshawHealthScript == null)
         {
-            rickshawHealthScript = GameObject.FindGameObjectWithTag("Player").transform.GetComponent<RickshawHealth>();
+            rickshawHealthScript = gameManager.player.transform.GetComponent<RickshawHealth>();
         }
         rickshawTransform = rickshawHealthScript.transform;
         playerLayer = LayerMask.GetMask("Player");
+        transform.DORotate(rotationVector, rotationSpeed, RotateMode.WorldAxisAdd).SetLoops(-1).SetEase(Ease.Linear);
         RespawnPickup();
     }
 
@@ -77,10 +83,14 @@ public class PickUpScipts : MonoBehaviour
     void RespawnPickup()
     {
         float posX = Random.Range(-spawnXRange, spawnXRange);
-        distanceProgress = Mathf.Clamp01(gameManager.score / gameManager.maxDificultyScore * 2);
-        distanceProgress = Mathf.SmoothStep(0f, 1f, distanceProgress);
-        float currentGap = Mathf.Lerp(minSpawnGap, maxSpawnGap, distanceProgress);
+        float currentGap = Mathf.Lerp(minSpawnGap, maxSpawnGap, gameManager.progress);
         nextSpawnZ = transform.position.z - currentGap;
         transform.position = new Vector3(posX, transform.position.y, nextSpawnZ);
+    }
+
+    public void GetPlayerReference(Transform player)
+    {
+        rickshawTransform = player;
+        rickshawHealthScript = rickshawTransform.GetComponent<RickshawHealth>();
     }
 }

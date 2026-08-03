@@ -9,7 +9,6 @@ public class UIPoolManager : MonoBehaviour
     public GameObject[] effectPrefabs;
     public int amountPerType = 4;
 
-    // A list of lists. Each inner list represents one type of effect.
     private List<List<PooledImpactEffect>> allPools;
 
     void Awake()

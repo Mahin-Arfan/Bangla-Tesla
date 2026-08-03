@@ -1653,7 +1653,7 @@ GameObject:
   - component: {fileID: 1824797521855307761}
   - component: {fileID: 7960068276069174131}
   - component: {fileID: 3527603372043672619}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Police
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1716,6 +1716,7 @@ MonoBehaviour:
   walking: 0
   salesman: 0
   police: 1
+  male: 1
   isDead: 0
   walkSpeed: 2
   detectionDistance: 1

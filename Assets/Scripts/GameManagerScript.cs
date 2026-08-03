@@ -25,15 +25,16 @@ public class GameManagerScript : MonoBehaviour
     }
 
     [Header("Game Settings")]
-    public int score = 0;
+    private int score = 0;
     public int highScore = 0;
     public float maxDificultyScore = 1000f;
-    public int pedestrianHitScore = 150;
-    public int vehicleHitScore = 50;
-    public int bikeHitScore = 100;
+    private int pedestrianHitScore = 150;
+    private int vehicleHitScore = 50;
+    private int bikeHitScore = 100;
     [HideInInspector] public float progress = 0f;
     public bool gameStarted = false;
     public bool gameOver = false;
+    public bool tiltSteeringControl = true;
 
     [Header("Road Settings")]
     public Road[] roads;
@@ -70,14 +71,13 @@ public class GameManagerScript : MonoBehaviour
     private int[] vehicleGroupIndex;
 
     [Header("Vehicle Spawn Settings")]
-    public float spawnRate = 2f; // base spawn rate
     public float startSpawnRate = 2f;
     public float maxSpawnRate = 10f;
-    public Vector3 spawnLocation;
     public float baseSpawnTime = 3f;
     public float spawnDistance = 80f;
     public float menuSpawnPositionZ = 20f;
-    public float spawnTimer;
+    private float spawnTimer;
+    private float spawnRate = 2f; // base spawn rate
 
     [Header("Pedestrians")]
     public float pedestrianSpawnRate = 1f;
@@ -101,17 +101,20 @@ public class GameManagerScript : MonoBehaviour
     private List<GameObject> toRecycle = new List<GameObject>();
 
     [Header("References")]
+    public PickUpScipts[] pickUpScript;
+    [HideInInspector] public Transform mainCamera;
     public GameObject player;
-    public Animator cameraAnimator;
-    public Animator rickshawManAnimator;
-    public Transform cam;
     private PlayerRickshawController playerController;
-    private UIScript uIScript;
+    [HideInInspector] public UIScript uIScript;
+    [HideInInspector] public Animator cameraAnimator;
     private bool gameInitiaded = false;
     private bool gameOverInitiaded = false;
-    //temp
-    public Vector3 gizmosSpawnPos;
-    public Vector3 gizmosSpawnSize;
+
+    //ScoreStats
+    int distanceScore = 0;
+    int vehicleHit = 0;
+    int bikeHit = 0;
+    int pedestriansHit = 0;
 
     void Awake()
     {
@@ -121,6 +124,14 @@ public class GameManagerScript : MonoBehaviour
             return;
         }
         Instance = this;
+        GetPlayerReference();
+        if (mainCamera == null) mainCamera = GameObject.FindGameObjectWithTag("MainCamera").transform;
+        cameraAnimator = mainCamera.GetComponentInParent<Animator>();
+        uIScript = GetComponent<UIScript>();
+        if (playerController == null || mainCamera == null || uIScript == null)
+        {
+            Debug.LogError("One or more required components not found!");
+        }
         Screen.orientation = ScreenOrientation.LandscapeLeft;
         Screen.autorotateToPortrait = false;
         Screen.autorotateToPortraitUpsideDown = false;
@@ -129,17 +140,6 @@ public class GameManagerScript : MonoBehaviour
     }
     void Start()
     {
-        if(player == null) player = GameObject.FindGameObjectWithTag("Player");
-        playerController = player.GetComponent<PlayerRickshawController>();
-        uIScript = GetComponent<UIScript>();
-        if (playerController == null)
-        {
-            Debug.LogError("PlayerRickshawController not found on player!");
-        }
-        if(uIScript == null)
-        {
-            Debug.LogError("UIScript not found on GameManagerScript!");
-        }
         // road initialization
         firstRoad = roads[0].roadSegment.transform;
         secondRoad = roads[1].roadSegment.transform;
@@ -161,11 +161,7 @@ public class GameManagerScript : MonoBehaviour
 
     void Update()
     {
-        score = (int)Mathf.Abs(player.transform.position.z); 
-        if (score > highScore)
-        {
-            highScore = score;
-        }
+        distanceScore = (int)Mathf.Abs(player.transform.position.z);
         UpdateDifficulty();
         HandleRoadSpawning();
         HandleVehicleSpawning();
@@ -186,7 +182,7 @@ public class GameManagerScript : MonoBehaviour
         }
         if (uIScript != null)
         {
-            uIScript.UpdateScoreUI(score, highScore);
+            uIScript.UpdateScoreUI(distanceScore, highScore);
         }
     }
 
@@ -365,7 +361,9 @@ public class GameManagerScript : MonoBehaviour
             return prefabPool[prefab].Dequeue();
 
         GameObject obj = Instantiate(prefab);
+#if UNITY_EDITOR
         Debug.Log("Instantiating new object for prefab: " + prefab.name);
+#endif
         PooledVehicle pv = obj.AddComponent<PooledVehicle>();
         pv.prefabSource = prefab;
         pv.controller = obj.GetComponent<NPCVehicleController>();
@@ -504,17 +502,39 @@ public class GameManagerScript : MonoBehaviour
 
     void UpdateDifficulty()
     {
-        progress = Mathf.Clamp01(score / maxDificultyScore);
+        progress = Mathf.Clamp01(distanceScore / maxDificultyScore);
         progress = Mathf.SmoothStep(0f, 1f, progress);
 
         playerController.baseSpeed = Mathf.Lerp(playerController.startSpeed, playerController.maxSpeed, progress);
         spawnRate = Mathf.Lerp(startSpawnRate, maxSpawnRate, progress);
     }
 
-    public void AddScore(int amount)
+    public void RegisterHit(Type hitType)
     {
-        score += amount;
-        uIScript.SpawnFloatingScore(amount);
+        int scoreToApply = 0;
+        switch (hitType)
+        {
+            case Type.Pedestrian:
+                scoreToApply = pedestrianHitScore;
+                pedestriansHit++;
+                break;
+
+            case Type.Bike:
+                scoreToApply = bikeHitScore;
+                bikeHit++;
+                break;
+
+            case Type.Car:
+                scoreToApply = vehicleHitScore;
+                vehicleHit++;
+                break;
+            default:
+                scoreToApply = vehicleHitScore;
+                vehicleHit++;
+                break;
+        }
+        score += scoreToApply;
+        uIScript.SpawnFloatingScore(scoreToApply);
     }
 
     void StartGame()
@@ -526,30 +546,24 @@ public class GameManagerScript : MonoBehaviour
     void GameOver()
     {
         gameOverInitiaded = true;
-        PlayerPrefs.SetInt("HighScore", highScore);
-        PlayerPrefs.Save();
-        uIScript.GameOver();
+        EconomyManager.Instance.ConvertRunToTaka(score, distanceScore);
+        score += distanceScore;
+        if (score > highScore)
+        {
+            highScore = score;
+            PlayerPrefs.SetInt("HighScore", highScore);
+            PlayerPrefs.Save();
+        }
+        uIScript.GameOver(distanceScore, vehicleHit, bikeHit, pedestriansHit, score);
     }
 
-#if UNITY_EDITOR
-    //temp gizmos
-    void OnDrawGizmosSelected()
+    public void GetPlayerReference()
     {
-        if (!Application.isPlaying) return;
-
-
-        // ----------------------------------------
-        // 4. DRAW LEFT SIDE CHECK BOX (checkPos)
-        // ----------------------------------------
-        Gizmos.color = Color.yellow;
-        Gizmos.matrix = Matrix4x4.TRS(
-            gizmosSpawnPos,
-            Quaternion.identity,
-            Vector3.one
-        );
-        Gizmos.DrawWireCube(Vector3.zero, gizmosSpawnSize * 2f);
-
-        Gizmos.matrix = Matrix4x4.identity;
+        player = GameObject.FindGameObjectWithTag("Player");
+        playerController = player.GetComponent<PlayerRickshawController>();
+        foreach (var pickUp in pickUpScript)
+        {
+            pickUp.GetPlayerReference(player.transform);
+        }
     }
-#endif
 }

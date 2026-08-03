@@ -1,4 +1,5 @@
 
+using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -43,14 +44,12 @@ public class RickshawHealth : MonoBehaviour
     public Collider[] rickshawManColliders;
     public Rigidbody[] rickshawManRigidBodies;
     public GameObject colliders;
-    public Slider healthSlider;
-    public Slider easeHealthSlider;
-    public Slider batterySlider;
 
     // Internal References
     private GameManagerScript gameManagerScript;
     private CameraScript cameraScript;
     private PlayerRickshawController playerRickshawController;
+    private UIScript uiscript;
     private BoxCollider frontWheelBoxCollider;
     private BoxCollider baseBoxCollider;
     private BoxCollider leftWheelBoxCollider;
@@ -62,16 +61,21 @@ public class RickshawHealth : MonoBehaviour
     private Rigidbody leftWheelRigidbody;
     private Rigidbody rightWheelRigidbody;
     private Rigidbody rb;
-    int pedestrianHitScore = 150;
-    int bikeHitScore = 100;
-    int vehicleHitScore = 50;
+    [HideInInspector] public int pedestrianHitScore = 150;
+    [HideInInspector] public int bikeHitScore = 100;
+    [HideInInspector] public int vehicleHitScore = 50;
 
     void Start()
     {
         gameManagerScript = GameManagerScript.Instance;
+        uiscript = gameManagerScript.GetComponent<UIScript>();
         cameraScript = GetComponent<CameraScript>();
         rb = GetComponent<Rigidbody>();
         playerRickshawController = GetComponent<PlayerRickshawController>();
+        if(playerRickshawController == null)
+        {
+            Debug.LogError("PlayerRickshawController not found on RickshawHealth GameObject.");
+        }
         frontWheelBoxCollider = frontWheelCollider.GetComponent<BoxCollider>();
         baseBoxCollider = baseCollider.GetComponent<BoxCollider>();
         leftWheelBoxCollider = leftWheelTransform.GetComponent<BoxCollider>();
@@ -84,21 +88,10 @@ public class RickshawHealth : MonoBehaviour
         rightWheelRigidbody = rightWheelTransform.GetComponent<Rigidbody>();
         currentBattery = maxBattery;
         drainCoefficient = maxBattery / initialRangeInMeters;
-        pedestrianHitScore = gameManagerScript.pedestrianHitScore;
-        bikeHitScore = gameManagerScript.bikeHitScore;
-        vehicleHitScore = gameManagerScript.vehicleHitScore;
     }
 
     void Update()
     {
-        if(healthSlider.value != health)
-        {
-            healthSlider.value = health;
-        }
-        if(healthSlider.value != easeHealthSlider.value)
-        {
-            easeHealthSlider.value = Mathf.Lerp(easeHealthSlider.value, health, Time.deltaTime * healthDrainSpeed);
-        }
         if (isDead) return;
         if (playerRickshawController.outOfBattery && playerRickshawController.currentSpeed < 0.1f && !isDead)
         {
@@ -110,7 +103,7 @@ public class RickshawHealth : MonoBehaviour
         if (currentBattery > 0 && playerRickshawController.enabled)
         {
             UpdateBatteryHealth();
-            batterySlider.value = currentBattery;
+            uiscript.BatteryUIUpdate(currentBattery);
         }
     }
 
@@ -121,23 +114,23 @@ public class RickshawHealth : MonoBehaviour
 
         AudioManager.Instance.PlayCrash(transform.position);
         float damageToApply = 0f;
-
+        if(gameManagerScript == null) gameManagerScript = GameManagerScript.Instance;
         if (wheelPos == CollisionDetector.WheelPosition.Front)
         {
             if (((1 << hitLayer) & pedestrianLayer) != 0)
             {
                 damageToApply = 20f;
-                gameManagerScript.AddScore(pedestrianHitScore);
+                gameManagerScript.RegisterHit(GameManagerScript.Type.Pedestrian);
             }
             else if (((1 << hitLayer) & BikeLayer) != 0)
             {
                 damageToApply = 50f;
-                gameManagerScript.AddScore(bikeHitScore);
+                gameManagerScript.RegisterHit(GameManagerScript.Type.Bike);
             }
             else
             {
                 damageToApply = 100f;
-                gameManagerScript.AddScore(vehicleHitScore);
+                gameManagerScript.RegisterHit(GameManagerScript.Type.Car);
             }
         }
         else
@@ -145,17 +138,17 @@ public class RickshawHealth : MonoBehaviour
             if (((1 << hitLayer) & pedestrianLayer) != 0)
             {
                 damageToApply = 10f;
-                gameManagerScript.AddScore(pedestrianHitScore);
+                gameManagerScript.RegisterHit(GameManagerScript.Type.Pedestrian);
             }
             else if (((1 << hitLayer) & BikeLayer) != 0)
             {
                 damageToApply = 15f;
-                gameManagerScript.AddScore(bikeHitScore);
+                gameManagerScript.RegisterHit(GameManagerScript.Type.Bike);
             }
             else
             {
                 damageToApply = 20f;
-                gameManagerScript.AddScore(vehicleHitScore);
+                gameManagerScript.RegisterHit(GameManagerScript.Type.Car);
             }
 
             if (wheelPos == CollisionDetector.WheelPosition.Left)
@@ -173,7 +166,7 @@ public class RickshawHealth : MonoBehaviour
         lastHitTime = Time.time;
 
         if (cameraScript != null) cameraScript.TriggerShake();
-
+        if (uiscript != null) uiscript.HealthUIUpdate(health);
         if (health <= 0)
         { 
             dieCausedByBattery = false;
@@ -191,7 +184,7 @@ public class RickshawHealth : MonoBehaviour
             if (!playerRickshawController.outOfBattery)
             {
                 playerRickshawController.outOfBattery = true;
-                //Play a "Power Down" sound here
+                //Play a Power Down sound here
             }
         }
     }
@@ -202,6 +195,11 @@ public class RickshawHealth : MonoBehaviour
         health = 100f;
         leftWheelHealth = 100f;
         rightWheelHealth = 100f;
+        if (playerRickshawController.isBrakeFailed)
+        {
+            playerRickshawController.brakeMeter = 0;
+            playerRickshawController.isBrakeFailed = false;
+        }
     }
 
     public void BatteryPickUp()
@@ -211,7 +209,7 @@ public class RickshawHealth : MonoBehaviour
         if(playerRickshawController.outOfBattery)
         {
             playerRickshawController.outOfBattery = false;
-            //Play a "Power Up" sound here
+            //Play a Power Up sound here
         }
     }
 

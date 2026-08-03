@@ -18,17 +18,17 @@ public class NPCVehicleController : MonoBehaviour
     }
 
     [Header("Driving Settings")]
-    public float vehicleSpeed;                // current speed (m/s)
-    public float minSpeed = 5f;                // min random speed (m/s)
-    public float maxSpeed = 15f;               // max random speed (m/s)
+    public float vehicleSpeed;
+    public float minSpeed = 5f;
+    public float maxSpeed = 15f;
     public float currentMaxSpeed;
     private float speedLimit;
-    public float acceleration = 25f;           // base acceleration amount (units used as torque multiplier)
-    public float accelerationSmoothness = 5f;  // lerp speed for acceleration changes
-    private float steerAngle = 30f;             // maximum steering angle (deg)
-    public float turnSmoothness = 5f;          // lerp speed for steering
-    public float brakeForce = 2000f;           // brake torque
-    public float stopDistanceMultiplier = 1f;  // multiplier used to compute stopDistance from speed
+    public float acceleration = 25f;
+    public float accelerationSmoothness = 5f;
+    private float steerAngle = 30f;
+    public float turnSmoothness = 5f;
+    public float brakeForce = 2000f; 
+    public float stopDistanceMultiplier = 1f;
     private bool isBraking = false;
     public float idleTime = 0f;
 
@@ -42,12 +42,12 @@ public class NPCVehicleController : MonoBehaviour
 
     [Header("Obstacle & Overtake")]
     public bool tryOvertake = true;
-    public float frontCheckerDistance = 20f;   // how far the rays check
+    public float frontCheckerDistance = 20f;
     public float overTakeSideClearance = 2f;   // extra gap when calculating overtake pos
     public float overTakeSideClearanceY = 0f;
     public float sideCheckDistance = 3f;
-    public float checkInterval = 0.2f;         // how often to run obstacle checks (seconds)
-    public float overTakingTendency = 3f;      // Lower = more likely to overtake
+    public float checkInterval = 0.2f;         // obstacle check tinme interval
+    public float overTakingTendency = 3f;
     private Vector3 overTakeLocalOffset = Vector3.zero;
     public float overTakeCompleteDisctance = 1f;
     private bool frontCheckHit = false;
@@ -71,9 +71,9 @@ public class NPCVehicleController : MonoBehaviour
 
     [Header("Vehicle Mechanics")]
     public Type vehicleType = Type.Car;
-    public bool lockXRotation = false;         // if true, freezes X rotation on Rigidbody
-    public bool lockZRotation  = false;          // if true, freezes Z rotation on Rigidbody
-    public bool lockYPosition = true;         // if true, freezes Y position on Rigidbody
+    public bool lockXRotation = false;         // x rotation on Rigidbody
+    public bool lockZRotation  = false;          // z rotation on Rigidbody
+    public bool lockYPosition = true;         // y position on Rigidbody
     public bool reverseMechanics = false;
     public bool wrongSideDriving = false;
 
@@ -85,14 +85,14 @@ public class NPCVehicleController : MonoBehaviour
     private float audioTriggerDistance;
 
     // runtime
-    private Rigidbody rb;              // randomly chosen top speed (m/s)
-    private float currentAcceleration;         // smoothed acceleration value
+    private Rigidbody rb;
+    private float currentAcceleration;
     private bool isOvertaking = false;
-    private GameObject obstacle;               // current obstacle GameObject or null
+    private GameObject obstacle;
     private float obstacleDistance = Mathf.Infinity;
     private Collider obstacleCollider = null;
     private Transform obstacleTransform = null;
-    private Vector3 checkSize;          // checkSize for CheckBox (world-space)
+    private Vector3 checkSize;
     private float overTakeCheckTimer = 0f;
     private float lastCheckTime = 0f;
     private Vector3 currentDriveTarget;
@@ -112,10 +112,10 @@ public class NPCVehicleController : MonoBehaviour
     public Transform frontRightChecker;        // right ray origin
     public Transform frontLeftChecker;         // left ray origin
     public Transform groundChecker;           // ground check origin
-    public BoxCollider vehicleBodyCollider;    // used for sizing overtake checks
-    public LayerMask vehicleLayer;             // layer mask for raycasts/CheckBox
-    private Vector3 driveTarget;              // main drive target
-    private Vector3 overtakeTarget;           // target used while overtaking
+    public BoxCollider vehicleBodyCollider;
+    public LayerMask vehicleLayer;
+    private Vector3 driveTarget;
+    private Vector3 overtakeTarget;
     private NPCCharacterScript nPCCharacterScript;
     private Transform playerTransform;
 
@@ -168,7 +168,6 @@ public class NPCVehicleController : MonoBehaviour
         else
         {
             Vector3 fullSize = Vector3.Scale(vehicleBodyCollider.size, vehicleBodyCollider.transform.lossyScale);
-            // requested size = (size.x + 0.5, 1, size.z*2)
             Vector3 requested = new Vector3(fullSize.x, 1f, fullSize.z * overTakingTendency);
             checkSize = requested * 0.5f;
         }
@@ -337,23 +336,19 @@ public class NPCVehicleController : MonoBehaviour
 
             if (w.axel == Axel.Rear)
             {
-                // torque only applied if below adjusted speed limit
                 if (vehicleSpeed < adjustedSpeedLimit)
                 {
                     w.wheelCollider.motorTorque = currentAcceleration * 50f;
-                    // ensure brakes not stuck
                     w.wheelCollider.brakeTorque = 0f;
                 }
                 else if (vehicleSpeed > adjustedSpeedLimit + 5f)
                 {
-                    // too fast -> brake
                     currentAcceleration = 0f;
                     w.wheelCollider.motorTorque = 0f;
                     w.wheelCollider.brakeTorque = brakeForce;
                 }
                 else
                 {
-                    // at or slightly above allowed speed -> cut power, no heavy brake
                     w.wheelCollider.motorTorque = 0f;
                     w.wheelCollider.brakeTorque = 0f;
                 }
@@ -402,7 +397,7 @@ public class NPCVehicleController : MonoBehaviour
         if (frontChecker != null && Physics.Raycast(frontChecker.position, flatForward, out hitCenter, frontCheckerDistance, vehicleLayer))
         {
             closest = hitCenter; frontCheckHit = true;
-            if (hitCenter.distance <= stopDistance) { ApplyBrakes(true); return; } // immediate contact sanity
+            if (hitCenter.distance <= stopDistance) { ApplyBrakes(true); return; }
         }
 
         // right
@@ -410,7 +405,7 @@ public class NPCVehicleController : MonoBehaviour
         {
             if (!frontCheckHit || hitRight.distance < closest.distance) closest = hitRight;
             frontCheckHit = true;
-            if (hitRight.distance <= stopDistance) { ApplyBrakes(true); return; } // immediate contact sanity
+            if (hitRight.distance <= stopDistance) { ApplyBrakes(true); return; }
         }
 
         // left
@@ -418,7 +413,7 @@ public class NPCVehicleController : MonoBehaviour
         {
             if (!frontCheckHit || hitLeft.distance < closest.distance) closest = hitLeft;
             frontCheckHit = true;
-            if (hitLeft.distance <= stopDistance) { ApplyBrakes(true); return; } // immediate contact sanity
+            if (hitLeft.distance <= stopDistance) { ApplyBrakes(true); return; }
         }
 
         if (!frontCheckHit && !isOvertaking)
@@ -430,7 +425,6 @@ public class NPCVehicleController : MonoBehaviour
             return;
         }
 
-        // assign obstacle & obstacle distance safely
         if (closest.collider != null)
         {
             GameObject newObstacle = closest.collider.gameObject;
@@ -452,10 +446,9 @@ public class NPCVehicleController : MonoBehaviour
         {
             obstacle = null;
             obstacleDistance = Mathf.Infinity;
-            return;   // <- unnecessary to continue if no obstacle
+            return;
         }
 
-        // If close enough brake
         if (obstacleDistance <= stopDistance)
         {
             ApplyBrakes(true);
@@ -464,27 +457,24 @@ public class NPCVehicleController : MonoBehaviour
 
         ApplyBrakes(false);
 
-        //If obstacle is already faster — no overtake needed
         if (otherNPC != null && otherNPC.vehicleSpeed > speedLimit)
         {
             return;
         }
 
-        // Try overtaking if enabled and not already overtaking
         if (tryOvertake && obstacle != null && !shouldStop && frontCheckHit && overTakeCheckTimer > checkInterval)
         {
             overTakeCheckTimer = 0f;
             Vector3 obstacleWorldSize = GetColliderWorldSize(obstacleCollider);
             float sideOffset = obstacleWorldSize.x * 0.5f + checkSize.x + overTakeSideClearance;
 
-            // right/left positions based on obstacle position and vehicle orientation
             Vector3 rightOvertakePos = new Vector3(obstacleTransform.position.x - sideOffset, vehicleBodyCollider.transform.position.y + overTakeSideClearanceY, obstacleTransform.position.z + obstacleWorldSize.x * 0.5f);
             Vector3 leftOvertakePos = new Vector3(obstacleTransform.position.x + sideOffset, vehicleBodyCollider.transform.position.y + overTakeSideClearanceY, obstacleTransform.position.z + obstacleWorldSize.x * 0.5f);
             //temp
             rightOvertakeGizmoPos = rightOvertakePos;
             leftOvertakeGizmoPos = leftOvertakePos;
             //temp End
-            // Decide best lane logically
+
             bool rightBlockedByRoad = rightOvertakePos.x < -5f;
             bool leftBlockedByRoad = leftOvertakePos.x > 5f;
             if (rightBlockedByRoad)
@@ -497,7 +487,6 @@ public class NPCVehicleController : MonoBehaviour
             }
             else
             {
-                // both available → prefer right but fallback left if needed
                 TryOvertakeRightSide(rightOvertakePos, leftOvertakePos, true);
             }
         }
@@ -548,6 +537,7 @@ public class NPCVehicleController : MonoBehaviour
 
             if (!Physics.CheckBox(checkPos, checkSize, checkRot))
             {
+                // safe to overtake on the left
                 overTakeLocalOffset = leftSideOverTakePosition - obstacleTransform.position;
                 isOvertaking = true;
             }
@@ -562,7 +552,6 @@ public class NPCVehicleController : MonoBehaviour
         RaycastHit hit;
         if (!Physics.Raycast(groundChecker.position, Vector3.down, out hit, 1f))
         {
-            // not grounded — apply simple gravity
             transform.position = new Vector3(transform.position.x, initialYPosition + 0.5f, transform.position.z);
             transform.rotation = Quaternion.Euler(0f, 180f, 0f);
         }
@@ -748,10 +737,10 @@ public class NPCVehicleController : MonoBehaviour
             gameStartedSettingsInitialized = false;
         }
 
-        // Re-randomize speed
+        // randomize speed
         speedLimit = Random.Range(minSpeed, currentMaxSpeed);
 
-        // Reset drive target far ahead
+        // Reset drive target
         if (!wrongSideDriving)
         {
             driveTarget = new Vector3(transform.position.x, transform.position.y, transform.position.z - 1000f);
@@ -827,7 +816,6 @@ public class NPCVehicleController : MonoBehaviour
 
     void HandleEngineAudio()
     {
-        // Request sound if close enough
         if (distanceToPlayer <= audioTriggerDistance && myEngineSound == null)
         {
             myEngineSound = AudioManager.Instance.RequestEngineAudio(engineClip, transform);
@@ -855,7 +843,6 @@ public class NPCVehicleController : MonoBehaviour
 
 #if UNITY_EDITOR
 
-    // Optional: draw debug rays / boxes in Scene view
     void OnDrawGizmosSelected()
     {
         if (!Application.isPlaying) return;
@@ -895,21 +882,14 @@ public class NPCVehicleController : MonoBehaviour
         );
         Gizmos.DrawWireCube(Vector3.zero, checkSize * 2f);
 
-        // ----------------------------------------
-        // 3. DRAW RIGHT SIDE CHECK BOX (checkPos)
-        // ----------------------------------------
         Gizmos.color = Color.yellow;
         Gizmos.matrix = Matrix4x4.TRS(
             rightSideCheckGizmoPos,
             Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f),
             Vector3.one
         );
-        Gizmos.DrawWireCube(Vector3.zero, checkSize * 2f); // *2 because checkSize is half-extents
+        Gizmos.DrawWireCube(Vector3.zero, checkSize * 2f);
 
-
-        // ----------------------------------------
-        // 4. DRAW LEFT SIDE CHECK BOX (checkPos)
-        // ----------------------------------------
         Gizmos.color = Color.yellow;
         Gizmos.matrix = Matrix4x4.TRS(
             leftSideCheckGizmoPos,

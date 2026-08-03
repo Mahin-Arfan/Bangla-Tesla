@@ -1,55 +1,144 @@
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class UIScript : MonoBehaviour
 {
     [Header("Score UI")]
-    public TextMeshProUGUI scoreText;      // Drag your current score text here
+    public TextMeshProUGUI scoreText;
     public TextMeshProUGUI highScoreText;
+
+    [Header("Rickshaw UI")]
+    public TextMeshProUGUI speedText;
+    public Slider healthSlider;
+    public Slider batterySlider;
+    private Image batteryBarColor;
 
     [Header("UI GameObjects")]
     public GameObject mainMenuUI;
     public GameObject endMenuUI;
-    public GameObject inputUI;
+    public GameObject inputUIButton;
+    public GameObject inputUITilt;
+    public GameObject screenMeterUI;
+    public GameObject stillCanvas;
+    public GameObject settingsCanvas;
+    public GameObject SettingOptionsPublic;
+    public GameObject updateCanvas;
+    public GameObject updateCanvas1;
+    public GameObject garageStillCanvas;
+    public GameObject garageUpdateCanvas;
     public FloatingText[] floatingScorePool;
 
+    [Header("Score Texts")]
+    public TextMeshProUGUI distanceTravelledValue;
+    public TextMeshProUGUI bikeHitValue;
+    public TextMeshProUGUI vehicleHitValue;
+    public TextMeshProUGUI pedestrianHitValue;
+    public TextMeshProUGUI takaEarnedValue;
+
+    [Header("Score Animation Settings")]
+    public float slideDuration = 0.5f;
+    public float countDuration = 1.0f;
+    public float delayBetweenRows = 0.2f;
+
+    [Header("Brake UIs")]
+    public Image brakingUI;
+    public Image brakeBrokenUI;
+    public Slider brakeSlider;
+    Vector2 brakeUIOriginalPosition;
+    float brakeUIShakeIntensity = 100f;
+    RectTransform brakeImageRect;
+    Image brakeSliderFillImage;
+
     private GameManagerScript gameManagerScript;
+
+    //Score UI Texts
+    GameObject distanceTravelledText;
+    GameObject bikeHitText;
+    GameObject vehicleHitText;
+    GameObject pedestrianHitText;
+    GameObject takaEarnedText;
 
     void Start()
     {
         gameManagerScript = GetComponent<GameManagerScript>();
-        inputUI.SetActive(false);
+        inputUIButton.SetActive(false);
+        inputUITilt.SetActive(false);
+        screenMeterUI.SetActive(false);
+        updateCanvas.SetActive(false);
+        updateCanvas1.SetActive(false);
+        batteryBarColor = batterySlider.GetComponentInChildren<Image>();
+         
+        brakeImageRect = brakingUI.rectTransform;
+        brakeSliderFillImage = brakeSlider.fillRect.GetComponent<Image>();
+        if (brakeImageRect != null)
+        {
+            brakeUIOriginalPosition = brakeImageRect.anchoredPosition;
+        }
+        brakingUI.enabled = false;
+        brakeBrokenUI.enabled = false;
+
+        //Grab Score UI Texts
+        distanceTravelledText = distanceTravelledValue.transform.parent.gameObject;
+        bikeHitText = bikeHitValue.transform.parent.gameObject;
+        vehicleHitText = vehicleHitValue.transform.parent.gameObject;
+        pedestrianHitText = pedestrianHitValue.transform.parent.gameObject;
+        takaEarnedText = takaEarnedValue.transform.parent.gameObject;
     }
 
     public void PlayGame()
     {
-        if(GameManagerScript.Instance.cameraAnimator != null && GameManagerScript.Instance.rickshawManAnimator != null) 
+        if(GameManagerScript.Instance.cameraAnimator != null && GameManagerScript.Instance.player != null) 
         {
-            GameManagerScript.Instance.cameraAnimator.enabled = true;
-            GameManagerScript.Instance.rickshawManAnimator.SetTrigger("Start");
+            GameManagerScript.Instance.cameraAnimator.SetTrigger("Start");
+            GameManagerScript.Instance.player.GetComponent<PlayerRickshawController>().rickshawManAnimator.SetTrigger("Start");
+        }
+        else
+        {
+            Debug.LogWarning("Camera Animator or Player is not assigned in GameManagerScript.");
         }
         mainMenuUI.SetActive(false);
+
         Invoke("StartGame", 1.5f);
     }
 
     void StartGame()
     {
-        GameManagerScript.Instance.cam.SetParent(null);
-        inputUI.SetActive(true);
+        GameManagerScript.Instance.mainCamera.SetParent(null);
+        screenMeterUI.SetActive(true);
+        updateCanvas.SetActive(true);
+        updateCanvas1.SetActive(true);
+        if (gameManagerScript.tiltSteeringControl == true)
+        {
+            inputUITilt.SetActive(true);
+        }
+        else
+        {
+            inputUIButton.SetActive(true);
+        }
         gameManagerScript.gameStarted = true;
     }
 
-    public void UpdateScoreUI(int currentScore, int currentHighScore)
+    public void UpdateScoreUI(int distanceScore, int currentHighScore)
     {
         if (scoreText != null)
         {
-            scoreText.text = "SCORE: " + currentScore.ToString("D5");
+            //scoreText.text = distanceScore.ToString("D5");
+            scoreText.text = $"<mspace=0.54em>{distanceScore}</mspace>";
         }
 
         if (highScoreText != null)
         {
             highScoreText.text = "HIGH SCORE: " + currentHighScore.ToString("D5");
+        }
+    }
+    public void UpdateSpeedUI(int speed)
+    {
+        if(speedText != null)
+        {
+            speedText.text = speed.ToString();
         }
     }
 
@@ -59,10 +148,94 @@ public class UIScript : MonoBehaviour
         {
             if (!ft.gameObject.activeInHierarchy)
             {
-                // We found a free text object! Play it and stop searching.
                 ft.SetupAndPlay("+" + pointsAdded.ToString());
                 return;
             }
+        }
+    }
+
+    public void HealthUIUpdate(float health)
+    {
+        if (healthSlider.value != health)
+        {
+            healthSlider.value = health;
+        }
+    }
+
+    public void BatteryUIUpdate(float battery)
+    {
+        float targetValue;
+        if (battery > 80f)
+        {
+            targetValue = 100f;
+            batteryBarColor.color = Color.green;
+        }
+        else if (battery > 60f)
+        {
+            targetValue = 80f;
+            batteryBarColor.color = Color.green;
+        }
+        else if (battery > 40f)
+        {
+            targetValue = 60f;
+            batteryBarColor.color = Color.yellow;
+        }
+        else if (battery > 20f)
+        {
+            targetValue = 40f;
+            batteryBarColor.color = new Color32(255, 165, 0, 255);
+        }
+        else if(battery > 0f)
+        {
+            targetValue = 20f;
+            batteryBarColor.color = Color.red;
+        }
+        else
+        {
+            targetValue = 0f;
+        }
+
+        if (batterySlider.value != targetValue)
+        {
+            batterySlider.value = targetValue;
+        }
+    }
+
+    public void BrakeMeterUIUpdate(float meter, bool isBraking, bool brakeFail)
+    {
+        if (brakeFail)
+        {
+            brakingUI.enabled = false;
+            brakeBrokenUI.enabled = true;
+
+            brakeImageRect.anchoredPosition = brakeUIOriginalPosition;
+            return;
+        }
+        float meterPercentage = meter / 80f;
+        if (brakeSlider.value != meter)
+        {
+            brakeSlider.value = meter; 
+            if (brakeSliderFillImage != null)
+            {
+                brakeSliderFillImage.color = Color.Lerp(Color.yellow, Color.red, meterPercentage);
+            }
+        }
+
+        if (meter > 0)
+        {
+            brakingUI.enabled = true;
+            brakeBrokenUI.enabled = false;
+
+            float currentShake = brakeUIShakeIntensity * meterPercentage;
+
+            Vector2 randomShake = Random.insideUnitCircle * currentShake;
+            brakeImageRect.anchoredPosition = brakeUIOriginalPosition + randomShake;
+        }
+        else
+        {
+            brakingUI.enabled = false;
+            brakeBrokenUI.enabled = false;
+            brakeImageRect.anchoredPosition = brakeUIOriginalPosition;
         }
     }
 
@@ -70,20 +243,105 @@ public class UIScript : MonoBehaviour
     {
         Application.Quit();
 
-        // For testing in Editor
+        // For testing in Editor temp
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
     }
 
-    public void GameOver()
+    public void GameOver(int distanceTravelled, int vehicleHit, int bikeHit, int pedestrianHit, int totalScore)
     {
-        inputUI.SetActive(false);
+        inputUIButton.SetActive(false);
+        inputUITilt.SetActive(false);
+        screenMeterUI.SetActive(false);
+        updateCanvas1.SetActive(false);
         endMenuUI.SetActive(true);
+        AnimateScoreShowcase(distanceTravelled, bikeHit, vehicleHit, pedestrianHit, totalScore);
+    }
+
+    public void Settings()
+    {
+        stillCanvas.SetActive(false);
+        updateCanvas.SetActive(false);
+        updateCanvas1.SetActive(false);
+        settingsCanvas.SetActive(true);
+        SettingOptionsPublic.SetActive(true);
+    }
+
+    public void BackToMainMenu()
+    {
+        stillCanvas.SetActive(true);
+        settingsCanvas.SetActive(false);
+        updateCanvas.SetActive(false);
+        updateCanvas1.SetActive(false);
+    }
+
+    public void CustomizeButton()
+    {
+        mainMenuUI.SetActive(false);
+        garageStillCanvas.SetActive(true);
+        garageUpdateCanvas.SetActive(true);
+        GarageManager.Instance.onCustomizeButtonPressed();
+    }
+
+    public void CustomizeToMainMenu()
+    {
+        mainMenuUI.SetActive(true);
+
+        garageStillCanvas.SetActive(false);
+        garageUpdateCanvas.SetActive(false);
+        GarageManager.Instance.onHomeButtonPressed();
     }
 
     public void HomeButton()
     {
+        DOTween.KillAll();
         SceneManager.LoadScene("SampleScene");
+    }
+
+
+    //For score showcase animation
+    public void AnimateScoreShowcase(int dist, int bikes, int vehicles, int peds, int taka)
+    {
+        distanceTravelledText.SetActive(false);
+        bikeHitText.SetActive(false);
+        vehicleHitText.SetActive(false);
+        pedestrianHitText.SetActive(false);
+        takaEarnedText.SetActive(false);
+
+        Sequence scoreSequence = DOTween.Sequence();
+
+        AnimateRow(scoreSequence, distanceTravelledText, distanceTravelledValue, dist, -24f, -34f);
+        AnimateRow(scoreSequence, bikeHitText, bikeHitValue, bikes, -6f, 6f);
+        AnimateRow(scoreSequence, vehicleHitText, vehicleHitValue, vehicles, 36f, 46f);
+        AnimateRow(scoreSequence, pedestrianHitText, pedestrianHitValue, peds, 76f, 86f);
+        AnimateRow(scoreSequence, takaEarnedText, takaEarnedValue, taka, 116f, 126f);
+    }
+
+    private void AnimateRow(Sequence seq, GameObject container, TextMeshProUGUI textMesh, int finalValue, float startX, float endX)
+    {
+        RectTransform rect = container.GetComponent<RectTransform>();
+
+        textMesh.text = "0";
+
+        
+        seq.AppendCallback(() =>
+        {
+            container.SetActive(true);
+            Vector2 startPos = rect.anchoredPosition;
+            startPos.x = startX;
+            rect.anchoredPosition = startPos;
+        });
+
+        seq.Append(rect.DOAnchorPosX(endX, slideDuration).SetEase(Ease.OutQuad));
+
+        int currentValue = 0;
+        seq.Join(DOTween.To(() => currentValue, x =>
+        {
+            currentValue = x;
+            textMesh.text = currentValue.ToString();
+        }, finalValue, countDuration).SetEase(Ease.Linear));
+
+        seq.AppendInterval(delayBetweenRows);
     }
 }

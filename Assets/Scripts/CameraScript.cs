@@ -51,8 +51,8 @@ public class CameraScript : MonoBehaviour
                 return;
             }
         }
-        seedX = Random.Range(0f, 100f); //Initialize seeds for Perlin Noise (random start point)
-        seedY = Random.Range(0f, 100f); //Initialize seeds for Perlin Noise (random start point)
+        seedX = Random.Range(0f, 100f);
+        seedY = Random.Range(0f, 100f);
         internalPosition = playerTransform.position + offset;
     }
 
