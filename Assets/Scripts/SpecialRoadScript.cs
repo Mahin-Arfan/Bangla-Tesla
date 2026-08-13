@@ -1,4 +1,8 @@
+using DG.Tweening;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SpecialRoadScript : MonoBehaviour
 {
@@ -16,6 +20,22 @@ public class SpecialRoadScript : MonoBehaviour
     private Animator animator;
     private Collider[] objectColliders;
 
+    [Header("Directional Arrow Settings")]
+    public RectTransform arrowRect;
+    public Image iconImage;
+    public Image arrowImage;
+    public TextMeshProUGUI textDistance;
+
+    public float pulseScaleMultiplier = 1.2f;
+    public float basePulseDuration = 0.5f;
+    private Vector3 iconOriginalScale;
+
+    [Header("Dynamic Pulse Speed")]
+    public float maxPulseSpeedMultiplier = 4f;
+    public float startSpeedingUpDistance = 50f;
+    public float maxSpeedDistance = 20f;
+    private Tween pulseTween;
+
     //internals
     float distanceToPlayer;
     Vector3 dropObjectPosition;
@@ -24,14 +44,18 @@ public class SpecialRoadScript : MonoBehaviour
     bool actionStarted = false;
     bool objectDropped = false;
 
+    private void OnEnable()
+    {
+        playerTransform = GameManagerScript.Instance.player.transform;
+    }
+    void OnDisable()
+    {
+        arrowRect.DOKill();
+    }
+
     void Start()
     {
-        if(playerTransform == null)
-        {
-            playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
-        }
         animator = GetComponent<Animator>();
-        
         objectColliders = new Collider[rigidObjects.Length];
         if (environmentType == EnvironmentTypes.CraneWork)
         {
@@ -46,12 +70,19 @@ public class SpecialRoadScript : MonoBehaviour
                 objectColliders[i] = rigidObjects[i].GetComponent<Collider>();
             }
         }
+        RectTransform iconRect = iconImage.GetComponent<RectTransform>();
+        iconOriginalScale = iconRect.localScale;
+        pulseTween = iconRect.DOScale(iconOriginalScale * pulseScaleMultiplier, basePulseDuration)
+            .SetEase(Ease.InOutSine)
+            .SetLoops(-1, LoopType.Yoyo)
+            .SetLink(gameObject);
     }
 
     void Update()
     {
         distanceToPlayer = playerTransform.position.z - transform.position.z;
-        if(distanceToPlayer > 0f)
+        float distanceZ = Mathf.Abs(distanceToPlayer);
+        if (distanceToPlayer > 0f)
         {
             if (distanceToPlayer < actionDistance)
             {
@@ -60,7 +91,7 @@ public class SpecialRoadScript : MonoBehaviour
         }
         else
         {
-            if (Mathf.Abs(distanceToPlayer) > inactiveDistace)
+            if (distanceZ > inactiveDistace)
             {
                 rigidObjects[actionObjectIndex].isKinematic = true;
                 rigidObjects[actionObjectIndex].transform.localPosition = dropObjectPosition;
@@ -70,6 +101,11 @@ public class SpecialRoadScript : MonoBehaviour
                 objectDropped = false;
                 this.gameObject.SetActive(false);
             }
+        }
+        if (arrowRect != null && distanceZ < 100f)
+        {
+            UpdateRotation();
+            UpdateAlpha(distanceZ);
         }
     }
 
@@ -102,6 +138,51 @@ public class SpecialRoadScript : MonoBehaviour
                 rigidObjects[actionObjectIndex].AddForce(dropForce * hitForce, ForceMode.Impulse);
             }
             objectDropped = true;
+        }
+    }
+
+    private void UpdateRotation()
+    {
+        Vector3 directionToTarget = rigidObjects[actionObjectIndex].transform.position - playerTransform.position;
+        directionToTarget.y = 0;
+        float angle = Vector3.SignedAngle(Vector3.back, directionToTarget, Vector3.up);
+        arrowRect.localEulerAngles = new Vector3(0, 0, -angle);
+    }
+
+    private void UpdateAlpha(float distanceZ)
+    {
+        float playerZ = playerTransform.position.z;
+        float targetZ = rigidObjects[actionObjectIndex].transform.position.z;
+        float targetAlpha = 0f;
+
+        if (playerZ > targetZ)
+        {
+            targetAlpha = Mathf.InverseLerp(100f, 50f, distanceZ);
+        }
+        else
+        {
+            targetAlpha = Mathf.InverseLerp(10f, 0f, distanceZ);
+        }
+        textDistance.text = Mathf.RoundToInt(distanceZ).ToString() + "m";
+        Color currentColor = arrowImage.color;
+        Color currentIconColor = iconImage.color;
+        currentColor.a = targetAlpha;
+        currentIconColor.a = targetAlpha;
+        arrowImage.color = currentColor;
+        iconImage.color = currentIconColor;
+        textDistance.color = currentColor;
+        UpdatePulseSpeed(distanceZ);
+    }
+
+    private void UpdatePulseSpeed(float distanceZ)
+    {
+        float speedUpPercentage = Mathf.InverseLerp(startSpeedingUpDistance, maxSpeedDistance, distanceZ);
+
+        float currentSpeed = Mathf.Lerp(1f, maxPulseSpeedMultiplier, speedUpPercentage);
+
+        if (pulseTween != null && pulseTween.IsActive())
+        {
+            pulseTween.timeScale = currentSpeed;
         }
     }
 }
