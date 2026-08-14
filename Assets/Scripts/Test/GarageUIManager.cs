@@ -15,6 +15,7 @@ public class GarageUIManager : MonoBehaviour
     [SerializeField] private TMP_Text speedValueText;
     [SerializeField] private TMP_Text batteryValueText;
     [SerializeField] private TMP_Text handlingValueText;
+    [SerializeField] private TMP_Text priceText;
 
     [Header("Single Contextual Action Button")]
     [SerializeField] private Button actionButton;
@@ -73,6 +74,15 @@ public class GarageUIManager : MonoBehaviour
         speedValueText.text = $"{data.topSpeedKmh:0} km/h";
         batteryValueText.text = $"{data.batteryDrainPerSecond:0} mi";
         handlingValueText.text = $"{data.durability:0}%";
+        if (isOwned)
+        {
+            priceText.enabled = false;
+        }
+        else
+        {
+            priceText.enabled = true;
+            priceText.text = $"Price: {data.unlockPrice:0} tk";
+        }
 
         RefreshActionButton(data, isOwned, isEquipped);
     }

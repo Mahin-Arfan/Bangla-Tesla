@@ -16,9 +16,9 @@ public class PlayerRickshawController : MonoBehaviour
     public float brakeDeceleration = 5f;
     public float brakeForce = 10f;
     private bool brakePressed = false;
-    public bool isBrakeFailed = false;
-    public float brakeMeter = 0f;
-    public float maxBrakeMeter = 100f;
+    [HideInInspector] public bool isBrakeFailed = false;
+    [HideInInspector] public float brakeMeter = 0f;
+    private float maxBrakeMeter = 100f;
     public float meterIncreaseRate = 30f;
     public float meterDecreaseRate = 15f; 
 
@@ -57,6 +57,13 @@ public class PlayerRickshawController : MonoBehaviour
     public float minPitch = 0f;
     public float maxPitch = 2f;
     private AudioSource rickshawAudioSource;
+
+    [Header("Brake Sound")]
+    public float brakeMinPitch = 0f;
+    public float brakeMaxPitch = 2f;
+    public float brakeVolume = 0.5f;
+    private AudioSource brakeSound;
+    public AudioSource brakeSoundSource;
 
     [Header("References")]
     public Animator rickshawManAnimator;
@@ -232,6 +239,7 @@ public class PlayerRickshawController : MonoBehaviour
         if (isBrakeFailed)
         {
             if (isBraking) isBraking = false;
+            if (brakeSound != null) ReleaseBrakeAudio();
             return;
         }
 
@@ -240,6 +248,7 @@ public class PlayerRickshawController : MonoBehaviour
         if (!brakePressed)
         {
             if(isBraking) isBraking = false;
+            ReleaseBrakeAudio();
             if (brakeMeter > 0f)
             {
                 brakeMeter -= meterDecreaseRate * Time.deltaTime;
@@ -249,12 +258,13 @@ public class PlayerRickshawController : MonoBehaviour
         {
             if (!isBraking) isBraking = true;
             brakeMeter += meterIncreaseRate * Time.deltaTime;
-
+            HandleBrakeSound(brakeMeter, maxBrakeMeter);
             if (brakeMeter >= maxBrakeMeter)
             {
                 brakeMeter = maxBrakeMeter;
                 isBrakeFailed = true;
                 isBraking = false;
+                brakeSoundSource = AudioManager.Instance.RequestGameAudioClip(AudioManager.Instance.brakeSnapSoundClip, transform, 0.8f, 1f, 0f, false);
             }
         }
 
@@ -365,6 +375,27 @@ public class PlayerRickshawController : MonoBehaviour
         float speedPercentage = Mathf.InverseLerp(0f, maxSpeed, currentSpeed);
         rickshawAudioSource.pitch = Mathf.Lerp(minPitch, maxPitch, speedPercentage);
         cameraScript.SetSpeedMultiplier(speedPercentage);
+    }
+
+    void HandleBrakeSound(float brakeMeter, float maxBrakeMeter)
+    {
+        if (brakeSound == null && AudioManager.Instance != null)
+        {
+            brakeSound = AudioManager.Instance.RequestGameAudioClip(AudioManager.Instance.brakeSoundClip, transform, brakeVolume, 1f, 0f, true);
+        }
+        if (brakeSound.isPlaying)
+        {
+            float brakePercentage = Mathf.InverseLerp(0f, maxBrakeMeter, brakeMeter);
+            brakeSound.pitch = Mathf.Lerp(brakeMinPitch, brakeMaxPitch, brakePercentage);
+        }
+    }
+    void ReleaseBrakeAudio()
+    {
+        if (brakeSound != null && AudioManager.Instance != null)
+        {
+            AudioManager.Instance.ReturnAudioSource(brakeSound);
+            brakeSound = null;
+        }
     }
 
     void UpdateSpeedMeterUI()

@@ -39,6 +39,12 @@ public class AudioManager : MonoBehaviour
     public AudioClip[] femaleDeadVoiceClips;
     public AudioClip[] galiVoiceClips;
     public AudioClip[] stallClips;
+    public AudioClip brakeSoundClip;
+    public AudioClip brakeSnapSoundClip;
+    public AudioClip batteryPickUpClip;
+    public AudioClip healthPickUpClip;
+    public AudioClip batteryEmptyClip;
+    public AudioClip lowBatteryWarningClip;
     public AudioClip environmentClip;
     public AudioClip music;
 
@@ -220,6 +226,27 @@ public class AudioManager : MonoBehaviour
             source.clip = clip;
             source.Play();
         }
+    }
+
+    public AudioSource RequestGameAudioClip(AudioClip clip, Transform parentTransform, float volume, float pitch, float spatialBlend, bool loop)
+    {
+        if (clip == null) return null;
+
+        AudioSource source = GetFreeSource();
+        if (source != null)
+        {
+            source.transform.SetParent(parentTransform);
+            source.transform.localPosition = Vector3.zero;
+            source.loop = loop;
+            source.volume = volume;
+            source.spatialBlend = spatialBlend;
+            source.pitch = pitch;
+            source.clip = clip;
+            source.Play();
+
+            return source;
+        }
+        return null;
     }
 
     public void ReturnAudioSource(AudioSource source)

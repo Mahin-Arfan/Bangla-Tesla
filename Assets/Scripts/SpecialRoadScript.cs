@@ -44,10 +44,6 @@ public class SpecialRoadScript : MonoBehaviour
     bool actionStarted = false;
     bool objectDropped = false;
 
-    private void OnEnable()
-    {
-        playerTransform = GameManagerScript.Instance.player.transform;
-    }
     void OnDisable()
     {
         arrowRect.DOKill();
@@ -55,6 +51,7 @@ public class SpecialRoadScript : MonoBehaviour
 
     void Start()
     {
+        playerTransform = GameManagerScript.Instance.player.transform;
         animator = GetComponent<Animator>();
         objectColliders = new Collider[rigidObjects.Length];
         if (environmentType == EnvironmentTypes.CraneWork)

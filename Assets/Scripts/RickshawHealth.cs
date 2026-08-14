@@ -184,7 +184,7 @@ public class RickshawHealth : MonoBehaviour
             if (!playerRickshawController.outOfBattery)
             {
                 playerRickshawController.outOfBattery = true;
-                //Play a Power Down sound here
+                AudioManager.Instance.RequestGameAudioClip(AudioManager.Instance.batteryEmptyClip, transform, 1f, 1f, 0f, false);
             }
         }
     }
@@ -200,6 +200,7 @@ public class RickshawHealth : MonoBehaviour
             playerRickshawController.brakeMeter = 0;
             playerRickshawController.isBrakeFailed = false;
         }
+        AudioManager.Instance.RequestGameAudioClip(AudioManager.Instance.healthPickUpClip, transform, 0.5f, 1.5f, 0f, false);
     }
 
     public void BatteryPickUp()
@@ -209,8 +210,8 @@ public class RickshawHealth : MonoBehaviour
         if(playerRickshawController.outOfBattery)
         {
             playerRickshawController.outOfBattery = false;
-            //Play a Power Up sound here
         }
+        AudioManager.Instance.RequestGameAudioClip(AudioManager.Instance.batteryPickUpClip, transform, 0.75f, 1.5f, 0f, false);
     }
 
     void ApplyWheelJiggle()

@@ -46,6 +46,7 @@ public class UIScript : MonoBehaviour
     [Header("Brake UIs")]
     public Image brakingUI;
     public Image brakeBrokenUI;
+    public Image brakeUnavailableUI;
     public Slider brakeSlider;
     Vector2 brakeUIOriginalPosition;
     float brakeUIShakeIntensity = 100f;
@@ -60,7 +61,7 @@ public class UIScript : MonoBehaviour
     GameObject vehicleHitText;
     GameObject pedestrianHitText;
     GameObject takaEarnedText;
-
+    private float currentBatteryTier = -1f;
     void Start()
     {
         gameManagerScript = GetComponent<GameManagerScript>();
@@ -161,43 +162,36 @@ public class UIScript : MonoBehaviour
             healthSlider.value = health;
         }
     }
-
     public void BatteryUIUpdate(float battery)
     {
         float targetValue;
-        if (battery > 80f)
+        if (battery > 80f) targetValue = 100f;
+        else if (battery > 60f) targetValue = 80f;
+        else if (battery > 40f) targetValue = 60f;
+        else if (battery > 20f) targetValue = 40f;
+        else if (battery > 0f) targetValue = 20f;
+        else targetValue = 0f;
+
+        if (targetValue == currentBatteryTier) return;
+
+        currentBatteryTier = targetValue;
+        batterySlider.value = targetValue;
+        if (targetValue >= 80f)
         {
-            targetValue = 100f;
             batteryBarColor.color = Color.green;
         }
-        else if (battery > 60f)
+        else if (targetValue == 60f)
         {
-            targetValue = 80f;
-            batteryBarColor.color = Color.green;
-        }
-        else if (battery > 40f)
-        {
-            targetValue = 60f;
             batteryBarColor.color = Color.yellow;
         }
-        else if (battery > 20f)
+        else if (targetValue == 40f)
         {
-            targetValue = 40f;
-            batteryBarColor.color = new Color32(255, 165, 0, 255);
+            batteryBarColor.color = new Color32(255, 165, 0, 255); // Orange
         }
-        else if(battery > 0f)
+        else if(targetValue == 20f)
         {
-            targetValue = 20f;
             batteryBarColor.color = Color.red;
-        }
-        else
-        {
-            targetValue = 0f;
-        }
-
-        if (batterySlider.value != targetValue)
-        {
-            batterySlider.value = targetValue;
+            AudioManager.Instance.RequestGameAudioClip(AudioManager.Instance.lowBatteryWarningClip, transform, 0.15f, 1f, 0f, false);
         }
     }
 
@@ -205,26 +199,31 @@ public class UIScript : MonoBehaviour
     {
         if (brakeFail)
         {
-            brakingUI.enabled = false;
-            brakeBrokenUI.enabled = true;
+            if(!brakeBrokenUI.enabled)
+            {
+                brakingUI.enabled = false;
+                brakeBrokenUI.enabled = true;
+                brakeUnavailableUI.enabled = true;
+            }
 
             brakeImageRect.anchoredPosition = brakeUIOriginalPosition;
             return;
         }
-        float meterPercentage = meter / 80f;
+        if (brakeUnavailableUI.enabled) brakeUnavailableUI.enabled = false;
+        float meterPercentage = Mathf.Clamp01(meter / 80f);
         if (brakeSlider.value != meter)
         {
-            brakeSlider.value = meter; 
-            if (brakeSliderFillImage != null)
-            {
-                brakeSliderFillImage.color = Color.Lerp(Color.yellow, Color.red, meterPercentage);
-            }
+            brakeSlider.value = meter;
+            brakeSliderFillImage.color = Color.Lerp(Color.yellow, Color.red, meterPercentage);
         }
 
         if (meter > 0)
         {
-            brakingUI.enabled = true;
-            brakeBrokenUI.enabled = false;
+            if (!brakingUI.enabled)
+            {
+                brakingUI.enabled = true;
+                brakeBrokenUI.enabled = false;
+            }
 
             float currentShake = brakeUIShakeIntensity * meterPercentage;
 
@@ -233,8 +232,8 @@ public class UIScript : MonoBehaviour
         }
         else
         {
-            brakingUI.enabled = false;
-            brakeBrokenUI.enabled = false;
+            if (brakingUI.enabled) brakingUI.enabled = false;
+            if (brakeBrokenUI.enabled) brakeBrokenUI.enabled = false;
             brakeImageRect.anchoredPosition = brakeUIOriginalPosition;
         }
     }
