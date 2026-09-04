@@ -25,7 +25,11 @@ public class CollisionDetector : MonoBehaviour
 
     void Awake()
     {
-        if (isNPC && pedestrian && npcCharacterScript == null)
+        if (!isNPC)
+        {
+            healthScript = GetComponentInParent<RickshawHealth>();
+        }
+        else if (pedestrian && npcCharacterScript == null)
         {
             npcCharacterScript = GetComponent<NPCCharacterScript>();
         }

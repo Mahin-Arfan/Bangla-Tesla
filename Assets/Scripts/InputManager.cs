@@ -22,6 +22,46 @@ public class InputManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+#if UNITY_EDITOR //KeyboardControl
+
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            BoostButtonDown();
+        }
+        if (Input.GetKeyUp(KeyCode.W))
+        {
+            BoostButtonUp();
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            BreakButtonDown();
+        }
+        if (Input.GetKeyUp(KeyCode.S))
+        {
+            BreakButtonUp();
+        }
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            LeftButtonDown();
+        }
+        if (Input.GetKeyUp(KeyCode.A))
+        {
+            LeftButtonUp();
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            RightButtonDown();
+        }
+        if (Input.GetKeyUp(KeyCode.D))
+        {
+            RightButtonUp();
+        }
+
+#endif
+    }
+
     public void LeftButtonDown() { leftPressed = true; }
     public void LeftButtonUp() { leftPressed = false; }
     public void RightButtonDown() { rightPressed = true; }

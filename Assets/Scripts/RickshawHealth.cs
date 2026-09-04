@@ -7,7 +7,8 @@ public class RickshawHealth : MonoBehaviour
 {
     [Header("Stats")]
     public bool invincible = false;
-    public float health = 100f;
+    private float health = 100f;
+    public float maxHealth = 100f;
     public float maxBattery = 100f;
     public bool isDead = false;
     public bool leftWheelDamaged = false;
@@ -27,7 +28,7 @@ public class RickshawHealth : MonoBehaviour
     [Header("Battery Settings")]
     [Tooltip("How many meters can it go with full battery?")]
     public float initialRangeInMeters = 250f;
-    public float currentBattery;
+    private float currentBattery;
     private float drainCoefficient;
 
     [Header("Wheel References")]
@@ -48,7 +49,7 @@ public class RickshawHealth : MonoBehaviour
     // Internal References
     private GameManagerScript gameManagerScript;
     private CameraScript cameraScript;
-    private PlayerRickshawController playerRickshawController;
+    public PlayerRickshawController playerRickshawController;
     private UIScript uiscript;
     private BoxCollider frontWheelBoxCollider;
     private BoxCollider baseBoxCollider;
@@ -64,6 +65,7 @@ public class RickshawHealth : MonoBehaviour
     [HideInInspector] public int pedestrianHitScore = 150;
     [HideInInspector] public int bikeHitScore = 100;
     [HideInInspector] public int vehicleHitScore = 50;
+    private AudioSource rickshawAudioSource;
 
     void Start()
     {
@@ -86,8 +88,10 @@ public class RickshawHealth : MonoBehaviour
         baseRigidbody = baseCollider.GetComponent<Rigidbody>();
         leftWheelRigidbody = leftWheelTransform.GetComponent<Rigidbody>();
         rightWheelRigidbody = rightWheelTransform.GetComponent<Rigidbody>();
+        rickshawAudioSource = GetComponent<AudioSource>();
         currentBattery = maxBattery;
         drainCoefficient = maxBattery / initialRangeInMeters;
+        health = maxHealth;
     }
 
     void Update()
@@ -100,7 +104,7 @@ public class RickshawHealth : MonoBehaviour
         }
         if (!playerRickshawController.gameStarted) return;
         ApplyWheelJiggle();
-        if (currentBattery > 0 && playerRickshawController.enabled)
+        if (currentBattery > 0 && playerRickshawController.enabled && !invincible)
         {
             UpdateBatteryHealth();
             uiscript.BatteryUIUpdate(currentBattery);
@@ -110,6 +114,7 @@ public class RickshawHealth : MonoBehaviour
     public void TakeDamage(int hitLayer, CollisionDetector.WheelPosition wheelPos)
     {
         if(invincible) return; //Temp
+        if (playerRickshawController == null) Debug.Log("player not found!" + gameObject.name);
         if (Time.time < lastHitTime + hitCooldown || isDead || !playerRickshawController.gameStarted) return;
 
         AudioManager.Instance.PlayCrash(transform.position);
@@ -129,7 +134,7 @@ public class RickshawHealth : MonoBehaviour
             }
             else
             {
-                damageToApply = 100f;
+                damageToApply = maxHealth;
                 gameManagerScript.RegisterHit(GameManagerScript.Type.Car);
             }
         }
@@ -165,11 +170,12 @@ public class RickshawHealth : MonoBehaviour
         health -= damageToApply;
         lastHitTime = Time.time;
 
-        if (cameraScript != null) cameraScript.TriggerShake();
+        if (cameraScript != null) cameraScript.HitTriggerShake();
         if (uiscript != null) uiscript.HealthUIUpdate(health);
         if (health <= 0)
         { 
             dieCausedByBattery = false;
+            AudioManager.Instance.RequestGameAudioClip(AudioManager.Instance.batteryEmptyClip, transform, 1f, 1f, 0f, false);
             Die(); 
         }
     }
@@ -192,7 +198,7 @@ public class RickshawHealth : MonoBehaviour
     public void HealthPickUp()
     {
         if(isDead) return;
-        health = 100f;
+        health = maxHealth;
         leftWheelHealth = 100f;
         rightWheelHealth = 100f;
         if (playerRickshawController.isBrakeFailed)
@@ -200,7 +206,7 @@ public class RickshawHealth : MonoBehaviour
             playerRickshawController.brakeMeter = 0;
             playerRickshawController.isBrakeFailed = false;
         }
-        AudioManager.Instance.RequestGameAudioClip(AudioManager.Instance.healthPickUpClip, transform, 0.5f, 1.5f, 0f, false);
+        AudioManager.Instance.RequestGameAudioClip(AudioManager.Instance.healthPickUpClip, transform, 0.35f, 1.5f, 0f, false);
     }
 
     public void BatteryPickUp()
@@ -211,12 +217,12 @@ public class RickshawHealth : MonoBehaviour
         {
             playerRickshawController.outOfBattery = false;
         }
-        AudioManager.Instance.RequestGameAudioClip(AudioManager.Instance.batteryPickUpClip, transform, 0.75f, 1.5f, 0f, false);
+        AudioManager.Instance.RequestGameAudioClip(AudioManager.Instance.batteryPickUpClip, transform, 0.45f, 1.5f, 0f, false);
     }
 
     void ApplyWheelJiggle()
     {
-        if (health >= 100 && !leftWheelDamaged && !rightWheelDamaged) return;
+        if (health >= maxHealth && !leftWheelDamaged && !rightWheelDamaged) return;
 
         if (leftWheelDamaged)
         {
@@ -238,7 +244,7 @@ public class RickshawHealth : MonoBehaviour
         wheel.localEulerAngles = rot;
     }
 
-    void Die()
+    public void Die()
     {
         isDead = true;
         rb.linearVelocity = Vector3.zero;
@@ -247,6 +253,7 @@ public class RickshawHealth : MonoBehaviour
         gameManagerScript.gameOver = true;
         colliders.SetActive(false);
         playerRickshawController.enabled = false;
+        rickshawAudioSource.enabled = false;
 
         if (!dieCausedByBattery) 
         {
@@ -268,6 +275,15 @@ public class RickshawHealth : MonoBehaviour
             foreach (var rb in rickshawManRigidBodies)
             {
                 rb.isKinematic = false;
+            }
+            if (!playerRickshawController.forHire)
+            {
+                NPCCharacterScript passenger = playerRickshawController.passengerCharacterScript;
+                if (passenger != null)
+                {
+                    passenger.transform.SetParent(null);
+                    passenger.isDead = true;
+                }
             }
         }
     }

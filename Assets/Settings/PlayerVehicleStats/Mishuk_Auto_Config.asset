@@ -14,9 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   vehicleId: 1
   displayName: Mishuk
-  description: 
-  thumbnail: {fileID: 0}
-  unlockPrice: 10000
+  colorMaterials:
+  - {fileID: 2100000, guid: b0045df3d42e71548a6b5dc9df600f65, type: 2}
+  - {fileID: 2100000, guid: 61463a88325d9fd4688579feccae6f9f, type: 2}
+  - {fileID: 2100000, guid: 68220f97df8fb094fa1272cf00382aa3, type: 2}
+  unlockPrice: 0
   topSpeedKmh: 22
   batteryDrainPerSecond: 550
   durability: 110

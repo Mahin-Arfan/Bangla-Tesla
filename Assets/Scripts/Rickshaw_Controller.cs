@@ -38,6 +38,21 @@ public class PlayerRickshawController : MonoBehaviour
     bool leftBlocked = false;
     bool rightBlocked = false;
 
+    [Header("Tilt Settings")]
+    public float tiltingTendency = 1.5f;
+    public float tiltMeter = 0f;
+    public float maxTiltMeter = 100f;
+    public float maxTiltAngle = 35f;
+    public float baseRecoveryRate = 10f;
+    public float recoveryAcceleration = 150f;
+    private float currentRecoveryRate;
+    public float tiltSlamShakeIntensity = 0.15f;
+    public Transform rickshawVisualModel;
+    private float currentVisualTiltZ = 0f;
+    private float previousSteerInput = 0f;
+    private bool isFlipped = false;
+    private bool wasHighlyTilted = false;
+
     [Header("Damage Effects")]
     public float maxDamagePullAngle = 5f;
     public float damageWobbleSpeed = 15f;
@@ -63,22 +78,25 @@ public class PlayerRickshawController : MonoBehaviour
     public float brakeMaxPitch = 2f;
     public float brakeVolume = 0.5f;
     private AudioSource brakeSound;
-    public AudioSource brakeSoundSource;
+    private AudioSource brakeSoundSource;
 
     [Header("References")]
     public Animator rickshawManAnimator;
     public Transform rickshawSteerHandle;
     public Transform turnCheck;
     public LayerMask obstacleLayer;
+
+    //Internal References
     private CameraScript cameraScript;
     private RickshawHealth healthScript;
     private UIScript uiScript;
     private GameManagerScript gameManager;
     [HideInInspector] public bool gameStarted = false;
-
     private Rigidbody rb;
-    private bool isBraking = false;
-    public float horizontalInput;
+    [HideInInspector] public bool isBraking = false;
+    [HideInInspector] public float horizontalInput;
+    [HideInInspector] public bool forHire = true;
+    [HideInInspector] public NPCCharacterScript passengerCharacterScript;
 
     void Start()
     {
@@ -193,8 +211,9 @@ public class PlayerRickshawController : MonoBehaviour
             )
         );
 
-        float deltaFromForward =
-            Mathf.Abs(Mathf.DeltaAngle(180f, rb.rotation.eulerAngles.y));
+        float deltaFromForward = Mathf.Abs(Mathf.DeltaAngle(180f, rb.rotation.eulerAngles.y));
+
+        HandleInstability(finalSteer);
 
         bool atMaxSteer = deltaFromForward >= (maxTurnAngle - maxTurnMinusVisual);
 
@@ -292,42 +311,152 @@ public class PlayerRickshawController : MonoBehaviour
             else
                 horizontalInput = Mathf.Lerp(horizontalInput, 0f, Time.deltaTime * steerSpeed);
         }
-#if UNITY_EDITOR //KeyboardControl
-        /*
-        if (Input.GetKeyDown(KeyCode.W))
+    }
+
+    void HandleInstability(float steerInput)
+    {
+        if (isFlipped)
         {
-            BoostButtonDown();
+            ApplyVisualTilt(steerInput);
+            return;
         }
-        if(Input.GetKeyUp(KeyCode.W))
+
+        float steerDelta = Mathf.Abs(steerInput - previousSteerInput);
+        float hardTurnFactor = Mathf.Abs(steerInput) > 0.8f ? Mathf.Abs(steerInput) : 0f;
+        float speedFactor = currentSpeed / maxSpeed;
+
+        // Base meter increase
+        float meterIncrease = (steerDelta * 60f + hardTurnFactor * 15f) * speedFactor * tiltingTendency * Time.deltaTime;
+
+        // Braking reduces the tilting rate by damping the increase
+        if (isBraking)
         {
-            BoostButtonUp();
+            meterIncrease *= 0.3f;
         }
-        if (Input.GetKeyDown(KeyCode.S))
+
+        if (Mathf.Abs(steerInput) > 0.1f)
         {
-            BreakButtonDown();
+            tiltMeter += meterIncrease;
+            currentRecoveryRate = baseRecoveryRate; // Reset recovery rate while steering
         }
-        if (Input.GetKeyUp(KeyCode.S))
+        else
         {
-            BreakButtonUp();
+            // Snappy recovery: Rate increases over time to simulate gravity
+            currentRecoveryRate += recoveryAcceleration * Time.deltaTime;
+            tiltMeter -= currentRecoveryRate * Time.deltaTime;
         }
-        if (Input.GetKeyDown(KeyCode.A))
+
+        tiltMeter = Mathf.Clamp(tiltMeter, 0f, maxTiltMeter);
+        previousSteerInput = steerInput;
+
+        ApplyVisualTilt(steerInput);
+    }
+
+    void ApplyVisualTilt(float steerInput)
+    {
+        // Determine target rotation (if steerInput is 0, maintain previous direction for the fall)
+        float activeSteer = steerInput != 0f ? steerInput : previousSteerInput;
+        float targetTiltZ = (tiltMeter / maxTiltMeter) * maxTiltAngle * Mathf.Sign(activeSteer);
+
+        // Lerp visuals
+        currentVisualTiltZ = Mathf.Lerp(currentVisualTiltZ, targetTiltZ, Time.deltaTime * 12f);
+        float absTiltZ = Mathf.Abs(currentVisualTiltZ);
+
+        // Map Y position based on Z rotation thresholds
+        float targetY = 0.1f;
+        if (absTiltZ <= 15f)
+            targetY = Mathf.Lerp(0.1f, 0.2f, absTiltZ / 15f);
+        else
+            targetY = Mathf.Lerp(0.2f, 0.37f, (absTiltZ - 15f) / (maxTiltAngle - 15f));
+
+        if (rickshawVisualModel != null)
         {
-            LeftButtonDown();
+            rickshawVisualModel.localPosition = new Vector3(rickshawVisualModel.localPosition.x, targetY, rickshawVisualModel.localPosition.z);
+            rickshawVisualModel.localRotation = Quaternion.Euler(rickshawVisualModel.localRotation.eulerAngles.x, rickshawVisualModel.localRotation.eulerAngles.y, currentVisualTiltZ);
         }
-        if (Input.GetKeyUp(KeyCode.A))
+
+        // --- Slam Detection ---
+        if (absTiltZ > 15f)
         {
-            LeftButtonUp();
+            wasHighlyTilted = true; // Rickshaw is significantly in the air
         }
-        if (Input.GetKeyDown(KeyCode.D))
+        else if (absTiltZ < 1f && wasHighlyTilted)
         {
-            RightButtonDown();
+            // Rickshaw has slammed back down to ~0
+            if (cameraScript != null) cameraScript.TriggerShake(tiltSlamShakeIntensity);
+            wasHighlyTilted = false;
         }
-        if (Input.GetKeyUp(KeyCode.D))
+
+        // Critical Flip Check
+        if (absTiltZ >= (maxTiltAngle - 0.5f) && !isFlipped) TriggerFlip();
+    }
+
+    void TriggerFlip()
+    {
+        isFlipped = true;
+        currentSpeed = 0f;
+        if(rickshawVisualModel.rotation.z > 0f)
         {
-            RightButtonUp();
+            rickshawManAnimator.SetTrigger("Flipped_Left");
         }
-        */
-#endif
+        else
+        {
+            rickshawManAnimator.SetTrigger("Flipped_Right");
+        }
+        StartCoroutine(FlipSlamRoutine());
+        //rickshawManAnimator.SetTrigger("rickshawFlip");
+
+        // Transition to Game Over (You may want to use an Animation Event or Coroutine here)
+        
+    }
+
+    private System.Collections.IEnumerator FlipSlamRoutine()
+    {
+        if (rickshawVisualModel == null) yield break;
+
+        // Capture the side we were tilting towards when the flip occurred
+        float flipDirection = Mathf.Sign(currentVisualTiltZ);
+        float targetZ = 80f * flipDirection;
+        float targetY = 0.46f;
+
+        Vector3 startPos = rickshawVisualModel.localPosition;
+        float startZ = currentVisualTiltZ;
+
+        float t = 0f;
+        float slamSpeed = 4f; // Adjust this higher for a faster slam, lower for slower
+
+        while (t < 1f)
+        {
+            t += Time.deltaTime * slamSpeed;
+
+            // Use an Ease-In curve (t * t) to make it feel like it's accelerating into the ground
+            float easeT = Mathf.Clamp01(t * t);
+
+            float newY = Mathf.Lerp(startPos.y, targetY, easeT);
+            currentVisualTiltZ = Mathf.LerpAngle(startZ, targetZ, easeT);
+
+            rickshawVisualModel.localPosition = new Vector3(startPos.x, newY, startPos.z);
+            rickshawVisualModel.localRotation = Quaternion.Euler(
+                rickshawVisualModel.localRotation.eulerAngles.x,
+                rickshawVisualModel.localRotation.eulerAngles.y,
+                currentVisualTiltZ
+            );
+
+            yield return null;
+        }
+
+        // Ensure it sets perfectly to the target values at the very end
+        rickshawVisualModel.localPosition = new Vector3(startPos.x, targetY, startPos.z);
+        rickshawVisualModel.localRotation = Quaternion.Euler(
+            rickshawVisualModel.localRotation.eulerAngles.x,
+            rickshawVisualModel.localRotation.eulerAngles.y,
+            targetZ
+        );
+
+        if (cameraScript != null) cameraScript.TriggerShake(0.2f);
+        AudioManager.Instance.PlayCrash(transform.position);
+        AudioManager.Instance.RequestGameAudioClip(AudioManager.Instance.batteryEmptyClip, transform, 1f, 1f, 0f, false);
+        healthScript.Die();
     }
 
     void UpdateSteerHandle(float steer)

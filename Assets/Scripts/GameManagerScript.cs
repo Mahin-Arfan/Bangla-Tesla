@@ -1,14 +1,14 @@
-﻿using System.Collections.Generic;
-using Unity.VisualScripting;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SocialPlatforms.Impl;
+using Random = UnityEngine.Random;
 
 public class GameManagerScript : MonoBehaviour
 {
     public static GameManagerScript Instance { get; private set; }
 
     [System.Serializable]
-    public enum Type { Truck, Bus, Car, Cng, Bike, Rickshaw, Crane, Barrier, WrongSides, Pedestrian}
+    public enum Type { Truck, Bus, Car, Cng, Bike, Rickshaw, Crane, Barrier, WrongSides, Pedestrian, Stall}
 
     [System.Serializable]
     public struct Road
@@ -31,10 +31,11 @@ public class GameManagerScript : MonoBehaviour
     private int pedestrianHitScore = 150;
     private int vehicleHitScore = 50;
     private int bikeHitScore = 100;
+    private int passengerDropOffScore = 200;
     [HideInInspector] public float progress = 0f;
-    public bool gameStarted = false;
-    public bool gameOver = false;
-    public bool tiltSteeringControl = true;
+    [HideInInspector] public bool gameStarted = false;
+    [HideInInspector] public bool gameOver = false;
+    [HideInInspector] public bool tiltSteeringControl = true;
 
     [Header("Road Settings")]
     public Road[] roads;
@@ -81,13 +82,27 @@ public class GameManagerScript : MonoBehaviour
 
     [Header("Pedestrians")]
     public float pedestrianSpawnRate = 1f;
-    public int maxActivePedestrians = 10; // New Limit just for people
+    public int maxActivePedestrians = 10;
     public Vector2 pedestrianXOffset = new Vector2(7f, 10.5f);
     public float pedestrianYOffset = 0f;
     public float padestrianSpawnDistance = 35f;
+    public float pedestrianRoadCrossProbability = 0.25f;
     public GameObject[] pedestrianPrefabs;
     private int pedestrianPrefabIndex = 0;
     private float pedestrianTimer;
+
+    [Header("Stalls")]
+    public float stallSpawnRate = 1f;
+    public int maxActiveStalls = 10;
+    public float stallSpawnDistance = 35f;
+    public int prewarmStallsCount = 3;
+    public GameObject[] stallPrefabs;
+    private int stallPrefabIndex = 0;
+    private float stallTimer;
+
+    [Header("Passenger Settings")]
+    public int passengerSpawnVariable = 10;
+    private int totalPedestriansSpawned = 0;
 
     [Header("Pooling")]
     public float vehicleRecycleDistance = 90f;
@@ -95,20 +110,28 @@ public class GameManagerScript : MonoBehaviour
     public int maxActiveVehicles = 35;
     private float recycleTimer;
 
+    [Header("Initial Spawn Settings")]
+    public Vector3[] stallSpawnPositions;
+    public int initialVehicleSpawnDistance = -30;
+    public int pedestrianSpawnGaps = 5;
+    public int vehicleSpawnGaps = 5;
+
     private Dictionary<GameObject, Queue<GameObject>> prefabPool = new Dictionary<GameObject, Queue<GameObject>>();
     private Dictionary<GameObject, Type> activeVehicles = new Dictionary<GameObject, Type>();
     private Dictionary<GameObject, Type> activePedestrians = new Dictionary<GameObject, Type>();
+    private Dictionary<GameObject, Type> activeStalls = new Dictionary<GameObject, Type>();
     private List<GameObject> toRecycle = new List<GameObject>();
 
     [Header("References")]
     public PickUpScipts[] pickUpScript;
     [HideInInspector] public Transform mainCamera;
-    public GameObject player;
+    [HideInInspector] public GameObject player;
     private PlayerRickshawController playerController;
     [HideInInspector] public UIScript uIScript;
     [HideInInspector] public Animator cameraAnimator;
     private bool gameInitiaded = false;
     private bool gameOverInitiaded = false;
+    public static event Action<Transform> OnPlayerChanged;
 
     //ScoreStats
     int distanceScore = 0;
@@ -157,6 +180,7 @@ public class GameManagerScript : MonoBehaviour
             vehicleGroupIndex[i] = 0;
         highScore = PlayerPrefs.GetInt("HighScore", 0);
         PrewarmPool();
+        InitialWorldSpawn();
     }
 
     void Update()
@@ -165,7 +189,7 @@ public class GameManagerScript : MonoBehaviour
         UpdateDifficulty();
         HandleRoadSpawning();
         HandleVehicleSpawning();
-        HandlePedestrianSpawning();
+        HandlePedestrianAndStallSpawning();
         recycleTimer += Time.deltaTime;
         if (recycleTimer > 0.25f)
         {
@@ -178,7 +202,8 @@ public class GameManagerScript : MonoBehaviour
         }
         if(gameOver && !gameOverInitiaded)
         {
-            GameOver();
+            gameOverInitiaded = true;
+            Invoke("GameOver", 4f);
         }
         if (uIScript != null)
         {
@@ -234,13 +259,19 @@ public class GameManagerScript : MonoBehaviour
         }
     }
 
-    void HandlePedestrianSpawning()
+    void HandlePedestrianAndStallSpawning()
     {
         pedestrianTimer += Time.deltaTime;
+        stallTimer += Time.deltaTime;
         if (pedestrianTimer >= pedestrianSpawnRate)
         {
             TrySpawnPedestrian();
             pedestrianTimer = 0f;
+        }
+        if (stallTimer >= stallSpawnRate && gameStarted && !gameOver)
+        {
+            TrySpawnStalls();
+            stallTimer = 0f;
         }
     }
 
@@ -278,12 +309,12 @@ public class GameManagerScript : MonoBehaviour
 
                 if (gameStarted && !gameOver)
                 {
-                    spawnPos = new Vector3(spawnX, 1f, playerZ - spawnDistance);
+                    spawnPos = new Vector3(spawnX, 2f, playerZ - spawnDistance);
                 }
                 else
                 {
                     if (spawnX > 2.5f) spawnX = 2.5f;
-                    spawnPos = new Vector3(spawnX, 1f, playerZ + menuSpawnPositionZ);
+                    spawnPos = new Vector3(spawnX, 2f, playerZ + menuSpawnPositionZ);
                 }
 
                 if (!Physics.CheckBox(spawnPos, chosenGroup.spawnCheckSize, Quaternion.identity))
@@ -350,6 +381,55 @@ public class GameManagerScript : MonoBehaviour
         ped.transform.position = spawnPos;
         ped.SetActive(true);
         activePedestrians[ped] = Type.Pedestrian;
+
+        //For Passenger Spawn Logic
+        if (gameStarted && playerController.forHire)
+        {
+            totalPedestriansSpawned++; 
+            if (totalPedestriansSpawned >= passengerSpawnVariable)
+            {
+                totalPedestriansSpawned = 0;
+                NPCCharacterScript npcScript = ped.GetComponent<NPCCharacterScript>();
+                if (npcScript != null)
+                {
+                    npcScript.playerRickshaw = playerController;
+                    npcScript.isPassenger = true;
+                    if(ped.transform.position.x > 0)
+                    {
+                        spawnPos.x = 7f;
+                        ped.transform.position = spawnPos;
+                    }
+                    else
+                    {
+                        spawnPos.x = -7f;
+                        ped.transform.position = spawnPos;
+                    }
+                }
+            }
+        }
+    }
+
+    void TrySpawnStalls()
+    {
+        if (activeStalls.Count >= maxActiveStalls || stallPrefabs.Length == 0)
+            return;
+
+        float sideMultiplier = (Random.value > 0.5f) ? 1f : -1f; // 1. Pick Side
+        float spawnX = sideMultiplier * 6.3f;
+        Vector3 spawnPos = Vector3.zero;
+
+        spawnPos = new Vector3(spawnX, pedestrianYOffset, player.transform.position.z - padestrianSpawnDistance);
+
+        GameObject prefab = stallPrefabs[stallPrefabIndex];
+        stallPrefabIndex++;
+        if (stallPrefabIndex >= stallPrefabs.Length)
+        {
+            stallPrefabIndex = 0;
+        }
+        GameObject ped = GetFromPool(prefab);
+        ped.transform.position = spawnPos;
+        ped.SetActive(true);
+        activeStalls[ped] = Type.Stall;
     }
 
     GameObject GetFromPool(GameObject prefab)
@@ -391,6 +471,17 @@ public class GameManagerScript : MonoBehaviour
                 CreateAndEnqueue(prefab);
             }
         }
+
+        if(stallPrefabs != null)  //For Stalls
+        {
+            foreach (GameObject prefab in stallPrefabs)
+            {
+                for (int s = 0; s < prewarmStallsCount; s++)
+                {
+                    CreateAndEnqueue(prefab);
+                }
+            }
+        }
     }
 
     void CreateAndEnqueue(GameObject prefab)
@@ -424,6 +515,15 @@ public class GameManagerScript : MonoBehaviour
         {
             ReturnToPool(pedestrianToRecycle);
             activePedestrians.Remove(pedestrianToRecycle);
+        }
+    }
+
+    public void RecycleSingleStall(GameObject stallToRecycle)
+    {
+        if (activeStalls.ContainsKey(stallToRecycle))
+        {
+            ReturnToPool(stallToRecycle);
+            activeStalls.Remove(stallToRecycle);
         }
     }
 
@@ -509,6 +609,72 @@ public class GameManagerScript : MonoBehaviour
         spawnRate = Mathf.Lerp(startSpawnRate, maxSpawnRate, progress);
     }
 
+    public void InitialWorldSpawn()
+    {
+        //Initial Pedestrian Spawn
+        for (float zPos = -10f; zPos <= 40f; zPos += pedestrianSpawnGaps)
+        {
+            if (activePedestrians.Count >= maxActivePedestrians || pedestrianPrefabs.Length == 0) break;
+
+            float spawnX = -1f * Random.Range(pedestrianXOffset.x, pedestrianXOffset.y);
+            Vector3 spawnPos = new Vector3(spawnX, pedestrianYOffset, zPos);
+
+            GameObject prefab = pedestrianPrefabs[pedestrianPrefabIndex];
+            pedestrianPrefabIndex = (pedestrianPrefabIndex + 1) % pedestrianPrefabs.Length;
+
+            GameObject ped = GetFromPool(prefab);
+            ped.transform.position = spawnPos;
+            ped.SetActive(true);
+            activePedestrians[ped] = Type.Pedestrian;
+        }
+
+        //Initial Stall Spawn
+        for(int i = 0; i < stallSpawnPositions.Length; i++)
+        {
+            if (activeStalls.Count >= maxActiveStalls || stallPrefabs.Length == 0) break;
+            GameObject prefab = stallPrefabs[i];
+            stallPrefabIndex = (stallPrefabIndex + 1) % stallPrefabs.Length;
+            GameObject stall = GetFromPool(prefab);
+            Vector3 stallSpawnPosition = new Vector3(stallSpawnPositions[i].x, 0.3f, stallSpawnPositions[i].z);
+            stall.transform.position = stallSpawnPosition;
+            stall.SetActive(true);
+            activeStalls[stall] = Type.Stall;
+        }
+
+        //Initial Vehicle Spawn
+        float currentVehicleX = -4f;
+        for (float zPos = initialVehicleSpawnDistance; zPos <= 30f; zPos += vehicleSpawnGaps)
+        {
+            if (activeVehicles.Count >= maxActiveVehicles) break;
+            int chosenGroupIndex;
+            VehicleGroup chosenGroup;
+            do
+            {
+                chosenGroupIndex = ChooseWeightedTypeIndex();
+                chosenGroup = vehicleGroups[chosenGroupIndex];
+            }
+            while (chosenGroup.type == Type.Barrier || chosenGroup.type == Type.WrongSides);    // Keep picking until we get a type that is NOT a Barrier or WrongSides
+
+            GameObject chosenVehiclePrefab = GetVehiclePrefab(chosenGroupIndex);
+
+            if (chosenVehiclePrefab != null)
+            {
+                Vector3 spawnPos = new Vector3(currentVehicleX, 2f, zPos);
+
+                GameObject vehicle = GetFromPool(chosenVehiclePrefab);
+                
+                //vehicle.transform.rotation = Quaternion.identity;
+                vehicle.transform.position = spawnPos;
+                vehicle.SetActive(true);
+
+                activeVehicles[vehicle] = chosenGroup.type;
+                IncreaseBonusForUnselected(chosenGroup);
+            }
+
+            currentVehicleX = (currentVehicleX == -4f) ? 0f : -4f;  // Toggle X position
+        }
+    }
+
     public void RegisterHit(Type hitType)
     {
         int scoreToApply = 0;
@@ -537,15 +703,19 @@ public class GameManagerScript : MonoBehaviour
         uIScript.SpawnFloatingScore(scoreToApply);
     }
 
+    public void SuccessfulPassengerDropOff()
+    {
+        score += passengerDropOffScore;
+        uIScript.SpawnFloatingScore(passengerDropOffScore);
+    }
+
     void StartGame()
     {
         playerController.gameStarted = true;
         gameInitiaded = true;
     }
-
     void GameOver()
     {
-        gameOverInitiaded = true;
         EconomyManager.Instance.ConvertRunToTaka(score, distanceScore);
         score += distanceScore;
         if (score > highScore)
@@ -556,14 +726,17 @@ public class GameManagerScript : MonoBehaviour
         }
         uIScript.GameOver(distanceScore, vehicleHit, bikeHit, pedestriansHit, score);
     }
-
     public void GetPlayerReference()
     {
         player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) return;
+
         playerController = player.GetComponent<PlayerRickshawController>();
+
         foreach (var pickUp in pickUpScript)
         {
             pickUp.GetPlayerReference(player.transform);
         }
+        OnPlayerChanged?.Invoke(player.transform);
     }
 }

@@ -1,6 +1,5 @@
-using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEngine.UI.Image;
+using System.Collections;
 
 public class NPCCharacterScript : MonoBehaviour
 {
@@ -11,6 +10,7 @@ public class NPCCharacterScript : MonoBehaviour
     public bool police = false;
     public bool male = true;
     public bool isDead = false;
+    private Vector3 commentPosition = new Vector3(-1f, 2.45f, 0f);
 
     [Header("Walk Settings")]
     public float walkSpeed = 2.0f;
@@ -40,6 +40,33 @@ public class NPCCharacterScript : MonoBehaviour
     public Transform spineTransform;
     private bool policeChaseStart = false;
     private Transform playerTransform;
+    public AudioClip[] policeWhistleClips;
+    public GameObject policeSignUI;
+    AudioSource policeAudioSource;
+
+    [Header("Salesman Settings")]
+    public int salesmanAnim = 0;
+    public AudioClip salesmanAudioClip;
+    private bool salesmanAudioPlayed = false;
+    public Transform salesmanParentStall;
+    private AudioSource salesmanAudioSource;
+
+    [Header("Passenger Settings")]
+    public float passengerCallDistance = 20f;
+    public int angryCommentInterval = 5;
+    private bool inRickshaw = false;
+    private bool isAngry = false;
+    private bool isGettingOut = false;
+    private bool waving = false;
+    private float dropPoint = 0f;
+    private float angryAnimationLength = 1.02f;
+    private float angryTimer = 0f;
+    bool passengerCallPlayed = false;
+    bool dropCallPlayer = false;
+    int angryCallInterval = 0;
+
+    [HideInInspector] public bool isPassenger = false;
+    [HideInInspector] public PlayerRickshawController playerRickshaw;
 
     [Header("Drive Settings")]
     public int vehicleType = 0; //0: None, 1: Bike, 2: SportsBike, 3: Texi
@@ -53,7 +80,6 @@ public class NPCCharacterScript : MonoBehaviour
 
     private bool stateUpdated = false;
     private bool rigidBodyActivated = false;
-    private Transform salesmanParentStall;
     private CollisionDetector detector;
     private BoxCollider boxCollider;
     private AudioSource deadAudioSource;
@@ -67,7 +93,6 @@ public class NPCCharacterScript : MonoBehaviour
     void Awake()
     {
         animator = GetComponent<Animator>();
-        playerTransform = GameManagerScript.Instance.player.transform;
         if (!driving)
         {
             detector = GetComponent<CollisionDetector>();
@@ -76,12 +101,32 @@ public class NPCCharacterScript : MonoBehaviour
         if (salesman)
         {
             salesmanParentStall = transform.parent.transform;
+            salesmanAudioSource = gameObject.AddComponent<AudioSource>();
+            salesmanAudioSource.clip = salesmanAudioClip;
+            salesmanAudioSource.volume = 0.5f;
+            salesmanAudioSource.loop = true;
+            salesmanAudioSource.spatialBlend = 1.0f; 
+            salesmanAudioSource.minDistance = 2.0f;
+            salesmanAudioSource.maxDistance = 20.0f;
+            salesmanAudioSource.rolloffMode = AudioRolloffMode.Linear;
         }
     }
 
     void OnEnable()
     {
+        GameManagerScript.OnPlayerChanged += UpdatePlayerReference;
+
+        if (GameManagerScript.Instance != null && GameManagerScript.Instance.player != null)
+        {
+            playerTransform = GameManagerScript.Instance.player.transform;
+        }
+
         ResetNPC();
+    }
+    void OnDisable()
+    {
+        GameManagerScript.OnPlayerChanged -= UpdatePlayerReference;
+        isPassenger = false;
     }
 
     void Update()
@@ -100,19 +145,30 @@ public class NPCCharacterScript : MonoBehaviour
             rigidBodyActivated = true;
             return;
         }
+
+        if (isPassenger)
+        {
+            UpdatePassengerLogic();
+            return;
+        }
         if(walking)
         {
             if (roadCrossing)
                 RoadCross();
             else
                 UpdateWalking();
-        }else if (police)
+        }
+        else if (police)
         {
             Police();
         }
-        else if (!stateUpdated && salesman)
+        else if (salesman)
         {
-            UpdateSalesman();
+            UpdateSalesmanAudio();
+            if (!stateUpdated)
+            {
+                UpdateSalesman();
+            }
         }
         else if (!stateUpdated && driving)
         {
@@ -142,6 +198,12 @@ public class NPCCharacterScript : MonoBehaviour
             {
                 animator.SetBool(policeHash, true);
                 policeChaseStart = true;
+                if (policeSignUI != null)
+                {
+                    policeSignUI.SetActive(true);
+                    int randomIndex = Random.Range(0, policeWhistleClips.Length);
+                    policeAudioSource = AudioManager.Instance.Play3DVoice(policeWhistleClips[randomIndex], transform.position);
+                }
             }
             if (zDistance > closestDistance)
             {
@@ -223,11 +285,8 @@ public class NPCCharacterScript : MonoBehaviour
 
     void UpdateSalesman()
     {
-        if(!GameManagerScript.Instance.gameStarted)
-        {
-            salesmanParentStall.gameObject.SetActive(false);
-            return;
-        }
+        animator.SetBool("Stall", true);
+        animator.SetInteger("StallAnim", salesmanAnim);
         if (transform.position.x > 0f)
         {
             Vector3 stallPosition = salesmanParentStall.position;
@@ -243,6 +302,28 @@ public class NPCCharacterScript : MonoBehaviour
             salesmanParentStall.rotation = Quaternion.Euler(0f, 180f, 0f);
         }
         stateUpdated = true;
+    }
+
+    void UpdateSalesmanAudio()
+    {
+        float zDistance = Mathf.Abs(transform.position.z - playerTransform.position.z);
+        if(zDistance > 20f)
+        {
+            if(salesmanAudioPlayed)
+            {
+                salesmanAudioPlayed = false;
+                salesmanAudioSource.Pause();
+            }
+        }
+        else
+        {
+            if (!salesmanAudioPlayed)
+            {
+                salesmanAudioPlayed = true;
+                if (salesmanAudioSource.time > 0f) salesmanAudioSource.UnPause();
+                else salesmanAudioSource.Play();
+            }
+        }
     }
 
     void UpdateDrivingState()
@@ -280,7 +361,6 @@ public class NPCCharacterScript : MonoBehaviour
             Vector3 origin = transform.position + Vector3.up * 1f;
             bool frontBlocked = Physics.Raycast(origin, transform.forward, detectionDistance * 2f, obstacleLayer);
 
-            // Corrected Origin Logic (Local Forward)
             origin = transform.position + Vector3.up * 1f + transform.forward * roadCheckForwadOffset;
             bool sideBlocked = Physics.Raycast(origin, raycastSideMultiplier * transform.right, roadCrossCheckDistance, obstacleLayer);
 
@@ -320,6 +400,152 @@ public class NPCCharacterScript : MonoBehaviour
         }
     }
 
+    void UpdatePassengerLogic()
+    {
+        if (!inRickshaw)                
+        {
+            if (!playerRickshaw.forHire)
+            {
+                animator.SetBool("Passenger_Waving", false);
+                waving = false;
+                isPassenger = false;
+                walking = true;
+                stateUpdated = false;
+                return;
+            }
+            float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+
+            if (!waving)
+            {
+                animator.SetBool("Passenger_Waving", true);
+                waving = true;
+            }
+            Vector3 directionToPlayer = playerTransform.position - transform.position;
+            directionToPlayer.y = 0f;
+            transform.rotation = Quaternion.LookRotation(directionToPlayer);
+            if(distanceToPlayer < passengerCallDistance && !passengerCallPlayed)
+            {
+                NPCCommentManager.Instance.PlayPassengerCallComment(transform, commentPosition);
+                passengerCallPlayed = true;
+            }
+            if (distanceToPlayer < 2f && playerRickshaw.isBraking && playerRickshaw.brakeMeter > 20f && playerRickshaw.forHire)
+            {
+                StartCoroutine(GetInRickshaw());
+            }
+        }
+        else if (!isGettingOut)
+        {
+            //In the Rickshaw
+            float playerZ = playerTransform.position.z;
+
+            if (!isAngry && (playerZ < dropPoint - 50f))
+            {
+                isAngry = true;
+                animator.SetTrigger("Passenger_angry");
+                angryTimer = angryAnimationLength;
+            }
+
+            // Apply Steering Sabotage
+            if (isAngry)
+            {
+                angryTimer -= Time.deltaTime;
+                if (angryTimer <= 0f)
+                {
+                    playerRickshaw.horizontalInput = Random.value > 0.5f ? 0.6f : -0.6f;
+                    angryTimer = angryAnimationLength;
+                    angryCallInterval--;
+                    if (angryCallInterval <= 0)
+                    {
+                        NPCCommentManager.Instance.PlayPassengerAngryComment(transform, commentPosition);
+                        angryCallInterval = angryCommentInterval;
+                    }
+                }
+            }
+
+            // Check for DropOff
+            if (playerZ <=dropPoint)
+            {
+                if (!dropCallPlayer)
+                {
+                    NPCCommentManager.Instance.PlayPassengerDropComment(transform, commentPosition);
+                    dropCallPlayer = true;
+                }
+                if(playerRickshaw.isBraking && playerRickshaw.brakeMeter > 20f)
+                {
+                    bool atSideOfRoad = playerTransform.position.x <= -4.5f || playerTransform.position.x >= 4.5f;
+                    if (atSideOfRoad)
+                    {
+                        StartCoroutine(GetOutRickshaw());
+                    }
+                }
+            }
+        }
+    }
+
+    private IEnumerator GetInRickshaw()
+    {
+        inRickshaw = true;
+        playerRickshaw.forHire = false;
+        playerRickshaw.passengerCharacterScript = this;
+
+        // Parent and reset position
+        detector.enabled = false;
+        boxCollider.enabled = false;
+        npcTriggerCollider.enabled = false;
+        transform.SetParent(playerRickshaw.rickshawVisualModel);
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+
+        // Trigger animation
+        animator.SetFloat("RoadSide", playerTransform.position.x);
+        animator.SetTrigger("Passenger_In");
+
+        waving = false;
+        animator.SetBool("Passenger_Waving", false);
+
+        // Assign random drop point
+        dropPoint = playerTransform.position.z - Random.Range(200f, 300f);
+        float dropPointX = transform.position.x > 0 ? 8f : -8f;
+        Vector3 dropPointPosition = new Vector3(dropPointX, 2.2f, dropPoint);
+        UIPoolManager.Instance.PlacePassengerDropPoint(dropPointPosition);
+
+        yield return null;
+    }
+
+    private IEnumerator GetOutRickshaw()
+    {
+        isGettingOut = true;
+        animator.SetFloat("RoadSide", playerTransform.position.x);
+        animator.SetTrigger("Passenger_Out");
+        UIPoolManager.Instance.passengerDropPointUI.SetActive(false);
+
+        yield return new WaitForSeconds(0.75f);
+
+        transform.SetParent(null);
+        Vector3 dropPos = transform.position;
+        dropPos.y = 0.3f;
+        transform.position = dropPos;
+        transform.rotation = Quaternion.identity;
+
+        if (!isAngry)
+        {
+            GameManagerScript.Instance.SuccessfulPassengerDropOff();
+        }
+        detector.enabled = true;
+        boxCollider.enabled = true;
+        npcTriggerCollider.enabled = true;
+        playerRickshaw.forHire = true;
+        isPassenger = false;
+        inRickshaw = false;
+        isAngry = false;
+        isGettingOut = false;
+        walking = true;
+        isPassenger = false;
+        angryCallInterval = 0;
+        dropCallPlayer = false;
+        passengerCallPlayed = false;
+    }
+
     void RigidBodyActive()
     {
         animator.enabled = false;
@@ -344,20 +570,25 @@ public class NPCCharacterScript : MonoBehaviour
             if(npcTriggerCollider != null)
                 npcTriggerCollider.enabled = false;
         }
+        else if (police && policeAudioSource != null)
+        {
+            AudioManager.Instance.ReturnAudioSource(policeAudioSource);
+            policeAudioSource = null;
+        }
         if (hitPoint != Vector3.zero)
             bodyRigidBodies[0].AddForce(hitPoint.normalized * hitForce, ForceMode.Impulse);
     }
 
     public void ResetNPC()
     {
-        // 1.Reset Ragdoll
+        //Reset Ragdoll
         if (isDead)
         {
             isDead = false;
             foreach (var col in bodyColliders) col.enabled = false;
             foreach (var rb in bodyRigidBodies) rb.isKinematic = true;
         }
-        // 2. Reset Logic
+        //Reset Logic
         stateUpdated = false;
         rigidBodyActivated = false;
 
@@ -369,7 +600,7 @@ public class NPCCharacterScript : MonoBehaviour
 
         isWalking = false;
 
-        // 3. Reset Components (Using Cached references)
+        //Reset Components
         if (walking)
         {
             if (detector != null)
@@ -381,11 +612,20 @@ public class NPCCharacterScript : MonoBehaviour
             if (boxCollider != null) boxCollider.enabled = true;
             if(npcTriggerCollider != null) npcTriggerCollider.enabled = true;
 
+            //Reset Passenger Logic
+            inRickshaw = false;
+            isAngry = false;
+            isGettingOut = false;
+            waving = false;
+            angryCallInterval = 0;
+            dropCallPlayer = false;
+            passengerCallPlayed = false;
+
             hitPoint = Vector3.zero;
             raycastTimer = 0f;
 
-            // 4. Randomize Road Crossing
-            if (GameManagerScript.Instance.progress >= 0.5f)
+            //Randomize Road Crossing
+            if (GameManagerScript.Instance.progress >= GameManagerScript.Instance.pedestrianRoadCrossProbability)
             {
                 roadCrossing = (Random.value <= roadCrossingProbability);
             }
@@ -424,21 +664,28 @@ public class NPCCharacterScript : MonoBehaviour
         Vector3 playerPos = playerTransform.position;
         Vector3 cPos = transform.position;
         bool outOfZRange = false;
-
+        float playertoNPCDistance = Mathf.Abs(cPos.z - playerPos.z);
         //Pre-game logic
-        if (!GameManagerScript.Instance.gameStarted)
+        if (!GameManagerScript.Instance.gameStarted || GameManagerScript.Instance.gameOver)
         {
-            outOfZRange = Mathf.Abs(cPos.z - playerPos.z) > GameManagerScript.Instance.pedestrianRecycleDistance;
+            outOfZRange = playertoNPCDistance > GameManagerScript.Instance.pedestrianRecycleDistance;
         }
         else
         {
-            outOfZRange = cPos.z - playerPos.z > 5f;
+            if (playerPos.z > cPos.z)
+            {
+                outOfZRange = playertoNPCDistance > GameManagerScript.Instance.pedestrianRecycleDistance;
+            }
+            else
+            {
+                outOfZRange = playertoNPCDistance > 20f;
+            }
         }
         //Trigger Recycle
         if (outOfZRange)
         {
             if(salesman)
-                GameManagerScript.Instance.RecycleSinglePedestrian(salesmanParentStall.gameObject);
+                GameManagerScript.Instance.RecycleSingleStall(salesmanParentStall.gameObject);
             else
                 GameManagerScript.Instance.RecycleSinglePedestrian(gameObject);
 
@@ -448,5 +695,10 @@ public class NPCCharacterScript : MonoBehaviour
                 deadAudioSource = null;
             }
         }
+    }
+
+    private void UpdatePlayerReference(Transform newPlayerTransform)
+    {
+        playerTransform = newPlayerTransform;
     }
 }

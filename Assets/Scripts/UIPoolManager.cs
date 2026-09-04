@@ -9,6 +9,8 @@ public class UIPoolManager : MonoBehaviour
     public GameObject[] effectPrefabs;
     public int amountPerType = 4;
 
+    public GameObject passengerDropPointUI;
+
     private List<List<PooledImpactEffect>> allPools;
 
     void Awake()
@@ -35,6 +37,7 @@ public class UIPoolManager : MonoBehaviour
             for (int i = 0; i < amountPerType; i++)
             {
                 GameObject obj = Instantiate(prefab, transform);
+                Debug.Log("Instantiated effect of type: " + prefab.name);
                 obj.SetActive(false);
 
                 var script = obj.GetComponent<PooledImpactEffect>();
@@ -62,5 +65,11 @@ public class UIPoolManager : MonoBehaviour
                 return;
             }
         }
+    }
+
+    public void PlacePassengerDropPoint(Vector3 position)
+    {
+        passengerDropPointUI.SetActive(true);
+        passengerDropPointUI.transform.position = position;
     }
 }

@@ -12,7 +12,7 @@ public class CameraScript : MonoBehaviour
     public float rotationSpeed = 5f;
 
     [Header("Hit Shake Settings")]
-    public float shakeIntensity = 0.25f;
+    public float hitShakeIntensity = 0.25f;
     public float shakeDecay = 1f;
     [Tooltip("How fast the camera vibrates.")]
     public float shakeFrequency = 25f;
@@ -22,6 +22,11 @@ public class CameraScript : MonoBehaviour
     public float maxDrivingShake = 0.05f;
     [Tooltip("How fast the camera vibrates from the road.")]
     public float drivingShakeFrequency = 15f;
+
+    [Header("DeadCamera Positions")]
+    public Vector3 deadCameraPositionOffset;
+    public Vector3 deadCameraRotation;
+    public float deadCamSpeed = 2f;
 
     [Header("References")]
     public Transform cam;
@@ -35,6 +40,7 @@ public class CameraScript : MonoBehaviour
     private Vector3 internalPosition;
     private float seedX;    // Random seeds to make X and Y shake differently
     private float seedY;
+    private RickshawHealth rickshawHealth;
 
     void Start()
     {
@@ -51,6 +57,7 @@ public class CameraScript : MonoBehaviour
                 return;
             }
         }
+        rickshawHealth = GetComponent<RickshawHealth>();
         seedX = Random.Range(0f, 100f);
         seedY = Random.Range(0f, 100f);
         internalPosition = playerTransform.position + offset;
@@ -59,6 +66,11 @@ public class CameraScript : MonoBehaviour
     void LateUpdate()
     {
         if (playerTransform == null || !GameManagerScript.Instance.gameStarted) return;
+        if (rickshawHealth.isDead)
+        {
+            HandleDeadCamera();
+            return;
+        }
         FollowPlayer();
         UpdateCameraRotation(); 
         HandleShakeDecay();
@@ -103,9 +115,19 @@ public class CameraScript : MonoBehaviour
         }
     }
 
-    public void TriggerShake()
+    void HandleDeadCamera()
+    {
+        cam.position = Vector3.Lerp(cam.position, deadCameraPositionOffset + playerTransform.position, Time.deltaTime * deadCamSpeed);
+        cam.rotation = Quaternion.Slerp(cam.rotation, Quaternion.Euler(deadCameraRotation), Time.deltaTime * deadCamSpeed);
+    }
+
+    public void TriggerShake(float shakeIntensity)
     {
         currentHitShake = shakeIntensity;
+    }
+    public void HitTriggerShake()
+    {
+        currentHitShake = hitShakeIntensity;
     }
 
     public void SetSteerInput(float input)

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 5f57150623c82e24cb90e3b27907ba7d
+guid: ee447511ee8ea0f40ae762be8e3d2332
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -113,20 +113,20 @@ TextureImporter:
       name: Arrow
       rect:
         serializedVersion: 2
-        x: 69
-        y: 342
-        width: 241
-        height: 190
+        x: 0
+        y: 855
+        width: 249
+        height: 193
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 538f75e745063b14ba9ba8f2be63ba00
-      internalID: -501498775
+      spriteID: 48b9840e44e052142b34f4bf4ca3b7b0
+      internalID: 522542430
       vertices: []
       indices: 
       edges: []
@@ -135,42 +135,20 @@ TextureImporter:
       name: DangerIcon
       rect:
         serializedVersion: 2
-        x: 34
-        y: 27
-        width: 309
-        height: 310
+        x: 0
+        y: 540
+        width: 316
+        height: 312
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ba6eddf24fe2ae747a5a850bf3d30d6b
-      internalID: 741397223
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: UnavailableIcon
-      rect:
-        serializedVersion: 2
-        x: 346
-        y: 323
-        width: 266
-        height: 267
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: eff414cd757cfb447ba39a6e1e6ccd0a
-      internalID: 267919011
+      spriteID: 76863a0fad69f5344b93390d73f2f05e
+      internalID: -967959118
       vertices: []
       indices: 
       edges: []
@@ -179,20 +157,20 @@ TextureImporter:
       name: DeadIcon
       rect:
         serializedVersion: 2
-        x: 371
-        y: 9
-        width: 263
-        height: 303
+        x: 325
+        y: 468
+        width: 264
+        height: 300
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6f9527b67c36ed444ab32df468eb8181
-      internalID: -1327142325
+      spriteID: f1b1480bf7ec1184686c7a9d1ffbbfa7
+      internalID: -1119899069
       vertices: []
       indices: 
       edges: []
@@ -201,20 +179,98 @@ TextureImporter:
       name: PoliceStopIcon
       rect:
         serializedVersion: 2
-        x: 670
-        y: 34
-        width: 570
-        height: 524
+        x: 592
+        y: 513
+        width: 565
+        height: 525
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline:
+      - - {x: -280.5, y: 13.5}
+        - {x: -256.5, y: -260.5}
+        - {x: -189.5, y: -255.5}
+        - {x: 280.5, y: -181.5}
+        - {x: 279.5, y: 260.5}
+        - {x: -278.5, y: 258.5}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e34db0aba7aacb04981a00d7a6a72453
+      internalID: 331497877
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Passenger_Destination
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 0
+        width: 350
+        height: 511
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 100c13c83938ef04d95b46b0b415bb62
-      internalID: -605318252
+      spriteID: 149dde730894f0544a50a7ea770e285e
+      internalID: 303908766
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Comment_Icon
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 0
+        width: 761
+        height: 528
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline:
+      - - {x: -377.5, y: 147}
+        - {x: -376.5, y: 8}
+        - {x: -344.5, y: -263}
+        - {x: 379.5, y: -193}
+        - {x: 378.5, y: 262}
+        - {x: -26.5, y: 262}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a34ded843d52b3a4ab82f90899874cbd
+      internalID: -737195598
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Unavailable_Icon
+      rect:
+        serializedVersion: 2
+        x: 284
+        y: 779
+        width: 272
+        height: 268
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0cebc0a21b7039d4ba8cb4603a9bc06d
+      internalID: -581615043
       vertices: []
       indices: 
       edges: []
@@ -223,7 +279,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: d80f50da31581b9459e4edd2b42e1d52
+    spriteID: 846874da550abed4fbb3e1ae04841772
     internalID: 0
     vertices: []
     indices: 
@@ -233,11 +289,13 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Arrow: -501498775
-      DangerIcon: 741397223
-      DeadIcon: -1327142325
-      PoliceStopIcon: -605318252
-      UnavailableIcon: 267919011
+      Arrow: 522542430
+      Comment_Icon: -737195598
+      DangerIcon: -967959118
+      DeadIcon: -1119899069
+      Passenger_Destination: 303908766
+      PoliceStopIcon: 331497877
+      Unavailable_Icon: -581615043
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

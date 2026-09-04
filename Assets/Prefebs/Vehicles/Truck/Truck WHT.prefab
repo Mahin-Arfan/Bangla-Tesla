@@ -1408,6 +1408,7 @@ MonoBehaviour:
   brakeForce: 20000
   stopDistanceMultiplier: 2.5
   idleTime: 0
+  initialYPosition: 1.9
   vehicleCanBeDamaged: 1
   vehicleDamaged: 0
   damageCooldown: 1
@@ -1434,8 +1435,8 @@ MonoBehaviour:
   lockYPosition: 0
   reverseMechanics: 1
   wrongSideDriving: 0
+  commentPosition: {x: 2, y: 1.6, z: 4.3}
   engineClip: {fileID: 8300000, guid: 69b23ce8f3d690b49b4ab97a3b116153, type: 3}
-  volume: 100
   minPitch: 1
   maxPitch: 2
   frontChecker: {fileID: 6913104161004670529}

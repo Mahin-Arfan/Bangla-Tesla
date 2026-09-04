@@ -31,6 +31,7 @@ public class NPCVehicleController : MonoBehaviour
     public float stopDistanceMultiplier = 1f;
     private bool isBraking = false;
     public float idleTime = 0f;
+    public float initialYPosition = 1.5f;
 
     [Header("Damage Settings")]
     public bool vehicleCanBeDamaged = true;
@@ -76,6 +77,7 @@ public class NPCVehicleController : MonoBehaviour
     public bool lockYPosition = true;         // y position on Rigidbody
     public bool reverseMechanics = false;
     public bool wrongSideDriving = false;
+    public Vector3 commentPosition = new Vector3(0f, 2f, 0f);
 
     [Header("Engine Audio")]
     public AudioClip engineClip;
@@ -100,7 +102,6 @@ public class NPCVehicleController : MonoBehaviour
     private Vector3 flatForward;
     private float driveToTargetDistance = 0f;
     private float driveToTargetDot = 0f;
-    private float initialYPosition;
     private bool gameStartedSettingsInitialized = false;
     private int hitCount = 0;
     private int playerLayer;
@@ -138,16 +139,23 @@ public class NPCVehicleController : MonoBehaviour
     {
         InvokeRepeating(nameof(HandleEngineAudio), 0.5f, 1f);
         ResetNPC();
+
+        if (GameManagerScript.Instance == null) return;
+        GameManagerScript.OnPlayerChanged += UpdatePlayerReference;
+        if (GameManagerScript.Instance != null && GameManagerScript.Instance.player != null)
+        {
+            playerTransform = GameManagerScript.Instance.player.transform;
+        }
     }
     void OnDisable()
     {
+        GameManagerScript.OnPlayerChanged -= UpdatePlayerReference;
         CancelInvoke(nameof(HandleEngineAudio));
     }
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         playerLayer = LayerMask.NameToLayer("Player");
-        playerTransform = GameManagerScript.Instance.player.transform;
         audioTriggerDistance = AudioManager.Instance.audioTriggerDistance;
         if (nPCCharacterScript == null)
         {
@@ -157,7 +165,6 @@ public class NPCVehicleController : MonoBehaviour
         if(lockYPosition) rb.constraints |= RigidbodyConstraints.FreezePositionY;
         if(lockZRotation) rb.constraints |= RigidbodyConstraints.FreezeRotationZ;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
-        initialYPosition = transform.position.y;
         // Randomize driving speed
         speedLimit = Random.Range(minSpeed, currentMaxSpeed);
 
@@ -672,7 +679,8 @@ public class NPCVehicleController : MonoBehaviour
         }
         //Comment
         if(vehicleType != Type.Bike)
-            AudioManager.Instance.RequestDialogueVoiceClip(transform.position);
+            NPCCommentManager.Instance.PlayCrashComment(transform, commentPosition);
+
     }
 
     public void ResetNPC()
@@ -839,6 +847,11 @@ public class NPCVehicleController : MonoBehaviour
             AudioManager.Instance.ReturnAudioSource(myEngineSound);
             myEngineSound = null;
         }
+    }
+
+    private void UpdatePlayerReference(Transform newPlayerTransform)
+    {
+        playerTransform = newPlayerTransform;
     }
 
 #if UNITY_EDITOR

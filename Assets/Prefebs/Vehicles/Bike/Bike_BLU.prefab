@@ -2168,6 +2168,13 @@ MonoBehaviour:
   closestDistance: 1
   spineRotationOffset: {x: 0, y: 0, z: 0}
   spineTransform: {fileID: 0}
+  policeWhistleClips: []
+  policeSignUI: {fileID: 0}
+  salesmanAnim: 0
+  salesmanAudioClip: {fileID: 0}
+  salesmanParentStall: {fileID: 0}
+  isPassenger: 0
+  playerRickshaw: {fileID: 0}
   vehicleType: 1
   nPCVehicleController: {fileID: 3343039211594015666}
   bodyColliders:
@@ -4141,6 +4148,7 @@ MonoBehaviour:
   brakeForce: 2000
   stopDistanceMultiplier: 1.5
   idleTime: 0
+  initialYPosition: 0.1
   vehicleCanBeDamaged: 1
   vehicleDamaged: 0
   damageCooldown: 1
@@ -4167,6 +4175,7 @@ MonoBehaviour:
   lockYPosition: 0
   reverseMechanics: 0
   wrongSideDriving: 0
+  commentPosition: {x: -1, y: 2.4, z: 0}
   engineClip: {fileID: 8300000, guid: 8b2b494be0890a54685f17f358a0398f, type: 3}
   minPitch: 1
   maxPitch: 2

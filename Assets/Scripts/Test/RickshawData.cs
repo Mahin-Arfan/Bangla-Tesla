@@ -7,14 +7,16 @@ public class RickshawData : ScriptableObject
     [Tooltip("Unique, stable ID used for save files. Never rename after shipping.")]
     public string vehicleId;
     public string displayName;
-    [TextArea] public string description;
-    public Sprite thumbnail;
+
+    [Header("Color Variants")]
+    [Tooltip("Material per color (e.g. Red, Green, Blue).")]
+    public Material[] colorMaterials;
 
     [Header("Economy")]
-    [Tooltip("Cost in Taka. Set to 0 for the starter vehicle.")]
+    [Tooltip("Cost in Taka.")]
     public int unlockPrice;
 
-    [Header("Stats — real gameplay values shown as text / used by VehicleController")]
+    [Header("Stats — real gameplay values shown as text")]
     public float topSpeedKmh;
     public float batteryDrainPerSecond;
     public float durability;

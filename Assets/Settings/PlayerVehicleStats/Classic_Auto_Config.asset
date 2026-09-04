@@ -14,8 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   vehicleId: 0
   displayName: Classic Auto
-  description: 
-  thumbnail: {fileID: 0}
+  colorMaterials:
+  - {fileID: 2100000, guid: ee4e1e8dac514814dba7cd990f1a5f8f, type: 2}
+  - {fileID: 2100000, guid: cfb7bd22a67bff14982edd372d7e1d40, type: 2}
+  - {fileID: 2100000, guid: a019ea19020647348af3c9661e6001b0, type: 2}
   unlockPrice: 0
   topSpeedKmh: 20
   batteryDrainPerSecond: 500

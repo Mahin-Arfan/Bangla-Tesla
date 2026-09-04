@@ -12,15 +12,26 @@ public class GarageManager : MonoBehaviour
     [Header("Pre-placed pooled models in the display pivot")]
     [SerializeField] private List<GameObject> displayModels;
 
+    [Header("Color Customization")]
+    [Tooltip("The renderer whose material gets swapped for color variants. ")]
+    [SerializeField] private List<VehicleRendererGroup> displayModelBodyRenderers;
+    [Serializable]  private struct VehicleRendererGroup
+    {
+        [Tooltip("All the MeshRenderers on this vehicle that use the color material")]
+        public Renderer[] renderers;
+    }
+
     private int _currentIndex;
     private HashSet<string> _unlockedIds;
-    private string _equippedId;
+    private string _equippedId; 
+    private int _currentColorIndex;
 
     public static event Action<RickshawData, bool, bool> OnVehicleChanged;
 
     public static event Action<string> OnVehicleUnlocked;
 
     public static event Action<RickshawData> OnPurchaseFailed;
+    public static event Action<int, bool> OnColorChanged;
 
     public LayerMask defaultUIMask;
     public LayerMask garageRenderUIMask;
@@ -81,6 +92,10 @@ public class GarageManager : MonoBehaviour
         bool isOwned = _unlockedIds.Contains(data.vehicleId);
         bool isEquipped = data.vehicleId == _equippedId;
         OnVehicleChanged?.Invoke(data, isOwned, isEquipped);
+
+        _currentColorIndex = SaveSystem.LoadColorIndex(data.vehicleId);
+        ApplyColorToRenderer(_currentIndex, _currentColorIndex);
+        OnColorChanged?.Invoke(_currentColorIndex, isOwned);
     }
 
     public void OnActionButtonPressed()
@@ -110,10 +125,66 @@ public class GarageManager : MonoBehaviour
         Equip(data);
     }
 
+    public void ShowEquippedVehicle()
+    {
+        int equippedIndex = allVehicles.FindIndex(v => v.vehicleId == _equippedId);
+
+        if (equippedIndex < 0) equippedIndex = 0;
+
+        _currentIndex = equippedIndex;
+
+        for (int i = 0; i < displayModels.Count; i++)
+        {
+            displayModels[i].SetActive(i == equippedIndex);
+        }
+    }
+
+    public void SelectColor(int colorIndex)
+    {
+        RickshawData data = allVehicles[_currentIndex];
+        if (data.colorMaterials == null || colorIndex < 0 || colorIndex >= data.colorMaterials.Length)
+        {
+            Debug.LogWarning($"[GarageManager] Color index {colorIndex} out of range for {data.displayName}.");
+            return;
+        }
+
+        _currentColorIndex = colorIndex;
+        ApplyColorToRenderer(_currentIndex, colorIndex);
+        SaveSystem.SaveColorIndex(data.vehicleId, colorIndex);
+
+        bool isOwned = _unlockedIds.Contains(data.vehicleId);
+        OnColorChanged?.Invoke(colorIndex, true);
+    }
+
+    private void ApplyColorToRenderer(int vehicleIndex, int colorIndex)
+    {
+        if (vehicleIndex < 0 || vehicleIndex >= displayModelBodyRenderers.Count) return;
+
+        RickshawData data = allVehicles[vehicleIndex];
+        if (data.colorMaterials == null || colorIndex < 0 || colorIndex >= data.colorMaterials.Length)
+        {
+            return;
+        }
+
+        Material colorMaterial = data.colorMaterials[colorIndex];
+        Renderer[] renderers = displayModelBodyRenderers[vehicleIndex].renderers;
+        if (renderers == null) return;
+
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            if (renderers[i] != null)
+            {
+                renderers[i].sharedMaterial = colorMaterial;
+            }
+        }
+    }
+
     public void onHomeButtonPressed()
     {
         garageUICamera.cullingMask = defaultUIMask;
         cameraAnimator.SetTrigger("MainMenu");
+        ShowEquippedVehicle();
+        GameManagerScript.Instance.GetPlayerReference();
     }
     public void onCustomizeButtonPressed()
     {

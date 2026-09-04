@@ -172,6 +172,7 @@ MonoBehaviour:
   walking: 0
   salesman: 1
   police: 0
+  male: 1
   isDead: 0
   walkSpeed: 2
   detectionDistance: 1
@@ -190,6 +191,10 @@ MonoBehaviour:
   closestDistance: 1
   spineRotationOffset: {x: 0, y: 0, z: 0}
   spineTransform: {fileID: 0}
+  policeWhistleClips: []
+  policeSignUI: {fileID: 0}
+  salesmanAnim: 4
+  salesmanAudioClip: {fileID: 8300000, guid: f4aee37b06df9dd4697e2179f4a617ee, type: 3}
   vehicleType: 0
   nPCVehicleController: {fileID: 0}
   bodyColliders:

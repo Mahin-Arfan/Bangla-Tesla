@@ -562,6 +562,8 @@ MonoBehaviour:
   driving: 0
   walking: 0
   salesman: 1
+  police: 0
+  male: 1
   isDead: 0
   walkSpeed: 2
   detectionDistance: 1
@@ -571,10 +573,19 @@ MonoBehaviour:
   hitForce: 150
   hitPoint: {x: 0, y: 0, z: 0}
   roadCrossing: 0
-  roadCrossEnableDistance: -500
   roadCrossingProbability: 0.1
   roadCrossCheckDistance: 5
   roadCheckForwadOffset: 1
+  chaseDistance: 10
+  xPositionLimit: 3.4
+  xPositionOffset: 0.5
+  closestDistance: 1
+  spineRotationOffset: {x: 0, y: 0, z: 0}
+  spineTransform: {fileID: 0}
+  policeWhistleClips: []
+  policeSignUI: {fileID: 0}
+  salesmanAnim: 1
+  salesmanAudioClip: {fileID: 8300000, guid: 8d595089b241e0c47b3a5d04adb0b619, type: 3}
   vehicleType: 0
   nPCVehicleController: {fileID: 0}
   bodyColliders:

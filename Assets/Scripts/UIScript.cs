@@ -62,6 +62,7 @@ public class UIScript : MonoBehaviour
     GameObject pedestrianHitText;
     GameObject takaEarnedText;
     private float currentBatteryTier = -1f;
+
     void Start()
     {
         gameManagerScript = GetComponent<GameManagerScript>();
@@ -149,7 +150,7 @@ public class UIScript : MonoBehaviour
         {
             if (!ft.gameObject.activeInHierarchy)
             {
-                ft.SetupAndPlay("+" + pointsAdded.ToString());
+                ft.SetupAndPlay(pointsAdded.ToString());
                 return;
             }
         }

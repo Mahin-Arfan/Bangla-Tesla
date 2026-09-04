@@ -29,7 +29,6 @@ public class AudioManager : MonoBehaviour
     public float sourceMaxDistance = 15f;
     private float lastCrashTime;
     private int deadVoiceIndexMale = 0;
-    private int lastChosenGaliIndex = 0;
     private int deadVoiceIndexFemale = 0;
     private int crashClipIndex = 0;
 
@@ -38,7 +37,6 @@ public class AudioManager : MonoBehaviour
     public AudioClip[] maleDeadVoiceClips;
     public AudioClip[] femaleDeadVoiceClips;
     public AudioClip[] galiVoiceClips;
-    public AudioClip[] stallClips;
     public AudioClip brakeSoundClip;
     public AudioClip brakeSnapSoundClip;
     public AudioClip batteryPickUpClip;
@@ -152,9 +150,9 @@ public class AudioManager : MonoBehaviour
         return null;
     }
 
-    public void Play3DVoice(AudioClip clip, Vector3 position) //for stalls & specialRoadAudio
+    public AudioSource Play3DVoice(AudioClip clip, Vector3 position) //for stalls & specialRoadAudio
     {
-        if (clip == null) return;
+        if (clip == null) return null;
 
         AudioSource source = GetFreeSource();
         if (source != null)
@@ -166,7 +164,9 @@ public class AudioManager : MonoBehaviour
             source.pitch = 1f;
             source.spatialBlend = 1f;
             source.Play();
+            return source;
         }
+        return null;
     }
 
     public void Play2DEnvironment(AudioClip clip, float volume)
@@ -204,28 +204,6 @@ public class AudioManager : MonoBehaviour
             return source;
         }
         return null;
-    }
-
-    public void RequestDialogueVoiceClip(Vector3 position)
-    {
-        AudioSource source = GetFreeSource();
-        if (source != null)
-        {
-            source.transform.position = position;
-            source.loop = false;
-            source.volume = dialogueVolume;
-            source.pitch = 1f;
-            source.spatialBlend = 1f;
-            int galiIndex = Random.Range(0, galiVoiceClips.Length);
-            if(lastChosenGaliIndex == galiIndex)
-            {
-                galiIndex = (galiIndex + 1) % galiVoiceClips.Length;
-            }
-            lastChosenGaliIndex = galiIndex;
-            AudioClip clip = galiVoiceClips[galiIndex];
-            source.clip = clip;
-            source.Play();
-        }
     }
 
     public AudioSource RequestGameAudioClip(AudioClip clip, Transform parentTransform, float volume, float pitch, float spatialBlend, bool loop)

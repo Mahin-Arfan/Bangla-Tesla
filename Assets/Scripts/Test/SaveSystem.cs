@@ -12,11 +12,19 @@ public static class SaveSystem
     private static readonly byte[] AesIV = Encoding.UTF8.GetBytes("Init1alVect0r16!"); // 16 bytes
 
     [Serializable]
+    private class VehicleColorEntry
+    {
+        public string vehicleId;
+        public int colorIndex;
+    }
+
+    [Serializable]
     private class SaveData
     {
         public int taka;
         public List<string> unlockedVehicleIds = new List<string>();
         public string equippedVehicleId;
+        public List<VehicleColorEntry> vehicleColors = new List<VehicleColorEntry>();
     }
 
     private static SaveData _cache;
@@ -79,6 +87,27 @@ public static class SaveSystem
     public static void SaveEquippedVehicle(string vehicleId)
     {
         GetOrLoad().equippedVehicleId = vehicleId;
+        Persist();
+    }
+
+    public static int LoadColorIndex(string vehicleId)
+    {
+        var entry = GetOrLoad().vehicleColors.Find(c => c.vehicleId == vehicleId);
+        return entry != null ? entry.colorIndex : 0; // default to the first color
+    }
+
+    public static void SaveColorIndex(string vehicleId, int colorIndex)
+    {
+        var data = GetOrLoad();
+        var entry = data.vehicleColors.Find(c => c.vehicleId == vehicleId);
+        if (entry == null)
+        {
+            data.vehicleColors.Add(new VehicleColorEntry { vehicleId = vehicleId, colorIndex = colorIndex });
+        }
+        else
+        {
+            entry.colorIndex = colorIndex;
+        }
         Persist();
     }
 

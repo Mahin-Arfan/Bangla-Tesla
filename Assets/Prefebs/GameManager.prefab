@@ -13,7 +13,12 @@ GameObject:
   - component: {fileID: 9186628493333926460}
   - component: {fileID: 7641818565905946149}
   - component: {fileID: 8456191857478658620}
-  - component: {fileID: 6995274334915770008}
+  - component: {fileID: 5762935281817158056}
+  - component: {fileID: 4945726639756355368}
+  - component: {fileID: 2082377117843013939}
+  - component: {fileID: 3634969301108133109}
+  - component: {fileID: 2773631296164614610}
+  - component: {fileID: 5987155446865817371}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: GameController
@@ -30,7 +35,7 @@ Transform:
   m_GameObject: {fileID: 7887398816664887179}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.4886577, y: -2.7491877, z: -8.708591}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -48,11 +53,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 462cff7cb181eba40a7757d8a0d5d9ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  score: 0
+  highScore: 0
   maxDificultyScore: 1500
   progress: 0
   gameStarted: 0
   gameOver: 0
+  tiltSteeringControl: 0
   roads:
   - roadSegment: {fileID: 0}
     endPoint: {fileID: 0}
@@ -60,90 +66,235 @@ MonoBehaviour:
     endPoint: {fileID: 0}
   - roadSegment: {fileID: 0}
     endPoint: {fileID: 0}
+  specialRoads:
+  - roadSegment: {fileID: 0}
+    endPoint: {fileID: 0}
+  - roadSegment: {fileID: 0}
+    endPoint: {fileID: 0}
+  - roadSegment: {fileID: 0}
+    endPoint: {fileID: 0}
+  - roadSegment: {fileID: 0}
+    endPoint: {fileID: 0}
   roadSpawnDistance: 110
+  specialRoadSpawnDistance: 250
   vehicleGroups:
   - type: 4
     prefabs:
     - {fileID: 8724004187032717744, guid: 1ba3d16b6453b9b42af9bc1e34d13df8, type: 3}
     - {fileID: 5829743467850098795, guid: 3b74d1bc286103840a5d65d1ed216e12, type: 3}
+    - {fileID: 5829743467850098795, guid: 6e1edf9fe29e1cf4b8ad40eebf3bd223, type: 3}
+    - {fileID: 8724004187032717744, guid: df690b5527a71de4f9b49c619a8d133b, type: 3}
+    - {fileID: 5829743467850098795, guid: caa65aba86f28634fad103e0daad35c1, type: 3}
+    - {fileID: 8724004187032717744, guid: fb9882eb1dbefbd4fa9b9d1f8386c3af, type: 3}
+    - {fileID: 5829743467850098795, guid: 3666a7fd9f0686944987af7abc7fbe93, type: 3}
+    - {fileID: 8724004187032717744, guid: 56b83526c5993cf4b806b996e70aeea5, type: 3}
+    - {fileID: 5829743467850098795, guid: ee657ff657f9e6a48a39ece2960817b4, type: 3}
     xRange: {x: -5.5, y: 5.5}
     weight: 35
     bonusWeight: 0
     weightIncrement: 1
     maxBonusWeight: 10
     spawnCheckSize: {x: 0.35, y: 0.5, z: 11}
+    prewarmPerPrefeb: 3
   - type: 3
     prefabs:
+    - {fileID: 3837573111360809350, guid: 534582e5d7749c14b806d0db6b45928c, type: 3}
+    - {fileID: 3837573111360809350, guid: e0fc0ca512edf934bac00760235b4e50, type: 3}
+    - {fileID: 3837573111360809350, guid: 148e89f6fd14a9c42941ef81ded1b3df, type: 3}
+    - {fileID: 3837573111360809350, guid: 33bc905723b906748a1e2cecb1fc07a6, type: 3}
     - {fileID: 3837573111360809350, guid: 1a990a8638b6b714fa7a0a81bc48f40b, type: 3}
+    - {fileID: 3837573111360809350, guid: 3319c3ca779252d49966da43a3102bca, type: 3}
     xRange: {x: -5, y: 5}
     weight: 30
     bonusWeight: 0
     weightIncrement: 1
     maxBonusWeight: 10
     spawnCheckSize: {x: 0.675, y: 0.5, z: 11}
+    prewarmPerPrefeb: 3
   - type: 2
     prefabs:
-    - {fileID: 3247104159443246242, guid: 8b2802472e56e054b92313fe260afe45, type: 3}
+    - {fileID: 3247104159443246242, guid: b102434b31738094688010d5dc730e71, type: 3}
     - {fileID: 3767484349822436447, guid: 0eb032ff4d5605842948dd9d065dcb07, type: 3}
     - {fileID: 8710936298454423071, guid: 9b17be39194320a42b89287935b99200, type: 3}
     - {fileID: 2628516971176168633, guid: ccc3768a06f30be4bb83ae6345c803eb, type: 3}
     - {fileID: 3692262683567292511, guid: c82b5386b8570ce48b0703e0c2673ab6, type: 3}
+    - {fileID: 3247104159443246242, guid: fe87d0acbc0117140bd4348576a9848c, type: 3}
+    - {fileID: 3767484349822436447, guid: a14a1c7a0704c74498d5ab230649d2db, type: 3}
+    - {fileID: 8710936298454423071, guid: 1ddbdd346ace9294bb2569d6dc7805ae, type: 3}
+    - {fileID: 2628516971176168633, guid: 66683add4007f7545af08a0323bb256c, type: 3}
+    - {fileID: 3692262683567292511, guid: 908780422f6150745a16a2f3df62b93d, type: 3}
+    - {fileID: 3247104159443246242, guid: b102434b31738094688010d5dc730e71, type: 3}
+    - {fileID: 3692262683567292511, guid: edf9c3b1ba1e2fd4d9c30bac7b9516fd, type: 3}
+    - {fileID: 3767484349822436447, guid: e5532f59e77f1ae4ca9ff8af8cd1aa7f, type: 3}
+    - {fileID: 8710936298454423071, guid: 9b17be39194320a42b89287935b99200, type: 3}
+    - {fileID: 2628516971176168633, guid: 66683add4007f7545af08a0323bb256c, type: 3}
+    - {fileID: 3692262683567292511, guid: cb5fe05d96d7f1d499d9bfbc2be86fef, type: 3}
+    - {fileID: 3767484349822436447, guid: 1a8e27a5d0fe394428ff418f53a3f9e0, type: 3}
     xRange: {x: -4.3, y: 3}
     weight: 40
     bonusWeight: 0
     weightIncrement: 1
     maxBonusWeight: 10
     spawnCheckSize: {x: 1.1, y: 0.5, z: 12.5}
+    prewarmPerPrefeb: 1
   - type: 1
     prefabs:
-    - {fileID: 2278272101244545825, guid: d24893936d9c9c14abf8c373c88508c7, type: 3}
+    - {fileID: 520875940457388950, guid: 2e98f37a1d5e0d2408dd5a505122d935, type: 3}
+    - {fileID: 8547310591373062432, guid: 94c9946ce1f5e2048a832dc3c310e115, type: 3}
+    - {fileID: 2278272101244545825, guid: 6505ae7c3ac0ead4ca0ffbd28e45bbf1, type: 3}
+    - {fileID: 9066658530984897508, guid: a9e0b8c98637c4848a1400e875c86497, type: 3}
+    - {fileID: 2278272101244545825, guid: f2d59f2ea94429445a8a5fe05511f13c, type: 3}
+    - {fileID: 1414418717465558657, guid: 3374ba19b6a663d48a1e5ebb2a921ff5, type: 3}
+    - {fileID: 1393639864034045437, guid: 407fca842d09a0840a7414a648fad963, type: 3}
+    - {fileID: 8694234241407485614, guid: 8eb5bf85540a6cd4e84c7f5920e3b2a2, type: 3}
     xRange: {x: -2.5, y: 2.5}
     weight: 12
     bonusWeight: 0
     weightIncrement: 2
-    maxBonusWeight: 25
+    maxBonusWeight: 20
     spawnCheckSize: {x: 1.5, y: 0.5, z: 15}
+    prewarmPerPrefeb: 1
   - type: 0
     prefabs:
     - {fileID: 8463349050262562609, guid: 752bb075a2b959b4baa3d10fe939c59d, type: 3}
-    - {fileID: 8724503343287003994, guid: 31803df8313969f4ab575bca6a7b0290, type: 3}
+    - {fileID: 8463349050262562609, guid: 032213360c107c4488fc179fc18aa3bf, type: 3}
+    - {fileID: 8463349050262562609, guid: 7b80a3c48b3540c47be32fff907dccb3, type: 3}
+    - {fileID: 8724503343287003994, guid: 1984b6058c52cd84e8de95e07d5cc494, type: 3}
+    - {fileID: 8463349050262562609, guid: 032213360c107c4488fc179fc18aa3bf, type: 3}
     - {fileID: 8463349050262562609, guid: 752bb075a2b959b4baa3d10fe939c59d, type: 3}
+    - {fileID: 8463349050262562609, guid: 7b80a3c48b3540c47be32fff907dccb3, type: 3}
+    - {fileID: 8724503343287003994, guid: ebaa9dfb4528ac04ca5afb1b5648775d, type: 3}
     xRange: {x: -3.25, y: 1.45}
     weight: 5
     bonusWeight: 0
     weightIncrement: 2
     maxBonusWeight: 10
     spawnCheckSize: {x: 1.25, y: 0.5, z: 13}
+    prewarmPerPrefeb: 1
   - type: 6
     prefabs:
     - {fileID: 4768512161167820869, guid: d7d71b78f728d834fae1c7b76998427b, type: 3}
     xRange: {x: 0.3, y: -1.8}
-    weight: 3
+    weight: 0.5
+    bonusWeight: 0
+    weightIncrement: 0.25
+    maxBonusWeight: 1
+    spawnCheckSize: {x: 2.05, y: 0.5, z: 12}
+    prewarmPerPrefeb: 1
+  - type: 7
+    prefabs:
+    - {fileID: 8440894365009972821, guid: 42d1c59d31fa8ab43806f90924cfcd00, type: 3}
+    - {fileID: 3821641890715359356, guid: 51508577966771c49adc4699ce00919e, type: 3}
+    - {fileID: 5133399542804948119, guid: c0a8f68c9610018449f429a3a6d8c3ff, type: 3}
+    - {fileID: 4777472225388761973, guid: e90f0d599bad0b6458c3c72eba597c09, type: 3}
+    - {fileID: 3341705599537536459, guid: ac7f54e6a3c87ea4e93b35e5a55fc0be, type: 3}
+    - {fileID: 710581059330392184, guid: 0635c6c58866e504b80ae6a550df90b5, type: 3}
+    - {fileID: 6926548672309886500, guid: 5ff1a9e78b301254b8d7ead93f772f36, type: 3}
+    - {fileID: 4777472225388761973, guid: e90f0d599bad0b6458c3c72eba597c09, type: 3}
+    xRange: {x: 0, y: 0}
+    weight: 4
     bonusWeight: 0
     weightIncrement: 1
+    maxBonusWeight: 10
+    spawnCheckSize: {x: 2, y: 0.5, z: 12}
+    prewarmPerPrefeb: 1
+  - type: 8
+    prefabs:
+    - {fileID: 8724004187032717744, guid: 9050d41e5a9c9a64e9d97f96fc882515, type: 3}
+    - {fileID: 8710936298454423071, guid: 62f5d1ad2cbeea947ba7dfd9a447ccc1, type: 3}
+    - {fileID: 3837573111360809350, guid: 483578c771769934c9446fcc96a0c2e6, type: 3}
+    - {fileID: 8724004187032717744, guid: 638cee213d30ebe43b2fcb1ab79506cc, type: 3}
+    - {fileID: 3837573111360809350, guid: 7d4d412dcbaf59e42b5c872775942946, type: 3}
+    - {fileID: 3767484349822436447, guid: 92e6fa7fb2993064fb94572282bd94b6, type: 3}
+    - {fileID: 5829743467850098795, guid: 51376fca11750284b8f1759fcb07d16e, type: 3}
+    - {fileID: 3837573111360809350, guid: 7a82d3c3927c9bd42ab2c3807c23f9c2, type: 3}
+    - {fileID: 5829743467850098795, guid: e30d8db86d29feb439ce4159b56d4633, type: 3}
+    - {fileID: 3767484349822436447, guid: 9be45b953ca417e41a10e59ffc557c2f, type: 3}
+    - {fileID: 5829743467850098795, guid: af1fd76863e982c47942280630d62d29, type: 3}
+    - {fileID: 2628516971176168633, guid: 5ce8b1a7a52d1d44a9501f3d6228e4ce, type: 3}
+    xRange: {x: 5.2, y: 5.2}
+    weight: 0.8
+    bonusWeight: 0
+    weightIncrement: 0.25
     maxBonusWeight: 2
-    spawnCheckSize: {x: 2.05, y: 0.5, z: 12}
-  spawnRate: 0
+    spawnCheckSize: {x: 1.1, y: 0.5, z: 12.5}
+    prewarmPerPrefeb: 1
   startSpawnRate: 2
-  maxSpawnRate: 8
-  spawnLocation: {x: 0, y: 0, z: 0}
+  maxSpawnRate: 5
   baseSpawnTime: 3
   spawnDistance: 150
-  spawnTimer: 0
-  pedestrianSpawnRate: 1
-  maxActivePedestrians: 10
+  menuSpawnPositionZ: 35
+  pedestrianSpawnRate: 0.5
+  maxActivePedestrians: 20
   pedestrianXOffset: {x: 7, y: 10.5}
   pedestrianYOffset: 0.3
-  padestrianSpawnDistance: 40
+  padestrianSpawnDistance: 80
+  pedestrianRoadCrossProbability: 0.25
   pedestrianPrefabs:
-  - {fileID: 7608566580439242773, guid: f514c076941da4f4986fc60fc1eeeffd, type: 3}
+  - {fileID: 238959316184379973, guid: 04572655abcb9d548a903acbe7719c9a, type: 3}
+  - {fileID: 8652054286614766446, guid: dd033bd0bc28a6041afc92e4ee81e952, type: 3}
+  - {fileID: 3238154853728627753, guid: e2e58b076d2ffdd4cb8154a67ec6f1ca, type: 3}
+  - {fileID: 2855003047629747146, guid: 7085fba742dad3545acc1b286e2c4633, type: 3}
+  - {fileID: 8265549317637811794, guid: 6c6050882c1717a4499b17df295e4bbb, type: 3}
+  - {fileID: 5681832519917644939, guid: e7547279dea5d8044814408cb48013dd, type: 3}
+  - {fileID: 8897522435460371574, guid: f23c765354e01354f994ee10fb4bcf31, type: 3}
+  - {fileID: 1692994249957416245, guid: c657310d77d14ec48b8d0e918d3fb74d, type: 3}
+  - {fileID: 7245339547562833088, guid: 31aba552e5e179b448c4bd7e6c922a94, type: 3}
+  - {fileID: 1683933618658369677, guid: 8467f8e265aefb54b9d3da72927de270, type: 3}
+  - {fileID: 8833865926828598914, guid: d02f7a22b3a81f142a265168ff1d0d58, type: 3}
+  - {fileID: 1709835780527333820, guid: 6224592aef30be34689e13044cf06bd9, type: 3}
+  - {fileID: 4075056117358871844, guid: fb2bf763cfb14e64089e3baef739e087, type: 3}
+  - {fileID: 2793385927411645866, guid: 387cdc24322d3bf4e8728f5dc3ef9cf9, type: 3}
+  - {fileID: 1195682829832744904, guid: d62ab5a335b242c4c84065ef4edb3080, type: 3}
+  - {fileID: 3527995119949778554, guid: 14d9756e992e89545ba844f0e34089e7, type: 3}
+  - {fileID: 1548892022237525869, guid: a65d782661158294cb7d8149ca96b670, type: 3}
+  - {fileID: 5879403400062331753, guid: 13abdcae6a981e941b55fb493eb46131, type: 3}
+  - {fileID: 4813361334579638844, guid: 6bf0ce0f54bd00446bfe7ec8673d0b26, type: 3}
+  - {fileID: 3344487386741406036, guid: 16384a7d31079f34790822b849aed48b, type: 3}
+  - {fileID: 1807047894284675510, guid: d9bc723f4ad895e4f92d70ee99246f0f, type: 3}
+  - {fileID: 2164705835572682388, guid: 5f4aa61f081c0e6458ef326baef37a6d, type: 3}
+  - {fileID: 540150869160623373, guid: 91735b16ff17cd443b172b317923ba60, type: 3}
+  - {fileID: 3804488232010427426, guid: d1cd12b85a782b540879ee883159e65f, type: 3}
+  - {fileID: 5893197632788370608, guid: 3002f011018203545ab33c9b9d728cb7, type: 3}
+  - {fileID: 2931391418424808023, guid: 0a38da3217410f740bb96143de480fd2, type: 3}
+  - {fileID: 279151585643249315, guid: da5ee92dd288a5c4885001e2a1357ea7, type: 3}
+  stallSpawnRate: 1
+  maxActiveStalls: 10
+  stallSpawnDistance: 80
+  prewarmStallsCount: 3
+  stallPrefabs:
+  - {fileID: 8391790988497986858, guid: 89a6d79792a2c8047bdec42f633b8d06, type: 3}
+  - {fileID: 3296947506717338976, guid: e5b53c59ca6d43f498739d51076d14c4, type: 3}
+  - {fileID: 1642760217960062174, guid: ad1ddd8623b23ed4daa7565cbed93f0f, type: 3}
+  - {fileID: 6393780281884926432, guid: 7f3d598669f3c6b47bc0c60d4c1191f4, type: 3}
+  - {fileID: 5252973053842038519, guid: 89ff7a851c7f64f489f769cadbc5436a, type: 3}
+  - {fileID: 6909079249750274599, guid: 1274aa20929c0e341860ba339710c379, type: 3}
+  - {fileID: 2362299364162732708, guid: 5ac9993c6c93fd541b8e468394bf04ff, type: 3}
+  - {fileID: 118108515620818024, guid: f58f9e9acc87e9c4c9abb530504ad21a, type: 3}
+  - {fileID: 9013232017384205353, guid: befc5f6abd004de44af642101031cbd4, type: 3}
+  passengerSpawnVariable: 10
   vehicleRecycleDistance: 180
-  pedestrianRecycleDistance: 60
+  pedestrianRecycleDistance: 85
   maxActiveVehicles: 35
-  prewarmPerPrefeb: 10
+  stallSpawnPositions:
+  - {x: -6.3, y: 0, z: 2.56}
+  - {x: -6.3, y: 2, z: -7.35}
+  - {x: 6.3, y: 1, z: -31.07}
+  - {x: -6.3, y: 3, z: 25.5}
+  - {x: 6.3, y: 5, z: -9.1}
+  - {x: -6.3, y: 6, z: -2.35}
+  - {x: -6.3, y: 7, z: -39.84}
+  - {x: -6.3, y: 8, z: 17}
+  initialVehicleSpawnDistance: -80
+  pedestrianSpawnGaps: 5
+  vehicleSpawnGaps: 10
+  pickUpScript:
+  - {fileID: 0}
+  - {fileID: 0}
+  mainCamera: {fileID: 0}
   player: {fileID: 0}
-  gizmosSpawnPos: {x: 0, y: 0, z: 0}
-  gizmosSpawnSize: {x: 0, y: 0, z: 0}
+  uIScript: {fileID: 0}
+  cameraAnimator: {fileID: 0}
 --- !u!114 &9186628493333926460
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -156,9 +307,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99a6c0458057b934bab611203e97cb24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scoreText: {fileID: 0}
+  highScoreText: {fileID: 0}
+  speedText: {fileID: 0}
+  healthSlider: {fileID: 0}
+  batterySlider: {fileID: 0}
   mainMenuUI: {fileID: 0}
   endMenuUI: {fileID: 0}
-  inputUI: {fileID: 0}
+  inputUIButton: {fileID: 0}
+  inputUITilt: {fileID: 0}
+  screenMeterUI: {fileID: 0}
+  stillCanvas: {fileID: 0}
+  settingsCanvas: {fileID: 0}
+  SettingOptionsPublic: {fileID: 0}
+  updateCanvas: {fileID: 0}
+  updateCanvas1: {fileID: 0}
+  garageStillCanvas: {fileID: 0}
+  garageUpdateCanvas: {fileID: 0}
+  floatingScorePool:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  distanceTravelledValue: {fileID: 0}
+  bikeHitValue: {fileID: 0}
+  vehicleHitValue: {fileID: 0}
+  pedestrianHitValue: {fileID: 0}
+  takaEarnedValue: {fileID: 0}
+  slideDuration: 0.5
+  countDuration: 1
+  delayBetweenRows: 0.2
+  brakingUI: {fileID: 0}
+  brakeBrokenUI: {fileID: 0}
+  brakeUnavailableUI: {fileID: 0}
+  brakeSlider: {fileID: 0}
 --- !u!114 &7641818565905946149
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -187,7 +370,8 @@ MonoBehaviour:
   - {fileID: 497811166449478340, guid: bcbdbe8e302f4454b93ec502082aacf7, type: 3}
   - {fileID: 497811166449478340, guid: 68969d6e604f8254f9c8b4efd1294180, type: 3}
   amountPerType: 4
---- !u!114 &6995274334915770008
+  passengerDropPointUI: {fileID: 0}
+--- !u!114 &5762935281817158056
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -196,6 +380,172 @@ MonoBehaviour:
   m_GameObject: {fileID: 7887398816664887179}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fffbdb9479b2914f9c05e2a7b13b86c, type: 3}
+  m_Script: {fileID: 11500000, guid: 14cfe19672da9a1419c47149226a9308, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  poolSize: 15
+  engineVolume: 0.5
+  crashVolume: 1
+  deadVolume: 1
+  environmentVolume: 0.25
+  musicVolume: 0.1
+  dialogueVolume: 1
+  audioTriggerDistance: 20
+  crashCooldown: 0.5
+  sourceMaxDistance: 20
+  crashClips:
+  - {fileID: 8300000, guid: 2f5c7eb614bb7064f859f67f610e391a, type: 3}
+  - {fileID: 8300000, guid: e3abcfca3ba35b14e877398f45346947, type: 3}
+  - {fileID: 8300000, guid: 806f41556e3d7db40bb7abae4b7cc998, type: 3}
+  - {fileID: 8300000, guid: 9d19544afa51d0d4b9ba8d2d3099de44, type: 3}
+  - {fileID: 8300000, guid: 08647a2a67f848f4ab65027e7bd90860, type: 3}
+  - {fileID: 8300000, guid: a0addb103af4940498a4eb4f74e55a61, type: 3}
+  maleDeadVoiceClips:
+  - {fileID: 8300000, guid: 7f81574dd5a82704495c47441c4ccd75, type: 3}
+  - {fileID: 8300000, guid: 60afdfe4d66f8684299dbe98129544ef, type: 3}
+  - {fileID: 8300000, guid: 5f0ec3aaa5d17fb4882baaa85dfdee28, type: 3}
+  - {fileID: 8300000, guid: 87a4ff1af50db4344ad924a61fb7b79e, type: 3}
+  - {fileID: 8300000, guid: 54d12ba8625e3d34bb70db9c3f36aa62, type: 3}
+  - {fileID: 8300000, guid: 5b3bfed85ae1a244e84370f14825c1b6, type: 3}
+  femaleDeadVoiceClips:
+  - {fileID: 8300000, guid: 08704a31c427a7b409ebd302c019510c, type: 3}
+  - {fileID: 8300000, guid: aa345d2cbbef5d44cb3c5da6f719e5f5, type: 3}
+  - {fileID: 8300000, guid: 8e20b3248e73a0e43b31de86b161e25d, type: 3}
+  - {fileID: 8300000, guid: 1a55de2cdec19b4448ca8e524f757290, type: 3}
+  galiVoiceClips:
+  - {fileID: 8300000, guid: 11c653476e337a94c87904b2d38b7cd9, type: 3}
+  - {fileID: 8300000, guid: 18339257e0ed354439491dc988a6e0f0, type: 3}
+  - {fileID: 8300000, guid: fccc73b4036ebb74b991abc962d97698, type: 3}
+  - {fileID: 8300000, guid: 64a3bfc21d939644bb7f9c06a4f2ece4, type: 3}
+  - {fileID: 8300000, guid: d4fe818431f96c046989a80268397f0c, type: 3}
+  - {fileID: 8300000, guid: fff6ddc5b6fc8e84f88e9e995df634a3, type: 3}
+  - {fileID: 8300000, guid: 4668be9596740c24da1e599225ec457e, type: 3}
+  - {fileID: 8300000, guid: c1642953803d5234283ac422da6fcc50, type: 3}
+  - {fileID: 8300000, guid: ba44f3650c2632e4cb8e9aae0fa35f6d, type: 3}
+  - {fileID: 8300000, guid: 53c71bbb2292d094eb1ca0528f75a851, type: 3}
+  - {fileID: 8300000, guid: c242f77b2b275244d82a8955ef6bf138, type: 3}
+  - {fileID: 8300000, guid: 421d4d6627778a44d969dd7d5f3542e2, type: 3}
+  brakeSoundClip: {fileID: 8300000, guid: 4bbab1c3db1cbdb45ad0d2fa1f2cac0b, type: 3}
+  brakeSnapSoundClip: {fileID: 8300000, guid: 0dab30a16ac9d5049a2fcdf8e514ed30, type: 3}
+  batteryPickUpClip: {fileID: 8300000, guid: a2d64003b4722cf4fba0ce50788a2d24, type: 3}
+  healthPickUpClip: {fileID: 8300000, guid: 6b86db20f7b5da045b7cc8750a113a3e, type: 3}
+  batteryEmptyClip: {fileID: 8300000, guid: ec22bc1ad9414af4dbaa6c031b929ada, type: 3}
+  lowBatteryWarningClip: {fileID: 8300000, guid: dae916fc04f07694e92cff57eaaaa333, type: 3}
+  environmentClip: {fileID: 8300000, guid: b7a1a63ac6ad79c4b8dd6b914b653c57, type: 3}
+  music: {fileID: 8300000, guid: 34a1b13e0245936449e65b37277f35e6, type: 3}
+--- !u!114 &4945726639756355368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7887398816664887179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ef3163b7be8bd04f8baa9764ec3b0e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  commentUIPrefab: {fileID: 4540971172546664273, guid: 3526e6ec0571f3041a4d993e804a427b, type: 3}
+  poolSize: 6
+  scaleAnimDuration: 0.25
+  easeInType: 27
+  easeOutType: 26
+--- !u!114 &2082377117843013939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7887398816664887179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae1fce3764992cf44b27c4986a5a1937, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerScript: {fileID: 0}
+  healthScript: {fileID: 0}
+  settingsPanel: {fileID: 0}
+  tiltToggle: {fileID: 0}
+  buttonToggle: {fileID: 0}
+  steerSensitivity: {fileID: 0}
+  developerPanel1: {fileID: 0}
+  developerPanel2: {fileID: 0}
+  openDeveloperPanelButton: {fileID: 0}
+  vehiceleStartSpawnRateSlider: {fileID: 0}
+  vehicleMaxSpawnRateSlider: {fileID: 0}
+  vehicleInactiveDistance: {fileID: 0}
+  specialRoadSpawnDistanceSlider: {fileID: 0}
+  maxDifficultyDistance: {fileID: 0}
+  pedastrianSpawnRate: {fileID: 0}
+  maxActivePedastrian: {fileID: 0}
+  startSpeed: {fileID: 0}
+  maxSpeed: {fileID: 0}
+  boostSpeed: {fileID: 0}
+  brakeDeceleration: {fileID: 0}
+  steerSpeed: {fileID: 0}
+  maxDistanceBatteryRange: {fileID: 0}
+  invincibleToggle: {fileID: 0}
+--- !u!114 &3634969301108133109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7887398816664887179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33260d94d769196479962d7e0474cf35, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2773631296164614610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7887398816664887179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb74213f9b2da8e41b1176bb6ace8e2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allVehicles:
+  - {fileID: 11400000, guid: d82818db62a6af74fb2e13c9241c7821, type: 2}
+  - {fileID: 11400000, guid: d537199b133c3a34f994cee4b899d01d, type: 2}
+  displayModels:
+  - {fileID: 0}
+  - {fileID: 0}
+  defaultUIMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  garageRenderUIMask:
+    serializedVersion: 2
+    m_Bits: 160
+--- !u!114 &5987155446865817371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7887398816664887179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39b895b80924045408c5fe240f9bbed7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  vehicleNameText: {fileID: 0}
+  currencyText: {fileID: 0}
+  speedBar: {fileID: 0}
+  batteryBar: {fileID: 0}
+  handlingBar: {fileID: 0}
+  speedValueText: {fileID: 0}
+  batteryValueText: {fileID: 0}
+  handlingValueText: {fileID: 0}
+  priceText: {fileID: 0}
+  actionButton: {fileID: 0}
+  actionButtonBackgroundImage: {fileID: 0}
+  buyIcon: {fileID: 1613267425, guid: 2492f929e6cdefc46ab7a529202ed8f2, type: 3}
+  equipIcon: {fileID: -314771866, guid: 2492f929e6cdefc46ab7a529202ed8f2, type: 3}
+  equippedIcon: {fileID: 1345028598, guid: 2492f929e6cdefc46ab7a529202ed8f2, type: 3}
+  nextButton: {fileID: 0}
+  previousButton: {fileID: 0}
