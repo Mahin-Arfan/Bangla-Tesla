@@ -961,6 +961,8 @@ MonoBehaviour:
   salesmanAnim: 0
   salesmanAudioClip: {fileID: 0}
   salesmanParentStall: {fileID: 0}
+  passengerCallDistance: 20
+  angryCommentInterval: 5
   isPassenger: 0
   playerRickshaw: {fileID: 0}
   vehicleType: 1
@@ -989,7 +991,7 @@ MonoBehaviour:
   - {fileID: 8016077148722582797}
   - {fileID: 1210887220537525004}
   - {fileID: 733651755641822102}
-  npcTriggerCollider: {fileID: 0}
+  npcTriggerCollider: {fileID: 1322719597529372406}
 --- !u!114 &4796980733692000531
 MonoBehaviour:
   m_ObjectHideFlags: 0

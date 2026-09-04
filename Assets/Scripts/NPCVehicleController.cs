@@ -123,18 +123,6 @@ public class NPCVehicleController : MonoBehaviour
     [Header("Wheels Setup")]
     public Wheel[] wheels;
 
-
-    [Header("Temps")]
-    // Gizmo storage
-    private Vector3 rightOvertakeGizmoPos;
-    private Vector3 leftOvertakeGizmoPos;
-    private Vector3 hitPos;
-    private Vector3 rightSideCheckGizmoPos;
-    private Vector3 leftSideCheckGizmoPos;
-    private Vector3 debugHitPoint;
-    private Vector3 debugPushDirection;
-    private bool showDebug;
-
     void OnEnable()
     {
         InvokeRepeating(nameof(HandleEngineAudio), 0.5f, 1f);
@@ -435,9 +423,7 @@ public class NPCVehicleController : MonoBehaviour
         if (closest.collider != null)
         {
             GameObject newObstacle = closest.collider.gameObject;
-            //temp
-            hitPos = closest.point;
-            //temp end
+
             if (obstacle != newObstacle)
             {
                 obstacle = newObstacle;
@@ -477,11 +463,7 @@ public class NPCVehicleController : MonoBehaviour
 
             Vector3 rightOvertakePos = new Vector3(obstacleTransform.position.x - sideOffset, vehicleBodyCollider.transform.position.y + overTakeSideClearanceY, obstacleTransform.position.z + obstacleWorldSize.x * 0.5f);
             Vector3 leftOvertakePos = new Vector3(obstacleTransform.position.x + sideOffset, vehicleBodyCollider.transform.position.y + overTakeSideClearanceY, obstacleTransform.position.z + obstacleWorldSize.x * 0.5f);
-            //temp
-            rightOvertakeGizmoPos = rightOvertakePos;
-            leftOvertakeGizmoPos = leftOvertakePos;
-            //temp End
-
+            
             bool rightBlockedByRoad = rightOvertakePos.x < -5f;
             bool leftBlockedByRoad = leftOvertakePos.x > 5f;
             if (rightBlockedByRoad)
@@ -521,8 +503,6 @@ public class NPCVehicleController : MonoBehaviour
             {
                 if (leftSideCheck) TryOvertakeLeftSide(leftSideOverTakePosition);
             }
-            //temp
-            rightSideCheckGizmoPos = checkPos;
         }
         else
         {
@@ -548,8 +528,6 @@ public class NPCVehicleController : MonoBehaviour
                 overTakeLocalOffset = leftSideOverTakePosition - obstacleTransform.position;
                 isOvertaking = true;
             }
-            //temp
-            leftSideCheckGizmoPos = checkPos;
         }
     }
 
@@ -635,8 +613,6 @@ public class NPCVehicleController : MonoBehaviour
         {
             leftSideClearForStop = false;
         }
-        //temp
-        leftSideCheckGizmoPos = checkPos;
     }
 
     public void VehicleHit(Vector3 hitPoint, int hitLayer)
@@ -663,11 +639,6 @@ public class NPCVehicleController : MonoBehaviour
                 nPCCharacterScript.hitPoint = pushDirection;
                 nPCCharacterScript.isDead = true;
             }
-
-            //store for gizmos temp
-            debugHitPoint = hitPoint;
-            debugPushDirection = pushDirection;
-            showDebug = true;
 
             rb.AddForce(pushDirection.normalized * hitForce, ForceMode.Impulse);
 
@@ -783,6 +754,8 @@ public class NPCVehicleController : MonoBehaviour
 
     void CheckIfShouldRecycle()
     {
+        if(playerTransform == null || GameManagerScript.Instance == null) return;
+
         Vector3 playerPos = playerTransform.position;
         Vector3 vPos = transform.position;
 
@@ -853,86 +826,4 @@ public class NPCVehicleController : MonoBehaviour
     {
         playerTransform = newPlayerTransform;
     }
-
-#if UNITY_EDITOR
-
-    void OnDrawGizmosSelected()
-    {
-        if (!Application.isPlaying) return;
-
-        Gizmos.color = Color.red;
-        if (frontChecker) Gizmos.DrawLine(frontChecker.position, frontChecker.position + flatForward * frontCheckerDistance);
-        if (frontRightChecker) Gizmos.DrawLine(frontRightChecker.position, frontRightChecker.position + flatForward * frontCheckerDistance);
-        if (frontLeftChecker) Gizmos.DrawLine(frontLeftChecker.position, frontLeftChecker.position + flatForward * frontCheckerDistance);
-        if(frontCheckHit)
-        {
-            Gizmos.color = Color.magenta;
-            Gizmos.DrawSphere(hitPos, 0.3f);
-        }
-        if (Application.isPlaying && isOvertaking)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.matrix = Matrix4x4.TRS(
-                overtakeTarget,
-                Quaternion.identity,
-                Vector3.one
-            );
-            Gizmos.DrawWireCube(Vector3.zero, checkSize);
-        }
-
-        Gizmos.color = Color.green;
-        Gizmos.matrix = Matrix4x4.TRS(
-            leftOvertakeGizmoPos,
-            Quaternion.identity,
-            Vector3.one
-        );
-        Gizmos.DrawWireCube(Vector3.zero, checkSize * 2f);
-        Gizmos.color = Color.green;
-        Gizmos.matrix = Matrix4x4.TRS(
-            rightOvertakeGizmoPos,
-            Quaternion.identity,
-            Vector3.one
-        );
-        Gizmos.DrawWireCube(Vector3.zero, checkSize * 2f);
-
-        Gizmos.color = Color.yellow;
-        Gizmos.matrix = Matrix4x4.TRS(
-            rightSideCheckGizmoPos,
-            Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f),
-            Vector3.one
-        );
-        Gizmos.DrawWireCube(Vector3.zero, checkSize * 2f);
-
-        Gizmos.color = Color.yellow;
-        Gizmos.matrix = Matrix4x4.TRS(
-            leftSideCheckGizmoPos,
-            Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f),
-            Vector3.one
-        );
-        Gizmos.DrawWireCube(Vector3.zero, checkSize * 2f);
-
-        Gizmos.matrix = Matrix4x4.identity;
-
-        if (!showDebug) return;
-
-        // Hit point (where impact happened)
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawSphere(debugHitPoint, 0.2f);
-
-        // Force direction
-        Gizmos.color = Color.red;
-        Vector3 start = debugHitPoint;
-        Vector3 dir = debugPushDirection.normalized * 2f;
-        Vector3 end = start + dir;
-
-        Gizmos.DrawLine(start, end);
-
-        // Arrow head
-        Vector3 right = Quaternion.LookRotation(dir) * Quaternion.Euler(0, 160, 0) * Vector3.forward;
-        Vector3 left = Quaternion.LookRotation(dir) * Quaternion.Euler(0, -160, 0) * Vector3.forward;
-
-        Gizmos.DrawLine(end, end + right * 0.4f);
-        Gizmos.DrawLine(end, end + left * 0.4f);
-    }
-#endif
 }

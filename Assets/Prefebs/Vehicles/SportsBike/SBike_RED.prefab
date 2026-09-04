@@ -1938,7 +1938,8 @@ MonoBehaviour:
   salesmanAnim: 0
   salesmanAudioClip: {fileID: 0}
   salesmanParentStall: {fileID: 0}
-  angryAnimationLength: 2
+  passengerCallDistance: 20
+  angryCommentInterval: 5
   isPassenger: 0
   playerRickshaw: {fileID: 0}
   vehicleType: 2
@@ -1967,7 +1968,7 @@ MonoBehaviour:
   - {fileID: 179127100600572263}
   - {fileID: 8774109494728373363}
   - {fileID: 6610781555317829720}
-  npcTriggerCollider: {fileID: 0}
+  npcTriggerCollider: {fileID: 3930361473258513420}
 --- !u!114 &8472151198415315549
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2993,6 +2994,7 @@ MonoBehaviour:
   lockYPosition: 0
   reverseMechanics: 0
   wrongSideDriving: 0
+  commentPosition: {x: 0, y: 2, z: 0}
   engineClip: {fileID: 8300000, guid: 782d3b6a554b8e04582040bc84a5cc79, type: 3}
   minPitch: 1
   maxPitch: 2

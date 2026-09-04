@@ -70,6 +70,7 @@ public class NPCCharacterScript : MonoBehaviour
 
     [Header("Drive Settings")]
     public int vehicleType = 0; //0: None, 1: Bike, 2: SportsBike, 3: Texi
+    public bool dieOnCollision = true;
 
     [Header("References")]
     public NPCVehicleController nPCVehicleController;
@@ -93,11 +94,8 @@ public class NPCCharacterScript : MonoBehaviour
     void Awake()
     {
         animator = GetComponent<Animator>();
-        if (!driving)
-        {
-            detector = GetComponent<CollisionDetector>();
-            boxCollider = GetComponent<BoxCollider>();
-        }
+        detector = GetComponent<CollisionDetector>();
+        boxCollider = GetComponent<BoxCollider>();
         if (salesman)
         {
             salesmanParentStall = transform.parent.transform;
@@ -139,7 +137,7 @@ public class NPCCharacterScript : MonoBehaviour
         }
         if (rigidBodyActivated) return;
 
-        if(isDead && !rigidBodyActivated && vehicleType != 3)
+        if(isDead && !rigidBodyActivated && dieOnCollision)
         {
             RigidBodyActive();
             rigidBodyActivated = true;
@@ -331,6 +329,9 @@ public class NPCCharacterScript : MonoBehaviour
         if (animator == null) return;
         animator.SetInteger("VehicleInt", vehicleType);
         animator.SetBool("Driving", true);
+        boxCollider.enabled = false;
+        if (npcTriggerCollider != null) npcTriggerCollider.enabled = false;
+        detector.enabled = false;
         stateUpdated = true;
     }
 
